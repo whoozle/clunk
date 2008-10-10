@@ -416,7 +416,7 @@ void Context::convert(clunk::Buffer &dst, const clunk::Buffer &src, int rate, co
 	\endcode
 	Moving listener is easy too, listener is regular clunk::Object, but it's stored in clunk::Context and holds information about your position
 	\code
-		context.get_listener()->update(clunk::v3<float>(x, y, z), clunk::v3<float>(velocity_x, velocity_y, velocity_z));
+		context.get_listener()->update(clunk::v3<float>(x, y, z), clunk::v3<float>(velocity_x, velocity_y, velocity_z), clunk::v3<float>(direction_x, direction_y, direction_z));
 	\endcode
 	
 	\section streaming Playing music and ambient sounds
