@@ -20,6 +20,11 @@
 */
 
 #include <math.h>
+
+#if !(defined(__GNUC__) || defined(__GNUG__) || defined(__attribute__))
+#	define __attribute__(p) /* nothing */
+#endif
+
 namespace clunk {
 /*! 
 	\brief 3d vector 
@@ -101,7 +106,7 @@ public:
 	///returns distance between two points	
 	inline const T distance(const v3<T>& other) const {
 		v3<T>d(*this);
-		d-= other;
+		d -= other;
 		return d.length();
 	}
 	
@@ -269,6 +274,250 @@ template <typename T>
 		return v3<T>(a / v.x, a / v.y, a / v.z);
 	}
 
+#if 0 //defined USE_SIMD
+#	include <xmmintrin.h>
+
+template <> 
+class v3<float>  {
+	__m128 value;
+	
+public:
+
+	template <int POS>
+	class float_placeholder {
+		__m128 &value;
+	public:
+		inline float_placeholder(__m128 &value) __attribute__((__always_inline__))  : value(value) {}
+		inline float get() const __attribute__((__always_inline__)) {
+			float r[4]; 
+			_mm_storeu_ps(r, value);
+			return r[POS];
+		}
+		inline void set(float v) __attribute__((__always_inline__)) {
+			__m128 mask = _mm_cmpgt_ps(_mm_set_ps(POS == 2?1:0, POS == 1?1:0, POS == 0?1:0, 0), _mm_setzero_ps());
+			value = _mm_or_ps(
+				_mm_andnot_ps(mask, value), 
+				_mm_and_ps(mask, _mm_set1_ps(v))
+			);
+		}
+		
+		inline operator float() const __attribute__((__always_inline__)) {
+			return get();
+		}
+		inline const float_placeholder<POS>& operator=(const float_placeholder<POS> &other) __attribute__((__always_inline__)) {
+			set(other.get());
+			return *this;
+		}
+
+		inline const float_placeholder<POS>& operator=(float v) __attribute__((__always_inline__)) {
+			set(v);
+			return *this;
+		}
+	};
+	float_placeholder<0> x;
+	float_placeholder<1> y;
+	float_placeholder<2> z;
+
+	inline v3<float>(): value(_mm_setzero_ps()), x(value), y(value), z(value) {}
+	inline v3<float>(__m128 v): value(v), x(value), y(value), z(value) {}
+	inline v3<float>(const float xv, const float yv, const float zv) : 
+		value(_mm_set_ps(zv, yv, xv, 0)), x(value), y(value), z(value) {}
+	
+	inline void clear() { value = _mm_setzero_ps(); }
+
+	inline const bool is0() const {
+		return (_mm_movemask_ps(_mm_cmpeq_ps(value, _mm_setzero_ps())) & 7 ) == 7;
+	}
+
+	inline const float normalize() {
+		float len = length();
+		if (len == (float)0 || len ==(float)1)
+			return len;
+			
+		value = _mm_div_ps(value, _mm_set1_ps(len));
+		return len;
+	}
+
+	inline const float normalize(const float nlen) {
+		const float len = length();
+		if (len == (float)0 || len == nlen) 
+			return len;
+		
+		__m128 k = _mm_div_ps(_mm_set1_ps(nlen), _mm_set1_ps(len));
+		value = _mm_div_ps(value, k);
+		return len;
+	}
+	
+	inline const float dot_product(const v3<float> &v) const {
+		float fixme[4];
+		_mm_storeu_ps(fixme, _mm_mul_ps(value, v.value));
+		return fixme[0] + fixme[1] + fixme[2] + fixme[3];
+	}
+	
+	inline const float length() const {
+		float v[4];
+		_mm_storeu_ps(v, _mm_mul_ps(value, value));
+		const float ql = v[0] + v[1] + v[2];
+		if (ql == 0 || ql == 1.0f) 
+			return ql;
+		
+		return (float)sqrt(ql);
+	}
+
+	inline float quick_length() const {
+		float v[4];
+		_mm_storeu_ps(v, _mm_mul_ps(value, value));
+		return v[0] + v[1] + v[2];
+	}
+
+	template <typename T2> 
+		inline v3<T2> convert() const { 
+			float v[4];
+			_mm_storeu_ps(v, value);
+			return v3<T2>((T2)v[0], (T2)v[1], (T2)v[2]); 
+		}
+
+	inline const float distance(const v3<float>& other) const {
+		v3<float>d(*this);
+		d -= other;
+		return d.length();
+	}
+	
+	inline float quick_distance(const v3<float>& other) const {
+		float v[4];
+		__m128 dv = _mm_sub_ps(value, other.value);
+		_mm_storeu_ps(v, _mm_mul_ps(dv, dv));
+		return v[0] + v[1] + v[2];
+	}
+
+	inline const bool operator<(const v3<float> &other) const {
+		int c = _mm_movemask_ps(_mm_cmpneq_ps(value, other.value));
+		int l = _mm_movemask_ps(_mm_cmplt_ps(value, other.value));
+		if (c & 1) {
+			return l & 1;
+		}
+		if (c & 2) {
+			return l & 2;
+		} 
+		return l & 4;
+	}
+
+	inline const v3<float> operator-() const {
+		return _mm_sub_ps(_mm_setzero_ps(), value);
+	}
+
+	inline const bool operator==(const v3<float> &other) const {
+		int mask = _mm_movemask_ps(_mm_cmpeq_ps(value, other.value));
+		return (mask & 7) == 7;
+	}
+
+	///test inequality 
+	inline const bool operator!=(const v3<float> &other) const {
+		int mask = _mm_movemask_ps(_mm_cmpeq_ps(value, other.value));
+		return (mask & 7) != 7;
+	}
+	
+	///adds another vector
+	inline const v3<float>& operator+=(const v3<float>& other) {
+		value = _mm_add_ps(value, other.value);
+		return *this;
+	}
+
+	///substracts another vector
+	inline const v3<float>& operator-=(const v3<float>& other) {
+		value = _mm_sub_ps(value, other.value);
+		return *this;
+	}
+
+	///multiplies another vector
+	inline const v3<float>& operator*=(const v3<float>& other) {
+		value = _mm_mul_ps(value, other.value);
+		return *this;
+	}
+
+	///divide with another vector
+	inline const v3<float>& operator/=(const v3<float>& other) {
+		value = _mm_div_ps(value, other.value);
+		return *this;
+	}
+	///multiplication
+	inline const v3<float> operator*(const v3<float>& other) const {
+		return v3<float>(_mm_mul_ps(value, other.value));
+	}
+	///summing
+	inline const v3<float> operator+(const v3<float>& other) const {
+		return v3<float>(_mm_add_ps(value, other.value));
+	}
+	///substraction
+	inline const v3<float> operator-(const v3<float>& other) const {
+		return v3<float>(_mm_sub_ps(value, other.value));
+	}
+	///division
+	inline const v3<float> operator/(const v3<float>& other) const {
+		return v3<float>(_mm_div_ps(value, other.value));
+	}
+	///multiplies all components with constant
+	inline const v3<float> operator*(const float& other) const {
+		return v3<float>(_mm_mul_ps(value, _mm_set1_ps(other)));
+	}
+	///sums all components with constant
+	inline const v3<float> operator+(const float& other) const {
+		return v3<float>(_mm_add_ps(value, _mm_set1_ps(other)));
+	}
+	///substracts all components with constant
+	inline const v3<float> operator-(const float& other) const {
+		return v3<float>(_mm_sub_ps(value, _mm_set1_ps(other)));
+	}
+	///divides all components by constant
+	inline const v3<float> operator/(const float& other) const {
+		return v3<float>(_mm_div_ps(value, _mm_set1_ps(other)));
+	}
+	///divides this vector by constant
+	inline const v3<float>& operator/=(const float& other) {
+		value = _mm_div_ps(value, _mm_set1_ps(other));
+		return *this;
+	}
+
+	///multiplies this vector with constant
+	inline const v3<float>& operator*=(const float& other) {
+		value = _mm_mul_ps(value, _mm_set1_ps(other));
+		return *this;
+	}
+
+	///sums this vector with constant
+	inline const v3<float>& operator+=(const float& other) {
+		value = _mm_add_ps(value, _mm_set1_ps(other));
+		return *this;
+	}
+
+	///substracts this vector with constant
+	inline const v3<float>& operator-=(const float& other) {
+		value = _mm_sub_ps(value, _mm_set1_ps(other));
+		return *this;
+	}
+
+	///adds constant to the vector
+	inline const v3<float> operator+(const float a)  {
+		return v3<float>(_mm_add_ps(value, _mm_set1_ps(a)));
+	}
+
+	///subs constant from the vector
+	inline const v3<float> operator-(const float a)  {
+		return v3<float>(_mm_sub_ps(value, _mm_set1_ps(a)));
+	}
+
+	///muls constant to the vector
+	inline const v3<float> operator*(const float a)  {
+		return v3<float>(_mm_mul_ps(value, _mm_set1_ps(a)));
+	}
+
+	///divs constant to the vector
+	inline const v3<float> operator/(const float a)  {
+		return v3<float>(_mm_div_ps(value, _mm_set1_ps(a)));
+	}
+};
+
+#endif //USE_SIMD
 	
 } //namespace clunk
 

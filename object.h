@@ -19,12 +19,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 */
 
-
-
+#include <string>
+#include <map>
 #include "export_clunk.h"
 #include "v3.h"
-#include <map>
-#include <string>
 
 namespace clunk {
 class Context;
