@@ -1,5 +1,7 @@
 #include "clunk_ex.h"
 #include <errno.h>
+#include <stdio.h>
+#include <string.h>
 
 void clunk::Exception::add_message(const char *file, int line) {
 	char buf[1024];
