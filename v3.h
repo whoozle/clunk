@@ -224,6 +224,26 @@ public:
 		z -= other;
 		return *this;
 	}
+
+	///adds constant to the vector
+	const v3<T> operator+(const T a)  {
+		return v3<T>(x + a, y + a, z + a);
+	}
+
+	///subs constant from the vector
+	const v3<T> operator-(const T a)  {
+		return v3<T>(x - a, y - a, z - a);
+	}
+
+	///muls constant to the vector
+	const v3<T> operator*(const T a)  {
+		return v3<T>(x * a, y * a, z * a);
+	}
+
+	///divs constant to the vector
+	const v3<T> operator/(const T a)  {
+		return v3<T>(x / a, y  / a, z / a);
+	}
 };
 ///external operator+
 template <typename T>
@@ -231,21 +251,16 @@ template <typename T>
 		return v3<T>(v.x + a, v.y + a, v.z + a);
 	}
 
-///external operator+
+///external operator-
 template <typename T>
-	const v3<T> operator+(const v3<T> &v, const T a)  {
-		return v3<T>(v.x + a, v.y + a, v.z + a);
+	const v3<T> operator-(const T a, const v3<T> &v)  {
+		return v3<T>(a - v.x, a - v.y, a - v.z);
 	}
 
 ///external operator*
 template <typename T>
 	const v3<T> operator*(const T a, const v3<T> &v)  {
-		return v3<T>(v.x *a, v.y * a, v.z * a);
-	}
-///external operator*
-template <typename T>
-	const v3<T> operator*(const v3<T> &v, const T a)  {
-		return v3<T>(v.x *a, v.y * a, v.z * a);
+		return v3<T>(v.x * a, v.y * a, v.z * a);
 	}
 
 ///external operator/
@@ -254,11 +269,6 @@ template <typename T>
 		return v3<T>(a / v.x, a / v.y, a / v.z);
 	}
 
-///external operator/
-template <typename T>
-	const v3<T> operator/(const v3<T> &v, const T a)  {
-		return v3<T>(v.x / a, v.y  / a, v.z / a);
-	}
 	
 } //namespace clunk
 
