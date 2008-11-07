@@ -1,7 +1,7 @@
 #ifndef CLUNK_LOGGER_H__
 #define CLUNK_LOGGER_H__
 
-/* libclunk - realtime 2d/3d sound render library
+/* libClunk - cross-platform 3D audio API built on top SDL library
  * Copyright (C) 2007-2008 Netive Media Group
  *
  * This library is free software; you can redistribute it and/or
