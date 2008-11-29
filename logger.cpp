@@ -26,6 +26,7 @@ void clunk::log_debug(const char *fmt, ...) {
 	va_start(ap, fmt);
 	vfprintf(stderr, fmt, ap);
 	va_end(ap);
+	fprintf(stderr, "\n");
 }
 
 #define FORMAT_BUFFER_SIZE 1024
