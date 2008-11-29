@@ -64,11 +64,14 @@ struct source_t {
 void Context::process(Sint16 *stream, int size) {
 	//TIMESPY(("total"));
 
-	v3<float> listener = this->listener->position;
-	v3<float> l_vel = this->listener->velocity;
+	v3<float> l_pos, l_vel;
+	if (listener != NULL) {
+		l_pos = listener->position;
+		l_vel = listener->velocity;
+	}
 	{
 		//TIMESPY(("sorting objects"));
-		std::sort(objects.begin(), objects.end(), Object::DistanceOrder(listener));
+		std::sort(objects.begin(), objects.end(), Object::DistanceOrder(l_pos));
 	}
 	//LOG_DEBUG(("sorted %u objects", (unsigned)objects.size()));
 	
@@ -93,7 +96,7 @@ void Context::process(Sint16 *stream, int size) {
 				continue;
 			}
 			if (lsources.size() < max_sources) {
-				lsources.push_back(source_t(s, o->position + s->delta_position - listener, o->velocity, o->direction, l_vel));
+				lsources.push_back(source_t(s, o->position + s->delta_position - l_pos, o->velocity, o->direction, l_vel));
 			} else {
 				s->update_position(n);
 			}
