@@ -354,6 +354,10 @@
 			>
 		</File>
 		<File
+			RelativePath="..\resource.h"
+			>
+		</File>
+		<File
 			RelativePath="..\resources.rc"
 			>
 		</File>
