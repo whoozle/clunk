@@ -5,7 +5,7 @@
 #	include <xmmintrin.h>
 #	define SIMD_LOAD(m, f) m = _mm_set_ss(f);
 #	define SIMD_STORE(f, m) _mm_store_ss(&(f), m);
-#	ifdef _WINDOWS
+#	ifdef _MSC_VER
 #		include <malloc.h>
 
 		__forceinline __m128 operator*(__m128 a, __m128 b) {

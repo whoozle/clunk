@@ -27,7 +27,7 @@ extern "C" {
 #ifdef USE_SIMD
 # include <xmmintrin.h>
 # define kiss_fft_scalar __m128
-#ifdef _WINDOWS
+#ifdef _MSC_VER
 #	define KISS_FFT_MALLOC(nbytes) _aligned_malloc(nbytes, 16)
 #	define kiss_fft_free _aligned_free
 #else 

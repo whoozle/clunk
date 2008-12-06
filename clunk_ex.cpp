@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#if defined _WINDOWS
+#if defined _MSC_VER
 #    ifndef snprintf
 #        define snprintf _snprintf
 #    endif
@@ -42,7 +42,7 @@ void clunk::IOException::add_custom_message() {
 	char buf[1024];
 	memset(buf, 0, sizeof(buf));
 
-#ifdef _WINDOWS
+#ifdef _MSC_VER
 	strncpy(buf, _strerror(NULL), sizeof(buf));
 #else 
 	strncpy(buf, strerror(errno), sizeof(buf));

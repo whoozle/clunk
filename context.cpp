@@ -332,7 +332,7 @@ void Context::convert(clunk::Buffer &dst, const clunk::Buffer &src, int rate, co
 	}
 	size_t buf_size = (size_t)(src.get_size() * cvt.len_mult);
 	cvt.buf = (Uint8 *)malloc(buf_size);
-	cvt.len = src.get_size();
+	cvt.len = (int)src.get_size();
 
 	assert(buf_size >= src.get_size());
 	memcpy(cvt.buf, src.get_ptr(), src.get_size());
