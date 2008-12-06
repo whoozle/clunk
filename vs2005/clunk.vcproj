@@ -354,6 +354,10 @@
 			>
 		</File>
 		<File
+			RelativePath="..\resources.rc"
+			>
+		</File>
+		<File
 			RelativePath="..\sample.cpp"
 			>
 		</File>
