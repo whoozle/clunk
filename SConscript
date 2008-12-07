@@ -17,7 +17,6 @@ clunk_libs = ['SDL']
 
 if sys.platform != 'win32':
 	env.Append(LINKFLAGS=['-Wl,-rpath,'+ lib_dir])
-	env.Append(LINKFLAGS=['-Wl,-rpath-link,build/' + env['mode'] + '/sdlx'])
 	clunk_libs.append('m')
 
 env.MergeFlags(sdl_cflags, sdl_libs)
