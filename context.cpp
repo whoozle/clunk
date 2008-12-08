@@ -350,6 +350,11 @@ void Context::convert(clunk::Buffer &dst, const clunk::Buffer &src, int rate, co
 	Here's quick explanation of the clunk library concepts and usage scenarios. 
 	\section scenario Typical scenario
 
+	First of all, initialize SDL in your code: 
+	\code
+	SDL_Init(SDL_INIT_AUDIO) or SDL_InitSubSystem(SDL_INIT_AUDIO);
+	\endcode
+
 	Let's initialize context with typical values: 22kHz sample rate, 2 channels and 1024 bytes period: 
 	\code
 	Context context; 
