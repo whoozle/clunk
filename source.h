@@ -31,9 +31,7 @@ namespace clunk {
 #	define CLUNK_WINDOW_SIZE 512
 #endif
 
-#ifndef CLUNK_WINDOW_OVERLAP
-#	define CLUNK_WINDOW_OVERLAP 128
-#endif
+#define CLUNK_WINDOW_OVERLAP (CLUNK_WINDOW_SIZE / 2)
 
 class Sample;
 class Buffer;
