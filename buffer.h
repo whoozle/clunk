@@ -105,6 +105,9 @@ public:
 
 	//! Returns nice string representation for the buffer. Useful for debugging.
 	const std::string dump() const;
+	
+	//! Pops n bytes from the front
+	void pop(size_t n); 
 
 protected:
 	void *ptr;

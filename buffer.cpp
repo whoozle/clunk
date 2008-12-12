@@ -168,3 +168,15 @@ const std::string Buffer::dump() const {
 	return result;
 }
 
+void Buffer::pop(size_t n) {
+	if (ptr == NULL)
+		return;
+	
+	if (n >= size) {
+		free();
+		return;
+	}
+	
+	memmove(ptr, (unsigned char *)ptr + n, size - n);
+	set_size(size - n);
+}
