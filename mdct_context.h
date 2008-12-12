@@ -28,8 +28,21 @@ public:
 			complex_type e = std::polar<T>(2, 2 * (T)M_PI / N * (k + (T)0.125));
 			fft.data[k] *= e;
 		}
+		
+		for(unsigned i = 0; i < N; ++i) {
+			data[i] = result(i);
+		}
 	}
 	
+	template<template<int, typename> class window_func>
+	void apply() {
+		window_func<N, T> func;
+		for(unsigned i = 0; i < N; ++i) {
+			data[i] *= func(i);
+		}
+	}
+
+private:
 	inline T result(unsigned idx) const {
 		int sign;
 		if (idx & 1) {
@@ -40,9 +53,6 @@ public:
 		
 		return sign * ((idx >= N / 2)?fft.data[(idx - N / 2) / 2].imag(): fft.data[idx / 2].real());
 	}
-private: 
-
-	
 };
 
 }
