@@ -17,25 +17,24 @@ public:
 		next.apply(data, inversion);
 		next.apply(data + M, inversion);
 
-		T wtemp,tempr,tempi,wr,wi,wpr,wpi;
-		wtemp = sin(M_PI/N);
-		wpr = -2.0*wtemp*wtemp;
+		T wr,wi,wpr,wpi;
+		
+		T wtemp = sin(M_PI/N);
+		wpr = -2.0 * wtemp * wtemp;
 		wpi = sin(2*M_PI/N) * (inversion?1:-1);
 		wr = 1.0;
 		wi = 0.0;
 		for (unsigned i=0; i < M ; ++i) {
-			tempr = data[i + M].real() * wr - data[i + M].imag() * wi;
-			tempi = data[i + M].real() * wi + data[i + M].imag() * wr;
+			std::complex<T> temp;
+			temp.real() = data[i + M].real() * wr - data[i + M].imag() * wi;
+			temp.imag() = data[i + M].real() * wi + data[i + M].imag() * wr;
 
-			data[i + M].real() = data[i].real() - tempr;
-			data[i + M].imag() = data[i].imag() - tempi;
+			data[i + M] = data[i] - temp;
+			data[i] += temp;
 
-			data[i].real() += tempr;
-			data[i].imag() += tempi;
-
-			wtemp = wr;
-			wr += wr*wpr - wi*wpi;
-			wi += wi*wpr + wtemp*wpi;
+			T wtemp = wr;
+			wr += wr * wpr - wi * wpi;
+			wi += wi * wpr + wtemp * wpi;
 		}
 	};
 };
