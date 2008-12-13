@@ -16,10 +16,9 @@ public:
 	void apply(std::complex<T>* data, bool inversion) {
 		next.apply(data, inversion);
 		next.apply(data + M, inversion);
-		int sign = inversion? -1: 1;
 		
 		for(unsigned i = 0; i < M; ++i) {
-			std::complex<T> t = data[i + M] * std::polar<T>(sign, i * (T)M_PI / M); //optimize it
+			std::complex<T> t = data[i + M] * std::polar<T>(1, i * (T)M_PI / M); //optimize it
 			data[i + M] = data[i] - t;
 			data[i] += t;
 		}
