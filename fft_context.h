@@ -16,11 +16,26 @@ public:
 	void apply(std::complex<T>* data, bool inversion) {
 		next.apply(data, inversion);
 		next.apply(data + M, inversion);
-		
-		for(unsigned i = 0; i < M; ++i) {
-			std::complex<T> t = data[i + M] * std::polar<T>(1, i * (T)M_PI / M); //optimize it
-			data[i + M] = data[i] - t;
-			data[i] += t;
+
+		T wtemp,tempr,tempi,wr,wi,wpr,wpi;
+		wtemp = sin(M_PI/N);
+		wpr = -2.0*wtemp*wtemp;
+		wpi = sin(2*M_PI/N) * (inversion?1:-1);
+		wr = 1.0;
+		wi = 0.0;
+		for (unsigned i=0; i < M ; ++i) {
+			tempr = data[i + M].real() * wr - data[i + M].imag() * wi;
+			tempi = data[i + M].real() * wi + data[i + M].imag() * wr;
+
+			data[i + M].real() = data[i].real() - tempr;
+			data[i + M].imag() = data[i].imag() - tempi;
+
+			data[i].real() += tempr;
+			data[i].imag() += tempi;
+
+			wtemp = wr;
+			wr += wr*wpr - wi*wpi;
+			wi += wi*wpr + wtemp*wpi;
 		}
 	};
 };
@@ -42,8 +57,9 @@ public:
 	inline void fft(bool inversion) {
 		scramble();
 		next.apply(data, inversion);
+		float n = sqrt(N);
 		for(unsigned i = 0; i < N; ++i) {
-			data[i] /= (inversion?-1: 1) * sqrt(N);
+			data[i] /= n;
 		}
 	}
 	
