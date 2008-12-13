@@ -13,10 +13,11 @@ private:
 
 public: 
 	enum { N = 1 << BITS , N4 =  fft_type::N };
+	
 	typedef std::complex<T> complex_type;
 
 	T data[N];
-
+	
 	void mdct(bool inversion) {
 		for(unsigned r = 0; r < N4; ++r) {
 			complex_type v(data[2 * r], data[N / 2 + 2 * r]);
@@ -51,7 +52,11 @@ private:
 		} else 
 			sign = 1;
 		
-		return sign * ((idx >= N / 2)?fft.data[(idx - N / 2) / 2].imag(): fft.data[idx / 2].real());
+		return sign * (
+			(idx < N / 2)?
+				fft.data[idx / 2].real():
+				fft.data[(idx - N / 2) / 2].imag()
+		);
 	}
 };
 
