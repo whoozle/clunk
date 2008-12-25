@@ -86,7 +86,6 @@ private:
 	int position, fadeout, fadeout_total;
 	
 	clunk::Buffer sample3d[2];
-
 	
 	enum { WINDOW_BITS = 9 };
 	typedef mdct_context<WINDOW_BITS, float> mdct_type;
