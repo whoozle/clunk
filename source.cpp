@@ -153,21 +153,20 @@ void Source::hrtf(int window, const unsigned channel_idx, clunk::Buffer &result,
 	mdct.mdct(false);
 		
 	//LOG_DEBUG(("kemar angle index: %d\n", kemar_idx));
-	/*
-	for(int i = 0; i < WINDOW_SIZE / 2; ++i) {
+	
+	for(int i = 0; i < mdct_type::M; ++i) {
 		//float * dst = (ch == 0)?tr_left + pos:tr_right + pos;
 		float v = mdct.data[i];
 		//LOG_DEBUG(("length: %g", v));
-		const int kemar_angle_idx = i * 512 / WINDOW_SIZE;
+		const int kemar_angle_idx = i * 512 / mdct_type::M;
 		assert(kemar_angle_idx < 512);
 		float m = pow10f(kemar_data[kemar_idx][1][kemar_angle_idx] * v / 20);
 
 		mdct.data[i] = v * m;
-		mdct.data[WINDOW_SIZE - i] = v * m;
-		//float len2 = sqrt(freq[j].r * freq[j].r + freq[j].i * freq[j].i);
-		//LOG_DEBUG(("%d: multiplicator = %g, len: %g -> %g", j, m, len, len2));
+		//fprintf(stderr, "%g", v * m);
+		//mdct.data[WINDOW_SIZE - i] = v * m;
 	}
-	*/
+	
 	
 	mdct.mdct(true);
 	mdct.apply<window_func>();
