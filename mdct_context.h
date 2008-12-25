@@ -15,6 +15,7 @@ private:
 public: 
 	enum { N = 1 << BITS , M = N / 2, N4 =  fft_type::N };
 	
+	typedef T value_type;
 	typedef std::complex<T> complex_type;
 
 	T data[N];
