@@ -8,41 +8,43 @@
 namespace clunk {
 
 template<int N, typename T>
-class danielson_lanczos {
-public:
+struct danielson_lanczos {
 	enum { M = N / 2 };
-	danielson_lanczos<M, T> next;
+	typedef danielson_lanczos<M, T> next_type;
 
-	void apply(std::complex<T>* data, bool inversion) {
-		next.apply(data, inversion);
-		next.apply(data + M, inversion);
-
-		T wr,wi,wpr,wpi;
+	static void apply(std::complex<T>* data, bool inversion) {
+		next_type::apply(data, inversion);
+		next_type::apply(data + M, inversion);
+			
+		int sign = inversion? -1: 1;
+		T a = (T)(-2 * M_PI / N * sign);
+		T wtemp = sin(a / 2);
 		
-		T wtemp = sin(M_PI/N);
-		wpr = -2.0 * wtemp * wtemp;
-		wpi = sin(2*M_PI/N) * (inversion?1:-1);
-		wr = 1.0;
-		wi = 0.0;
-		for (unsigned i=0; i < M ; ++i) {
-			std::complex<T> temp;
-			temp.real() = data[i + M].real() * wr - data[i + M].imag() * wi;
-			temp.imag() = data[i + M].real() * wi + data[i + M].imag() * wr;
+		std::complex<T> wp(-2 * wtemp * wtemp, sin(a)), w(1, 0);
 
-			data[i + M] = data[i] - temp;
-			data[i] += temp;
+		for (unsigned i = 0; i < M ; ++i) {
+			int j = i + M;
 
-			T wtemp = wr;
-			wr += wr * wpr - wi * wpi;
-			wi += wi * wpr + wtemp * wpi;
+			std::complex<T> temp (
+				data[j].real() * w.real() - data[j].imag() * w.imag(), 
+				data[j].real() * w.imag() + data[j].imag() * w.real()
+			);
+
+			data[j].real() = data[i].real() - temp.real();
+			data[i].real() += temp.real();
+			data[j].imag() = data[i].imag() - temp.imag();
+			data[i].imag() += temp.imag();
+
+			T wtemp = w.real();
+			w.real() += wtemp * wp.real() - w.imag() * wp.imag();
+			w.imag() += w.imag() * wp.real() + wtemp * wp.imag();
 		}
 	};
 };
 
 template<typename T>
-class danielson_lanczos<1, T> {
-public:
-	void apply(std::complex<T>*, bool) {}
+struct danielson_lanczos<1, T> {
+	static void apply(std::complex<T>*, bool) {}
 };
 
 
@@ -56,15 +58,16 @@ public:
 	inline void fft(bool inversion) {
 		scramble();
 		next.apply(data, inversion);
-		float n = sqrt(N);
-		for(unsigned i = 0; i < N; ++i) {
-			data[i] /= n;
+		if (inversion) {
+			for(unsigned i = 0; i < N; ++i) {
+				data[i] /= N;
+			}
 		}
 	}
 	
 private:
 	danielson_lanczos<N, T> next;
- 
+	
 	template<typename V>
 	static inline void swap(V &a, V &b) {
 		V t = a;
@@ -73,17 +76,13 @@ private:
 	}
 
 	void scramble() {
-		unsigned j = 1;
-		for (unsigned i = 1; i < 2 * N; i += 2) {
-			assert(j < 2 * N);
-			if (j > i) {
-				//assert(j & 1);
-				//assert(i & 1);
-				//printf("%x <-> %x\n", (i - 1) / 2, (j - 1) / 2);
-				swap(data[(j - 1) / 2], data[(i - 1) / 2]);
+		int j = 0;
+		for(int i = 0; i < N; ++i) {
+			if (i > j) {
+				swap(data[i], data[j]);
 			}
-			unsigned m = N;
-			while (m >= 2 && j > m) {
+			int m = N / 2;
+			while(j >= m && m >= 2) {
 				j -= m;
 				m >>= 1;
 			}

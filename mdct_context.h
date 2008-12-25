@@ -8,32 +8,88 @@ namespace clunk {
 template<int BITS, typename T = float> 
 class mdct_context {
 private:
-	typedef fft_context<BITS - 2> fft_type;
+	typedef fft_context<BITS - 2, T> fft_type;
 	fft_type fft;
 
 public: 
-	enum { N = 1 << BITS , N4 =  fft_type::N };
+	enum { N = 1 << BITS , M = N / 2, N4 =  fft_type::N };
 	
 	typedef std::complex<T> complex_type;
 
 	T data[N];
 	
 	void mdct(bool inversion) {
-		for(unsigned r = 0; r < N4; ++r) {
-			complex_type v(data[2 * r], data[N / 2 + 2 * r]);
-			complex_type e = std::polar<T>(1, 2 * (T)M_PI / N * (r + (T)0.125));
-			fft.data[r] = v * e;
-		}
-		fft.fft(inversion);
-		for(unsigned k = 0; k < N4; ++k) {
-			complex_type e = std::polar<T>(2, 2 * (T)M_PI / N * (k + (T)0.125));
-			fft.data[k] *= e;
-		}
-		
-		for(unsigned i = 0; i < N; ++i) {
-			data[i] = result(i);
+		assert(N / 4 == N4); //we need static_assert :(
+		if (!inversion) {
+			T rotate[N];
+			unsigned int t;
+			for(t = 0; t < N4; ++t) {
+				rotate[t] = -data[t + 3 * N4];
+			}
+			for(; t < N; ++t) {
+				rotate[t] = data[t - N4];
+			}
+			for(t = 0; t < N4; ++t) {
+				T re = (rotate[t * 2] - rotate[N - 1 - t * 2]) / 2;
+				T im = (rotate[M + t * 2] - rotate[M - 1 - t * 2]) / -2;
+				
+				std::complex<T> a = std::polar<T>(1, 2 * T(M_PI) * (t + T(0.125)) / N);
+				fft.data[t].real() = re * a.real() + im * a.imag();
+				fft.data[t].imag() = -re * a.imag() + im * a.real();
+			}
+			fft.fft(false);
+			T sqrt_N = sqrt(N);
+
+			for(t = 0; t < N4; ++t) {
+				std::complex<T> a = std::polar<T>(1, 2 * T(M_PI) * (t + T(0.125)) / N);
+				std::complex<T>& f = fft.data[t];
+				T f_real = f.real();
+				f.real() = 2 / sqrt_N * (f_real * a.real() + f.imag() * a.imag());
+				f.imag() = 2 / sqrt_N * (-f_real * a.imag() + f.imag() * a.real());
+			}
+
+			for(t = 0; t < N4; ++t) {
+				data[2 * t] = fft.data[t].real();
+				data[M - 2 * t - 1] = -fft.data[t].imag();
+			}
+		} else {
+			unsigned int t; 
+			for(t = 0; t < N4; ++t) {
+				T re = data[t * 2] / 2, im = data[M - 1 - t * 2] / 2;
+				std::complex<T> a = std::polar<T>(1, 2 * T(M_PI) * (t + T(0.125)) / N);
+				fft.data[t].real() = re * a.real() + im * a.imag();
+				fft.data[t].imag() = - re * a.imag() + im * a.real();
+			}
+			fft.fft(false);
+			T sqrt_N = sqrt(N);
+			
+			for(t = 0; t < N4; ++t) {
+				std::complex<T> a = std::polar<T>(1, 2 * T(M_PI) * (t + T(0.125)) / N);
+				std::complex<T>& f = fft.data[t];
+				T f_real = f.real();
+				f.real() = 8 / sqrt_N * (f_real * a.real() + f.imag() * a.imag());
+				f.imag() = 8 / sqrt_N * (-f_real * a.imag() + f.imag() * a.real());
+			}
+
+			T rotate[N];
+			for(t = 0; t < N4; ++t) {
+				rotate[2 * t] = fft.data[t].real();
+				rotate[M + 2 * t] = fft.data[t].imag();
+			}
+			for(t = 1; t < N; t += 2) {
+				rotate[t] = - rotate[N - t - 1];
+			}
+
+			//shift
+			for(t = 0; t < 3 * N4; ++t) {
+				data[t] = rotate[t + N4];
+			}
+			for(; t < N; ++t) {
+				data[t] = -rotate[t - 3 * N4];
+			}
 		}
 	}
+
 	
 	template<template<int, typename> class window_func>
 	void apply() {
@@ -42,7 +98,7 @@ public:
 			data[i] *= func(i);
 		}
 	}
-
+	
 private:
 	inline T result(unsigned idx) const {
 		int sign;
