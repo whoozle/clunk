@@ -160,7 +160,7 @@ void Source::hrtf(int window, const unsigned channel_idx, clunk::Buffer &result,
 		//LOG_DEBUG(("length: %g", v));
 		const int kemar_angle_idx = i * 512 / mdct_type::M;
 		assert(kemar_angle_idx < 512);
-		float m = pow10f(kemar_data[kemar_idx][1][kemar_angle_idx] * v / 20);
+		float m = pow10f(kemar_data[kemar_idx][0][kemar_angle_idx] * v / 20);
 
 		mdct.data[i] = v * m;
 		//fprintf(stderr, "%g", v * m);

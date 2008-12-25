@@ -52,10 +52,10 @@ public:
 	void init(const int sample_rate, const Uint8 channels, int period_size);
 	/*! 
 		\brief Sets maximum simultaneous sources number. 
-		Do not use values that are too high. Use reasonable default such 8 or 16 
+		Do not use values that are too high. Use reasonable default such as 8 or 16 
 		\param[in] sources maximum simultaneous sources
 	*/
-	void set_sources_num(int sources);
+	void set_max_sources(int sources);
 
 	///stops any sound generation and shuts down SDL subsystem
 	void deinit();

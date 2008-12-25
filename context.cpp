@@ -77,6 +77,8 @@ void Context::process(Sint16 *stream, int size) {
 	
 	std::vector<source_t> lsources;
 	int n = size / 2 / spec.channels;
+	typedef std::map<const std::string, unsigned> stats_type;
+	stats_type sources_stats;
 	
 	for(objects_type::iterator i = objects.begin(); i != objects.end(); ) {
 		Object *o = *i;
@@ -88,6 +90,7 @@ void Context::process(Sint16 *stream, int size) {
 			continue;
 		}
 		for(Object::Sources::iterator j = sset.begin(); j != sset.end(); ) {
+			const std::string &name = j->first;
 			Source *s = j->second;
 			if (!s->playing()) {
 				//LOG_DEBUG(("purging inactive source %s", j->first.c_str()));
@@ -95,8 +98,18 @@ void Context::process(Sint16 *stream, int size) {
 				sset.erase(j++);
 				continue;
 			}
-			if (lsources.size() < max_sources) {
+			
+			stats_type::iterator s_i = sources_stats.find(name);
+			unsigned same_sounds_n = (s_i != sources_stats.end())? s_i->second: 0;
+
+			if (lsources.size() < max_sources && same_sounds_n < distance_model.same_sounds_limit) {
 				lsources.push_back(source_t(s, o->position + s->delta_position - l_pos, o->velocity, o->direction, l_vel));
+				if (same_sounds_n == 0) {
+					sources_stats.insert(stats_type::value_type(name, 1));
+				} else {
+					++s_i->second;
+				}
+				//LOG_DEBUG(("source: %s", name.c_str()));
 			} else {
 				s->update_position(n);
 			}
@@ -321,7 +334,7 @@ void Context::stop_all() {
 	streams.clear();
 }
 
-void Context::set_sources_num(int sources) {
+void Context::set_max_sources(int sources) {
 	AudioLocker l;
 	max_sources = sources;
 }
