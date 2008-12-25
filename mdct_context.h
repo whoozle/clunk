@@ -2,6 +2,7 @@
 #define MDCT_CONTEXT_H__
 
 #include "fft_context.h"
+#include <string.h>
 
 namespace clunk {
 
@@ -97,6 +98,10 @@ public:
 		for(unsigned i = 0; i < N; ++i) {
 			data[i] *= func(i);
 		}
+	}
+	
+	void clear() {
+		memset(data, 0, sizeof(data));
 	}
 	
 private:
