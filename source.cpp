@@ -196,7 +196,7 @@ void Source::update_position(const int dp) {
 	
 	for(int i = 0; i < 2; ++i) {
 		Buffer & buf = sample3d[i];
-		buf.pop(dp * 4); //wtf???
+		buf.pop(dp * 2);
 	}
 	
 	int src_n = sample->data.get_size() / sample->spec.channels / 2;
