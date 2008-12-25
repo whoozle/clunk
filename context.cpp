@@ -176,9 +176,11 @@ void Context::process(Sint16 *stream, int size) {
 		//check for 0
 		volume = source->process(buf, spec.channels, source_info.s_pos, source_info.s_dir, volume, dpitch);
 		sdl_v = (int)floor(SDL_MIX_MAXVOLUME * volume + 0.5f);
-		//LOG_DEBUG(("%u: mixing source with volume %g (%d), distance^2: %g", i, volume, sdl_v, position.quick_length()));
+		//LOG_DEBUG(("%u: mixing source with volume %g (%d)", i, volume, sdl_v));
 		if (sdl_v <= 0)
 			continue;
+		if (sdl_v > SDL_MIX_MAXVOLUME)
+			sdl_v = SDL_MIX_MAXVOLUME;
 		
 		SDL_MixAudio((Uint8 *)stream, (Uint8 *)buf.get_ptr(), size, sdl_v);
 	}
@@ -203,7 +205,7 @@ void Context::init(const int sample_rate, const Uint8 channels, int period_size)
 	memset(&src, 0, sizeof(src));
 	src.freq = sample_rate;
 	src.channels = channels;
-	src.format = AUDIO_S16LSB;
+	src.format = AUDIO_S16SYS;
 	src.samples = period_size;
 	src.callback = &Context::callback;
 	src.userdata = (void *) this;

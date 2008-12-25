@@ -25,7 +25,6 @@ clunk = env.SharedLibrary('clunk',
 	[
 		'context.cpp', 'sample.cpp', 'object.cpp', 'source.cpp', 'sdl_ex.cpp', 'stream.cpp', 
 		'kemar.c', 'buffer.cpp', 'distance_model.cpp', 'logger.cpp', 'clunk_ex.cpp', 
-		'kiss/kiss_fftr.cpp', 'kiss/kiss_fft.cpp', 
 	], 
 	LIBS=clunk_libs)
 

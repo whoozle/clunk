@@ -31,9 +31,6 @@
 #	define log2f(x) (logf(x) / M_LN2)
 #endif
 
-#include "kiss/clunk_simd_hacks.h"
-
-
 template <typename T> inline T clunk_min(T a, T b) {
 	return a < b? a: b;
 }
@@ -43,13 +40,23 @@ template <typename T> inline T clunk_max(T a, T b) {
 }
 
 using namespace clunk;
+
+//window function used in ogg/vorbis
+template<int N, typename T>
+struct window_func {
+	inline T operator()(int x) const {
+		T s = sin(T(M_PI) * (x + 0.5) / N);
+		return sin(T(M_PI_2) * s * s); 
+	}
+};
+
 Source::Source(const Sample * sample, const bool loop, const v3<float> &delta, float gain, float pitch) : 
 	sample(sample), loop(loop), delta_position(delta), gain(gain), pitch(pitch), 
-	position(0), fadeout(0), fadeout_total(0),
-	fft_state(NULL), ffti_state(NULL) 
+	position(0), fadeout(0), fadeout_total(0)
 	{
 	for(int i = 0; i < 2; ++i) {
-		use_overlap[i] = false;
+		for(int j = 0; j < WINDOW_SIZE / 2; ++j)
+			overlap_data[i][j] = 0;
 	}
 	
 	if (sample == NULL)
@@ -59,8 +66,14 @@ Source::Source(const Sample * sample, const bool loop, const v3<float> &delta, f
 bool Source::playing() const {
 	if (fadeout_total > 0 && fadeout <= 0)
 		return false;
+
+	if (loop) 
+		return true;
 	
-	return loop?true: position < (int)(sample->data.get_size() / sample->spec.channels / 2);
+	if (!sample3d[0].empty() || !sample3d[1].empty())
+		return true;
+	
+	return position < (int)(sample->data.get_size() / sample->spec.channels / 2);
 }
 	
 void Source::idt(const v3<float> &delta, const v3<float> &dir_vec, float &idt_offset, float &angle_gr) {
@@ -92,24 +105,15 @@ void Source::idt(const v3<float> &delta, const v3<float> &dir_vec, float &idt_of
 	//printf("idt_offset %g", idt_offset);
 }
 
-#include "kiss/kiss_fftr.h"
-
-#define CLUNK_ACTUAL_WINDOW (CLUNK_WINDOW_SIZE - CLUNK_WINDOW_OVERLAP)
-
-void Source::hrtf(const unsigned channel_idx, clunk::Buffer &result, int dst_n, const Sint16 *src, int src_ch, int src_n, int idt_offset, const kemar_ptr& kemar_data, int kemar_idx) {
-	//const int lowpass_cutoff = 5000 * CLUNK_ACTUAL_WINDOW / sample->spec.freq;
-	//LOG_DEBUG(("using cutoff at %d", lowpass_cutoff));
+void Source::hrtf(int window, const unsigned channel_idx, clunk::Buffer &result, const Sint16 *src, int src_ch, int src_n, int idt_offset, const kemar_ptr& kemar_data, int kemar_idx) {
 	assert(channel_idx < 2);
-	if (fft_state == NULL)
-		fft_state = kiss_fftr_alloc(CLUNK_WINDOW_SIZE, 0, NULL, NULL);
-	if (ffti_state == NULL)
-		ffti_state = kiss_fftr_alloc(CLUNK_WINDOW_SIZE, 1, NULL, NULL);
 	
-	int n = (dst_n - 1) / CLUNK_ACTUAL_WINDOW + 1;
 	//LOG_DEBUG(("%d bytes, %d actual window size, %d windows", dst_n, CLUNK_ACTUAL_WINDOW, n));
-	result.set_size(2 * dst_n);
-
-	Sint16 *dst = (Sint16 *)result.get_ptr();
+	//result.set_size(2 * WINDOW_SIZE / 2); //sizeof(Sint16) * window  / 2
+	size_t result_start = result.get_size();
+	result.reserve(WINDOW_SIZE);
+	
+	//LOG_DEBUG(("channel %d: window %d: adding %d, buffer size: %u", channel_idx, window, WINDOW_SIZE, (unsigned)result.get_size()));
 
 	if (channel_idx <= 1) {
 		bool left = channel_idx == 0;
@@ -122,107 +126,81 @@ void Source::hrtf(const unsigned channel_idx, clunk::Buffer &result, int dst_n, 
 			idt_offset = - idt_offset;
 	} else 
 		idt_offset = 0;
+
+	for(int i = 0; i < WINDOW_SIZE; ++i) {
+		//-1 0 1 2 3
+		int p = position + idt_offset + (int)((window * WINDOW_SIZE / 2 + i) * pitch); //overlapping half
+		//printf("%d of %d, ", p, src_n);
+		int v = 0;
+		if (fadeout_total > 0 && fadeout - i <= 0) {
+			//v = 0;
+		} else if (loop || (p >= 0 && p < src_n)) {
+			p %= src_n;
+			if (p < 0)
+				p += src_n;
+			v = src[p * src_ch];
+		}
+		//assert(v < 32768 && v > -32768);
+		if (fadeout_total > 0 && fadeout - i > 0) {
+			//LOG_DEBUG(("fadeout %d: %d -> %d", fadeout - i, v, v * (fadeout - i) / fadeout_total));
+			v *= (fadeout - i) / fadeout_total;
+		}
+		mdct.data[i] = v / 32768.0f;
+		//fprintf(stderr, "%g ", mdct.data[i]);
+	}
 	
-	for(int i = 0; i < n; ++i) {
-		kiss_fft_scalar src_data[CLUNK_WINDOW_SIZE];
-		kiss_fft_cpx freq[CLUNK_WINDOW_SIZE / 2 + 1];
-		//printf("fft #%d\n", i);
-		for(int j = 0; j < CLUNK_WINDOW_SIZE; ++j) {
-			int idx = i * CLUNK_ACTUAL_WINDOW + j;
-			int p = (int)(position + idx * pitch + idt_offset);
-
-			int v = 0;
-			if (fadeout_total > 0 && fadeout - idx <= 0) {
-				//no sound
-			} else if (p >= 0 || p < src_n || loop) {
-				p %= src_n;
-				if (p < 0)
-					p += src_n;
-				v = src[p * src_ch];
-			}
-			if (fadeout_total > 0 && fadeout - idx > 0) {
-				//LOG_DEBUG(("fadeout %d: %d -> %d", fadeout - idx, v, v * (fadeout - idx) / fadeout_total));
-				v = v * (fadeout - idx) / fadeout_total;
-			}
-			float vv = (v / 32767.0f); // * sin(M_PI * j / (CLUNK_WINDOW_SIZE - 1));
-			SIMD_LOAD(src_data[j], vv);
-		}
+	mdct.apply<window_func>();
+	mdct.mdct(false);
 		
-		kiss_fftr(fft_state, src_data, freq);
+	//LOG_DEBUG(("kemar angle index: %d\n", kemar_idx));
+	/*
+	for(int i = 0; i < WINDOW_SIZE / 2; ++i) {
+		//float * dst = (ch == 0)?tr_left + pos:tr_right + pos;
+		float v = mdct.data[i];
+		//LOG_DEBUG(("length: %g", v));
+		const int kemar_angle_idx = i * 512 / WINDOW_SIZE;
+		assert(kemar_angle_idx < 512);
+		float m = pow10f(kemar_data[kemar_idx][1][kemar_angle_idx] * v / 20);
+
+		mdct.data[i] = v * m;
+		mdct.data[WINDOW_SIZE - i] = v * m;
+		//float len2 = sqrt(freq[j].r * freq[j].r + freq[j].i * freq[j].i);
+		//LOG_DEBUG(("%d: multiplicator = %g, len: %g -> %g", j, m, len, len2));
+	}
+	*/
+	
+	mdct.mdct(true);
+	mdct.apply<window_func>();
+
+	Sint16 *dst = (Sint16 *)((unsigned char *)result.get_ptr() + result_start);
+	int i;
+	for(i = 0; i < WINDOW_SIZE / 2; ++i) {
+		float v = mdct.data[i] + overlap_data[channel_idx][i];
 		
-		//LOG_DEBUG(("kemar angle index: %d\n", kemar_idx));
-		for(int j = 0; j <= CLUNK_WINDOW_SIZE / 2; ++j) {
-			//float * dst = (ch == 0)?tr_left + pos:tr_right + pos;
-			kiss_fft_scalar mlen = freq[j].r * freq[j].r + freq[j].i * freq[j].i;
-			float len;
-			SIMD_STORE(len, mlen);
-			len = sqrt(len);
-			//LOG_DEBUG(("length: %g", len));
-			const int kemar_angle_idx = j * 512 / (CLUNK_WINDOW_SIZE / 2 + 1);
-			assert(kemar_angle_idx < 512);
-			float m = pow10f(kemar_data[kemar_idx][1][kemar_angle_idx] * len / 20);
-			/*
-			if (j > lowpass_cutoff) {
-				float k = 1.0f - (1.0f * j - lowpass_cutoff) / (CLUNK_WINDOW_SIZE / 2 - lowpass_cutoff);
-				m *= k / 2;
-				//LOG_DEBUG(("%d -> %g", j, k);
-			}
-			*/
-			kiss_fft_scalar mm;
-			SIMD_LOAD(mm, m);
-			freq[j].r = freq[j].r * mm; //do not replace with *=, breaks compilation on windows
-			freq[j].i = freq[j].r * mm;
-			//float len2 = sqrt(freq[j].r * freq[j].r + freq[j].i * freq[j].i);
-			//LOG_DEBUG(("%d: multiplicator = %g, len: %g -> %g", j, m, len, len2));
+		if (v < -1) {
+			LOG_DEBUG(("clipping %g", v));
+			v = -1;
+		} else if (v > 1) {
+			LOG_DEBUG(("clipping %g", v));
+			v = 1;
 		}
-
-		kiss_fftri(ffti_state, freq, src_data);
-		
-		int offset = i * CLUNK_ACTUAL_WINDOW;
-		int more = dst_n - offset;
-
-		float max = CLUNK_WINDOW_SIZE;
-		int jmax = clunk_min(more, CLUNK_ACTUAL_WINDOW);
-		int jmin = clunk_min(jmax, CLUNK_WINDOW_OVERLAP);
-		//LOG_DEBUG(("last chunk : %d, overlap first %d, more: %d", jmax, jmin, more));
-
-		for(int j = 0; j < jmax + CLUNK_WINDOW_OVERLAP; ++j) {
-			float v;
-			SIMD_STORE(v, src_data[j]);
-			if (v > max) {
-				//LOG_DEBUG(("increased max to %g", v));
-				max = v;
-			} else if (v < -max) {
-				//LOG_DEBUG(("increased min to %g", v));
-				max = -v;
-			}
-			int x = (int)(v / max * 32766);
-			//if (x > 32767 || x < -32767) 
-			//	LOG_WARN(("sample overflow: %d", x));
-			
-			if (j >= jmax) {
-				assert(j - jmax < CLUNK_WINDOW_OVERLAP);
-				overlap_data[channel_idx][j - jmax] = x;
-				//if (jmax != CLUNK_ACTUAL_WINDOW)
-				//	LOG_DEBUG(("overlap[%d] = %d", j - jmax, x));
-				use_overlap[channel_idx] = true;
-			} else {
-				assert(offset + j < dst_n);
-
-				if (use_overlap[channel_idx] && j < jmin) {
-					x = (x * j + overlap_data[channel_idx][j] * (jmin - j)) / jmin;
-				}
-
-				dst[offset + j] = x;
-			}
-		}
-		//assert (jmax == CLUNK_ACTUAL_WINDOW || offset + jmax == dst_n);
+		*dst++ = (int)(v * 32767);
+	}
+	for(; i < WINDOW_SIZE; ++i) {
+		overlap_data[channel_idx][i - WINDOW_SIZE / 2] = mdct.data[i];
 	}
 }
 
 void Source::update_position(const int dp) {
-	int src_n = sample->data.get_size() / sample->spec.channels / 2;
+	//LOG_DEBUG(("update_position(%d)", dp));
 	position += dp;
+	
+	for(int i = 0; i < 2; ++i) {
+		Buffer & buf = sample3d[i];
+		buf.pop(dp * 4); //wtf???
+	}
+	
+	int src_n = sample->data.get_size() / sample->spec.channels / 2;
 	if (loop) {
 		position %= src_n;
 		//LOG_DEBUG(("position %d", position));
@@ -273,7 +251,11 @@ float Source::process(clunk::Buffer &buffer, unsigned dst_ch, const v3<float> &d
 				int p = position + (int)(i * pitch);
 			
 				Sint16 v = 0;
-				if (p >= 0 && p < (int)src_n) {
+				if (loop || (p >= 0 && p < (int)src_n)) {
+					p %= src_n;
+					if (p < 0)
+						p += src_n;
+					
 					if (c < src_ch) {
 						v = src[p * src_ch + c];
 					} else {
@@ -291,7 +273,7 @@ float Source::process(clunk::Buffer &buffer, unsigned dst_ch, const v3<float> &d
 	update_position(0);
 	
 	if (position >= (int)src_n) {
-		//LOG_WARN(("process called on inactive source"));
+		//LOG_ERROR(("process called on inactive source"));
 		return 0;
 	}
 
@@ -303,23 +285,28 @@ float Source::process(clunk::Buffer &buffer, unsigned dst_ch, const v3<float> &d
 	
 	int idt_offset = (int)(t_idt * sample->spec.freq);
 
-	clunk::Buffer sample3d_left, sample3d_right;
-
-	hrtf(0, sample3d_left, dst_n, src, src_ch, src_n, idt_offset, kemar_data, kemar_idx_left);
-	hrtf(1, sample3d_right, dst_n, src, src_ch, src_n, idt_offset, kemar_data, kemar_idx_right);
+	int window = 0;
+	while(sample3d[0].get_size() < dst_n * 2 || sample3d[1].get_size() < dst_n * 2) {
+		hrtf(window, 0, sample3d[0], src, src_ch, src_n, idt_offset, kemar_data, kemar_idx_left);
+		hrtf(window, 1, sample3d[1], src, src_ch, src_n, idt_offset, kemar_data, kemar_idx_right);
+		++window;
+	}
+	assert(sample3d[0].get_size() >= dst_n * 2 && sample3d[1].get_size() >= dst_n * 2);
 	
 	//LOG_DEBUG(("angle: %g", angle_gr));
 	//LOG_DEBUG(("idt offset %d samples", idt_offset));
-	Sint16 * src_3d[2] = { (Sint16 *)sample3d_left.get_ptr(), (Sint16 *)sample3d_right.get_ptr() };
+	Sint16 * src_3d[2] = { (Sint16 *)sample3d[0].get_ptr(), (Sint16 *)sample3d[0].get_ptr() };
 	
-	//LOG_DEBUG(("size: %u", (unsigned)sample3d_left.get_size()));
+	//LOG_DEBUG(("size1: %u, %u, needed: %u\n%s", (unsigned)sample3d[0].get_size(), (unsigned)sample3d[1].get_size(), dst_n, sample3d[0].dump().c_str()));
 	
 	for(unsigned i = 0; i < dst_n; ++i) {
 		for(unsigned c = 0; c < dst_ch; ++c) {
 			dst[i * dst_ch + c] = src_3d[c][i];
 		}
 	}
+	
 	update_position((int)(dst_n * pitch));
+	//LOG_DEBUG(("size2: %u, %u, needed: %u", (unsigned)sample3d[0].get_size(), (unsigned)sample3d[1].get_size(), dst_n));
 	return vol;
 }
 
@@ -332,7 +319,7 @@ void Source::get_kemar_data(kemar_ptr & kemar_data, int & elev_n, const v3<float
 	if (pos.is0())
 		return;
 
-	int elev_gr = (int)(180 * atan2f(pos.z, sqrt(pos.x * pos.x + pos.y * pos.y)) / M_PI);
+	int elev_gr = (int)(180 * atan2f(pos.z, hypot(pos.x, pos.y)) / M_PI);
 
 	if (elev_gr < -35) {
 		kemar_data = elev_m40;
@@ -379,12 +366,7 @@ void Source::get_kemar_data(kemar_ptr & kemar_data, int & elev_n, const v3<float
 	}
 }
 
-Source::~Source() {
-	if (fft_state != NULL) 
-		kiss_fft_free(fft_state);
-	if (ffti_state != NULL)
-		kiss_fft_free(ffti_state);
-}
+Source::~Source() {}
 
 void Source::fade_out(const float sec) {
 	fadeout = fadeout_total = (int)(sample->spec.freq * sec);

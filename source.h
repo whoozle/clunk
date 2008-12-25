@@ -22,16 +22,13 @@
 #include <SDL_audio.h>
 #include "export_clunk.h"
 #include "v3.h"
+#include "mdct_context.h"
+#include "buffer.h"
 
 struct kiss_fftr_state;
 
 namespace clunk {
 
-#ifndef CLUNK_WINDOW_SIZE
-#	define CLUNK_WINDOW_SIZE 512
-#endif
-
-#define CLUNK_WINDOW_OVERLAP (CLUNK_WINDOW_SIZE / 2)
 
 class Sample;
 class Buffer;
@@ -83,14 +80,21 @@ private:
 	void get_kemar_data(kemar_ptr & kemar_data, int & samples, const v3<float> &delta_position);
 
 	static void idt(const v3<float> &delta, const v3<float> &direction, float &idt_offset, float &angle_gr);
-	void hrtf(const unsigned channel_idx, clunk::Buffer &result, int dst_n, const Sint16 *src, int src_ch, int src_n, int idt_offset, const kemar_ptr& kemar_data, int kemar_idx);
+	//generate hrtf response for channel idx (0 left), in result.
+	void hrtf(int window, const unsigned channel_idx, clunk::Buffer &result, const Sint16 *src, int src_ch, int src_n, int idt_offset, const kemar_ptr& kemar_data, int kemar_idx);
 
 	int position, fadeout, fadeout_total;
 	
-	bool use_overlap[2];
-	Sint16 overlap_data[2][CLUNK_WINDOW_OVERLAP];
+	clunk::Buffer sample3d[2];
+
 	
-	kiss_fftr_state *fft_state, *ffti_state;
+	enum { WINDOW_BITS = 9 };
+	typedef mdct_context<WINDOW_BITS, float> mdct_type;
+	enum { WINDOW_SIZE = mdct_type::N };
+
+	mdct_type mdct;
+
+	float overlap_data[2][WINDOW_SIZE / 2];
 };
 }
 
