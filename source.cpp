@@ -41,15 +41,6 @@ template <typename T> inline T clunk_max(T a, T b) {
 
 using namespace clunk;
 
-//window function used in ogg/vorbis
-template<int N, typename T>
-struct window_func {
-	inline T operator()(int x) const {
-		T s = sin(T(M_PI) * (x + 0.5f) / N);
-		return sin(T(M_PI_2) * s * s); 
-	}
-};
-
 Source::Source(const Sample * sample, const bool loop, const v3<float> &delta, float gain, float pitch) : 
 	sample(sample), loop(loop), delta_position(delta), gain(gain), pitch(pitch), 
 	position(0), fadeout(0), fadeout_total(0)
@@ -149,7 +140,7 @@ void Source::hrtf(int window, const unsigned channel_idx, clunk::Buffer &result,
 		//fprintf(stderr, "%g ", mdct.data[i]);
 	}
 	
-	mdct.apply<window_func>();
+	mdct.apply();
 	mdct.mdct(false);
 		
 	//LOG_DEBUG(("kemar angle index: %d\n", kemar_idx));
@@ -169,7 +160,7 @@ void Source::hrtf(int window, const unsigned channel_idx, clunk::Buffer &result,
 	
 	
 	mdct.mdct(true);
-	mdct.apply<window_func>();
+	mdct.apply();
 
 	Sint16 *dst = (Sint16 *)((unsigned char *)result.get_ptr() + result_start);
 	int i;

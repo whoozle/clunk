@@ -6,9 +6,22 @@
 
 namespace clunk {
 
-template<int BITS, typename T = float> 
+template<int N, typename T>
+struct window_func_base {
+	virtual ~window_func_base() {}
+	virtual T operator() (int x) const = 0;
+	void precalculate() {
+		for(int i = 0; i < N; ++i) {
+			cache[i] = (*this)(i);
+		}
+	}
+	T cache[N];
+};
+
+
+template<int BITS, template <int, typename> class window_func_type , typename T = float> 
 class mdct_context {
-private:
+
 	typedef fft_context<BITS - 2, T> fft_type;
 	fft_type fft;
 
@@ -19,6 +32,10 @@ public:
 	typedef std::complex<T> complex_type;
 
 	T data[N];
+	
+	mdct_context() {
+		window_func.precalculate();
+	}
 	
 	void mdct(bool inversion) {
 		assert(N / 4 == N4); //we need static_assert :(
@@ -87,11 +104,9 @@ public:
 	}
 
 	
-	template<template<int, typename> class window_func>
 	void apply() {
-		window_func<N, T> func;
 		for(unsigned i = 0; i < N; ++i) {
-			data[i] *= func(i);
+			data[i] *= window_func.cache[i];
 		}
 	}
 	
@@ -100,6 +115,8 @@ public:
 	}
 	
 private:
+	window_func_type<N, T> window_func;
+	
 	inline T result(unsigned idx) const {
 		int sign;
 		if (idx & 1) {

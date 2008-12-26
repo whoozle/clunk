@@ -33,6 +33,15 @@ namespace clunk {
 class Sample;
 class Buffer;
 
+//window function used in ogg/vorbis
+template<int N, typename T>
+struct clunk_window_func : public clunk::window_func_base<N, T> {
+	inline T operator()(int x) const {
+		T s = sin(T(M_PI) * (x + 0.5f) / N);
+		return sin(T(M_PI_2) * s * s); 
+	}
+};
+
 //!class holding information about source. 
 class CLUNKAPI Source {
 public:
@@ -88,7 +97,7 @@ private:
 	clunk::Buffer sample3d[2];
 	
 	enum { WINDOW_BITS = 9 };
-	typedef mdct_context<WINDOW_BITS, float> mdct_type;
+	typedef mdct_context<WINDOW_BITS, clunk_window_func, float> mdct_type;
 	enum { WINDOW_SIZE = mdct_type::N };
 
 	mdct_type mdct;
