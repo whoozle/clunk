@@ -109,7 +109,7 @@ void Context::process(Sint16 *stream, int size) {
 				} else {
 					++s_i->second;
 				}
-				//LOG_DEBUG(("source: %s", name.c_str()));
+				//LOG_DEBUG(("%u: source: %s", (unsigned)lsources.size(), name.c_str()));
 			} else {
 				s->update_position(n);
 			}

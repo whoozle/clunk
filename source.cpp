@@ -70,8 +70,8 @@ bool Source::playing() const {
 	if (loop) 
 		return true;
 	
-	if (!sample3d[0].empty() || !sample3d[1].empty())
-		return true;
+	//if (!sample3d[0].empty() || !sample3d[1].empty())
+	//	return true;
 	
 	return position < (int)(sample->data.get_size() / sample->spec.channels / 2);
 }
