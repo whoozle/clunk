@@ -30,14 +30,10 @@ struct danielson_lanczos {
 				data[j].real() * w.imag() + data[j].imag() * w.real()
 			);
 
-			data[j].real() = data[i].real() - temp.real();
-			data[i].real() += temp.real();
-			data[j].imag() = data[i].imag() - temp.imag();
-			data[i].imag() += temp.imag();
+			data[j] = data[i] - temp;
+			data[i] += temp;
 
-			T wtemp = w.real();
-			w.real() += wtemp * wp.real() - w.imag() * wp.imag();
-			w.imag() += w.imag() * wp.real() + wtemp * wp.imag();
+			w += std::complex<T>(w.real() * wp.real() - w.imag() * wp.imag(), w.imag() * wp.real() + w.real() * wp.imag());
 		}
 	};
 };

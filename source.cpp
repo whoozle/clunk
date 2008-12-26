@@ -45,7 +45,7 @@ using namespace clunk;
 template<int N, typename T>
 struct window_func {
 	inline T operator()(int x) const {
-		T s = sin(T(M_PI) * (x + 0.5) / N);
+		T s = sin(T(M_PI) * (x + 0.5f) / N);
 		return sin(T(M_PI_2) * s * s); 
 	}
 };
@@ -79,10 +79,10 @@ bool Source::playing() const {
 void Source::idt(const v3<float> &delta, const v3<float> &dir_vec, float &idt_offset, float &angle_gr) {
 	float head_r = 0.09554140127388535032f;
 
-	float direction = dir_vec.is0()? M_PI_2: atan2f(dir_vec.y, dir_vec.x);
+	float direction = dir_vec.is0()? float(M_PI_2): (float)atan2f(dir_vec.y, dir_vec.x);
 	float angle = direction - atan2f(delta.y, delta.x);
 	
-	angle_gr = angle * 180 / M_PI;
+	angle_gr = angle * 180 / float(M_PI);
 	while (angle_gr < 0)
 		angle_gr += 360;
 	
@@ -92,12 +92,12 @@ void Source::idt(const v3<float> &delta, const v3<float> &dir_vec, float &idt_of
 	if (idt_angle < 0)
 		idt_angle += 2 * (float)M_PI;
 
-	if (idt_angle >= M_PI_2 && idt_angle < M_PI) {
-		idt_angle = M_PI - idt_angle;
-	} else if (idt_angle >= M_PI && idt_angle < 3 * M_PI_2) {
-		idt_angle = M_PI - idt_angle;
-	} else if (idt_angle >= 3 * M_PI_2) {
-		idt_angle -= M_PI * 2;
+	if (idt_angle >= float(M_PI_2) && idt_angle < (float)M_PI) {
+		idt_angle = float(M_PI) - idt_angle;
+	} else if (idt_angle >= float(M_PI) && idt_angle < 3 * float(M_PI_2)) {
+		idt_angle = (float)M_PI - idt_angle;
+	} else if (idt_angle >= 3 * (float)M_PI_2) {
+		idt_angle -= (float)M_PI * 2;
 	}
 
 	//printf("idt_angle = %g (%d)\n", idt_angle, (int)(idt_angle * 180 / M_PI));
@@ -318,7 +318,13 @@ void Source::get_kemar_data(kemar_ptr & kemar_data, int & elev_n, const v3<float
 	if (pos.is0())
 		return;
 
-	int elev_gr = (int)(180 * atan2f(pos.z, hypot(pos.x, pos.y)) / M_PI);
+#ifdef _WINDOWS
+	float len = (float)_hypot(pos.x, pos.y);
+#else
+	float len = (float)hypot(pos.x, pos.y);
+#endif
+
+	int elev_gr = (int)(180 * atan2f(pos.z, len) / (float)M_PI);
 
 	if (elev_gr < -35) {
 		kemar_data = elev_m40;

@@ -36,18 +36,15 @@ public:
 				T im = (rotate[M + t * 2] - rotate[M - 1 - t * 2]) / -2;
 				
 				std::complex<T> a = std::polar<T>(1, 2 * T(M_PI) * (t + T(0.125)) / N);
-				fft.data[t].real() = re * a.real() + im * a.imag();
-				fft.data[t].imag() = -re * a.imag() + im * a.real();
+				fft.data[t] = std::complex<T>(re * a.real() + im * a.imag(), -re * a.imag() + im * a.real());
 			}
 			fft.fft(false);
-			T sqrt_N = sqrt(N);
+			T sqrt_N = sqrt((T)N);
 
 			for(t = 0; t < N4; ++t) {
 				std::complex<T> a = std::polar<T>(1, 2 * T(M_PI) * (t + T(0.125)) / N);
 				std::complex<T>& f = fft.data[t];
-				T f_real = f.real();
-				f.real() = 2 / sqrt_N * (f_real * a.real() + f.imag() * a.imag());
-				f.imag() = 2 / sqrt_N * (-f_real * a.imag() + f.imag() * a.real());
+				f = std::complex<T>(2 / sqrt_N * (f.real() * a.real() + f.imag() * a.imag()), 2 / sqrt_N * (-f.real() * a.imag() + f.imag() * a.real()));
 			}
 
 			for(t = 0; t < N4; ++t) {
@@ -59,18 +56,15 @@ public:
 			for(t = 0; t < N4; ++t) {
 				T re = data[t * 2] / 2, im = data[M - 1 - t * 2] / 2;
 				std::complex<T> a = std::polar<T>(1, 2 * T(M_PI) * (t + T(0.125)) / N);
-				fft.data[t].real() = re * a.real() + im * a.imag();
-				fft.data[t].imag() = - re * a.imag() + im * a.real();
+				fft.data[t] = std::complex<T>(re * a.real() + im * a.imag(), - re * a.imag() + im * a.real());
 			}
 			fft.fft(false);
-			T sqrt_N = sqrt(N);
+			T sqrt_N = sqrt((T)N);
 			
 			for(t = 0; t < N4; ++t) {
 				std::complex<T> a = std::polar<T>(1, 2 * T(M_PI) * (t + T(0.125)) / N);
 				std::complex<T>& f = fft.data[t];
-				T f_real = f.real();
-				f.real() = 8 / sqrt_N * (f_real * a.real() + f.imag() * a.imag());
-				f.imag() = 8 / sqrt_N * (-f_real * a.imag() + f.imag() * a.real());
+				fft.data[t] = std::complex<T>(8 / sqrt_N * (f.real() * a.real() + f.imag() * a.imag()), 8 / sqrt_N * (-f.real() * a.imag() + f.imag() * a.real()));
 			}
 
 			T rotate[N];
