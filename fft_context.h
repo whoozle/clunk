@@ -25,15 +25,12 @@ struct danielson_lanczos {
 		for (unsigned i = 0; i < M ; ++i) {
 			int j = i + M;
 
-			std::complex<T> temp (
-				data[j].real() * w.real() - data[j].imag() * w.imag(), 
-				data[j].real() * w.imag() + data[j].imag() * w.real()
-			);
+			std::complex<T> temp = data[j] * w;
 
 			data[j] = data[i] - temp;
 			data[i] += temp;
 
-			w += std::complex<T>(w.real() * wp.real() - w.imag() * wp.imag(), w.imag() * wp.real() + w.real() * wp.imag());
+			w += w * wp;
 		}
 	};
 };
