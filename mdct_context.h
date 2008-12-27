@@ -35,6 +35,9 @@ public:
 	
 	mdct_context() {
 		window_func.precalculate();
+		for(unsigned t = 0; t < N4; ++t) {
+			angle_cache[t] = std::polar<T>(1, 2 * T(M_PI) * (t + T(0.125)) / N);
+		}
 	}
 	
 	void mdct(bool inversion) {
@@ -52,14 +55,14 @@ public:
 				T re = (rotate[t * 2] - rotate[N - 1 - t * 2]) / 2;
 				T im = (rotate[M + t * 2] - rotate[M - 1 - t * 2]) / -2;
 				
-				std::complex<T> a = std::polar<T>(1, 2 * T(M_PI) * (t + T(0.125)) / N);
+				std::complex<T> a = angle_cache[t];
 				fft.data[t] = std::complex<T>(re * a.real() + im * a.imag(), -re * a.imag() + im * a.real());
 			}
 			fft.fft(false);
 			T sqrt_N = sqrt((T)N);
 
 			for(t = 0; t < N4; ++t) {
-				std::complex<T> a = std::polar<T>(1, 2 * T(M_PI) * (t + T(0.125)) / N);
+				std::complex<T> a = angle_cache[t];
 				std::complex<T>& f = fft.data[t];
 				f = std::complex<T>(2 / sqrt_N * (f.real() * a.real() + f.imag() * a.imag()), 2 / sqrt_N * (-f.real() * a.imag() + f.imag() * a.real()));
 			}
@@ -72,14 +75,14 @@ public:
 			unsigned int t; 
 			for(t = 0; t < N4; ++t) {
 				T re = data[t * 2] / 2, im = data[M - 1 - t * 2] / 2;
-				std::complex<T> a = std::polar<T>(1, 2 * T(M_PI) * (t + T(0.125)) / N);
+				std::complex<T> a = angle_cache[t];
 				fft.data[t] = std::complex<T>(re * a.real() + im * a.imag(), - re * a.imag() + im * a.real());
 			}
 			fft.fft(false);
 			T sqrt_N = sqrt((T)N);
 			
 			for(t = 0; t < N4; ++t) {
-				std::complex<T> a = std::polar<T>(1, 2 * T(M_PI) * (t + T(0.125)) / N);
+				std::complex<T> a = angle_cache[t];
 				std::complex<T>& f = fft.data[t];
 				fft.data[t] = std::complex<T>(8 / sqrt_N * (f.real() * a.real() + f.imag() * a.imag()), 8 / sqrt_N * (-f.real() * a.imag() + f.imag() * a.real()));
 			}
@@ -117,20 +120,7 @@ public:
 private:
 	window_func_type<N, T> window_func;
 	
-	inline T result(unsigned idx) const {
-		int sign;
-		if (idx & 1) {
-			idx = N - idx - 1;
-			sign = -1;
-		} else 
-			sign = 1;
-		
-		return sign * (
-			(idx < N / 2)?
-				fft.data[idx / 2].real():
-				fft.data[(idx - N / 2) / 2].imag()
-		);
-	}
+	std::complex<T> angle_cache[N4];
 };
 
 }
