@@ -68,7 +68,7 @@ bool Source::playing() const {
 }
 	
 void Source::idt(const v3<float> &delta, const v3<float> &dir_vec, float &idt_offset, float &angle_gr) {
-	float head_r = 0.09554140127388535032f;
+	float head_r = 0.093f;
 
 	float direction = dir_vec.is0()? float(M_PI_2): (float)atan2f(dir_vec.y, dir_vec.x);
 	float angle = direction - atan2f(delta.y, delta.x);
