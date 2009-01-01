@@ -145,6 +145,7 @@ void Source::hrtf(int window, const unsigned channel_idx, clunk::Buffer &result,
 		
 	//LOG_DEBUG(("kemar angle index: %d\n", kemar_idx));
 	
+	float energy = 1.0f;
 	for(int i = 0; i < mdct_type::M; ++i) {
 		//float * dst = (ch == 0)?tr_left + pos:tr_right + pos;
 		float v = mdct.data[i];
@@ -154,10 +155,12 @@ void Source::hrtf(int window, const unsigned channel_idx, clunk::Buffer &result,
 		float m = pow10f(kemar_data[kemar_idx][0][kemar_angle_idx] * v / 20);
 
 		mdct.data[i] = v * m;
+		energy += (m * m);
 		//fprintf(stderr, "%g", v * m);
 		//mdct.data[WINDOW_SIZE - i] = v * m;
 	}
-	
+	energy /= mdct_type::M;
+	//LOG_DEBUG(("energy = %g", energy));
 	
 	mdct.mdct(true);
 	mdct.apply();
@@ -165,7 +168,7 @@ void Source::hrtf(int window, const unsigned channel_idx, clunk::Buffer &result,
 	Sint16 *dst = (Sint16 *)((unsigned char *)result.get_ptr() + result_start);
 	int i;
 	for(i = 0; i < WINDOW_SIZE / 2; ++i) {
-		float v = mdct.data[i] + overlap_data[channel_idx][i];
+		float v = (mdct.data[i] + overlap_data[channel_idx][i]) / energy;
 		
 		if (v < -1) {
 			LOG_DEBUG(("clipping %g", v));
