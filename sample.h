@@ -39,12 +39,20 @@ public:
 		\param[in] channels audio channels
 	*/	
 	void init(const clunk::Buffer &data, int rate, const Uint16 format, const Uint8 channels);
+	/*!
+		\brief loads sample from file
+	*/
+	void load(const std::string &file);
 	/*! 
 		\brief generate sine wave with given length (seconds)
 		\param[in] freq frequency
 		\param[in] len of the sample in seconds
 	*/
 	void generateSine(const int freq, const float len);
+	
+	float length() const {
+		return 1.0f * data.get_size() / spec.freq / spec.channels / 2;
+	}
 	
 private: 	
 	friend class Context;

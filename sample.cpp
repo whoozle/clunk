@@ -63,6 +63,19 @@ void Sample::init(const clunk::Buffer &src_data, int rate, const Uint16 format, 
 	context->convert(data, src_data, rate, format, channels);
 }
 
+void Sample::load(const std::string &file) {
+	Uint8 *buf;
+	Uint32 len;
+	//SDL_AudioSpec * SDLCALL SDL_LoadWAV_RW(SDL_RWops *src, int freesrc, SDL_AudioSpec *spec, Uint8 **audio_buf, Uint32 *audio_len);
+	if (SDL_LoadWAV(file.c_str(), &spec, &buf, &len) == NULL)
+		throw_sdl(("SDL_LoadWav"));
+
+	clunk::Buffer wav;
+	wav.set_data(buf, len, true);
+	context->convert(data, wav, spec.freq, spec.format, spec.channels);
+}
+
+
 Sample::~Sample() {
 	
 }
