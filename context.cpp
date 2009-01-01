@@ -214,6 +214,11 @@ Sample *Context::create_sample() {
 
 
 void Context::init(const int sample_rate, const Uint8 channels, int period_size) {
+	if (!SDL_WasInit(SDL_INIT_AUDIO)) {
+		if (SDL_InitSubSystem(SDL_INIT_AUDIO) == -1)
+			throw_sdl(("SDL_InitSubSystem"));
+	}
+	
 	SDL_AudioSpec src;
 	memset(&src, 0, sizeof(src));
 	src.freq = sample_rate;
@@ -229,8 +234,10 @@ void Context::init(const int sample_rate, const Uint8 channels, int period_size)
 		throw_sdl(("SDL_OpenAudio(%d, %u, %d)", sample_rate, channels, period_size));
 	if (src.format != AUDIO_S16LSB)
 		throw_ex(("SDL_OpenAudio(%d, %u, %d) returned format %d", sample_rate, channels, period_size, spec.format));
-	LOG_DEBUG(("opened audio device, sample rate: %d, period: %d", spec.freq, spec.samples));
-//	SDL_InitSubSystem(SDL_INIT_AUDIO);
+	if (spec.channels < 2)
+		LOG_ERROR(("Could not operate on %d channels", spec.channels));
+
+	LOG_DEBUG(("opened audio device, sample rate: %d, period: %d, channels: %d", spec.freq, spec.samples, spec.channels));
 	SDL_PauseAudio(0);
 	
 	AudioLocker l;
