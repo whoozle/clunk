@@ -288,7 +288,7 @@ float Source::process(clunk::Buffer &buffer, unsigned dst_ch, const v3<float> &d
 	
 	//LOG_DEBUG(("angle: %g", angle_gr));
 	//LOG_DEBUG(("idt offset %d samples", idt_offset));
-	Sint16 * src_3d[2] = { (Sint16 *)sample3d[0].get_ptr(), (Sint16 *)sample3d[0].get_ptr() };
+	Sint16 * src_3d[2] = { (Sint16 *)sample3d[0].get_ptr(), (Sint16 *)sample3d[1].get_ptr() };
 	
 	//LOG_DEBUG(("size1: %u, %u, needed: %u\n%s", (unsigned)sample3d[0].get_size(), (unsigned)sample3d[1].get_size(), dst_n, sample3d[0].dump().c_str()));
 	
