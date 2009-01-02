@@ -11,6 +11,8 @@ int main() {
 
 	s->load("scissors.wav");
 	static const int d = 2, n = 6;
+	
+	context.save("test_out.raw");
 /*	o->play("l", new clunk::Source(s, false, clunk::v3<float>(-d, 0, 0)));
 	sleep(1);
 	//o->play("c", new clunk::Source(s, false, clunk::v3<float>(0, 0, 0)));

@@ -197,6 +197,13 @@ void Context::process(Sint16 *stream, int size) {
 		
 		SDL_MixAudio((Uint8 *)stream, (Uint8 *)buf.get_ptr(), size, sdl_v);
 	}
+	
+	if (fdump != NULL) {
+		if (fwrite(stream, size, 1, fdump) != 1) {
+			fclose(fdump);
+			fdump = NULL;
+		}
+	}
 }
 
 
