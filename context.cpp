@@ -35,7 +35,7 @@
 
 using namespace clunk;
 
-Context::Context() : period_size(0), listener(NULL), max_sources(8), fx_volume(1), distance_model(DistanceModel::Inverse, true, 128) {
+Context::Context() : period_size(0), listener(NULL), max_sources(8), fx_volume(1), distance_model(DistanceModel::Inverse, true, 128), fdump(NULL) {
 }
 
 void Context::callback(void *userdata, Uint8 *bstream, int len) {
@@ -212,6 +212,17 @@ Sample *Context::create_sample() {
 	return new Sample(this);
 }
 
+void Context::save(const std::string &file) {
+	AudioLocker l;
+	if (fdump != NULL) {
+		fclose(fdump);
+		fdump = NULL;
+	}
+	if (file.empty())
+		return;
+	
+	fdump = fopen(file.c_str(), "wb");
+}
 
 void Context::init(const int sample_rate, const Uint8 channels, int period_size) {
 	if (!SDL_WasInit(SDL_INIT_AUDIO)) {
@@ -260,6 +271,11 @@ void Context::deinit() {
 	delete listener;
 	listener = NULL;
 	SDL_CloseAudio();
+	
+	if (fdump != NULL) {
+		fclose(fdump);
+		fdump = NULL;
+	}
 
 	SDL_QuitSubSystem(SDL_INIT_AUDIO);
 }

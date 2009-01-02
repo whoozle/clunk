@@ -20,12 +20,14 @@
 #ifndef CLUNK_CONTEXT_H__
 #define CLUNK_CONTEXT_H__
 
+#include <map>
+#include <deque>
+#include <stdio.h>
+#include <SDL_audio.h>
+
 #include "export_clunk.h"
 #include "object.h"
 #include "sample.h"
-#include <SDL_audio.h>
-#include <map>
-#include <deque>
 #include "buffer.h"
 #include "distance_model.h"
 
@@ -56,6 +58,9 @@ public:
 		\param[in] sources maximum simultaneous sources
 	*/
 	void set_max_sources(int sources);
+	
+	//saves raw stream into file. use save(std::string()) to stop this madness.
+	void save(const std::string &file);
 
 	///stops any sound generation and shuts down SDL subsystem
 	void deinit();
@@ -159,6 +164,8 @@ private:
 	float fx_volume;
 	
 	DistanceModel distance_model;
+	
+	FILE * fdump;
 };
 }
 
