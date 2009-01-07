@@ -250,7 +250,7 @@ void Context::init(const int sample_rate, const Uint8 channels, int period_size)
 	
 	if ( SDL_OpenAudio(&src, &spec) < 0 )
 		throw_sdl(("SDL_OpenAudio(%d, %u, %d)", sample_rate, channels, period_size));
-	if (src.format != AUDIO_S16SYS)
+	if (spec.format != AUDIO_S16SYS)
 		throw_ex(("SDL_OpenAudio(%d, %u, %d) returned format %d", sample_rate, channels, period_size, spec.format));
 	if (spec.channels < 2)
 		LOG_ERROR(("Could not operate on %d channels", spec.channels));
