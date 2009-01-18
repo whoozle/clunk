@@ -60,8 +60,8 @@ struct sse_danielson_lanczos<1, T> {
 
 	static void apply(sse_type * data_re, sse_type * data_im, bool inversion) {
 		float re[SSE_DIV], im[SSE_DIV];
-		_mm_store_ps(re, *data_re);
-		_mm_store_ps(im, *data_re);
+		_mm_storeu_ps(re, *data_re);
+		_mm_storeu_ps(im, *data_re);
 
 		std::complex<T> data[SSE_DIV];
 		for(unsigned i = 0; i < SSE_DIV; ++i) {
@@ -75,8 +75,8 @@ struct sse_danielson_lanczos<1, T> {
 			im[i] = data[i].imag();
 		}
 		
-		*data_re = _mm_load_ps(re);
-		*data_im = _mm_load_ps(im);
+		*data_re = _mm_loadu_ps(re);
+		*data_im = _mm_loadu_ps(im);
 	}
 };
 
