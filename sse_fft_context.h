@@ -30,23 +30,23 @@ struct sse_danielson_lanczos {
 		for (unsigned i = 0; i < N / 2 ; ++i) {
 			int j = i + N / 2;
 			
-			sse_type w_re, w_im;
 			float w_re_buf[SSE_DIV], w_im_buf[SSE_DIV];
 			for (unsigned k = 0; k < SSE_DIV; ++k) {
 				w_re_buf[k] = w.real();
 				w_im_buf[k] = w.imag();
 				w += w * wp;
 			}
+			sse_type w_re, w_im;
 			w_re = _mm_loadu_ps(w_re_buf);
 			w_im = _mm_loadu_ps(w_im_buf);
 			
 			sse_type temp_re = _mm_sub_ps(_mm_mul_ps(data_re[j], w_re), _mm_mul_ps(data_im[j], w_im)), 
 					 temp_im = _mm_add_ps(_mm_mul_ps(data_im[j], w_re), _mm_mul_ps(data_re[j], w_im));
 
-			data_re[j] = data_re[i] - temp_re;
-			data_im[j] = data_im[i] - temp_im;
-			data_re[i] += temp_re;
-			data_im[i] += temp_re;
+			data_re[j] = _mm_sub_ps(data_re[i], temp_re);
+			data_im[j] = _mm_sub_ps(data_im[i], temp_im);
+			data_re[i] = _mm_add_ps(data_re[i], temp_re);
+			data_im[i] = _mm_add_ps(data_im[i], temp_im);
 		}
 	};
 };
@@ -54,12 +54,12 @@ struct sse_danielson_lanczos {
 template<typename T>
 struct sse_danielson_lanczos<1, T> {
 	typedef __m128 sse_type;
-	enum { SSE_DIV = sizeof(sse_type) / sizeof(float) };
+	enum { SSE_DIV = sizeof(sse_type) / sizeof(T) };
 
-	typedef danielson_lanczos<SSE_DIV, float> next_type;
+	typedef danielson_lanczos<SSE_DIV, T> next_type;
 
 	static void apply(sse_type * data_re, sse_type * data_im, bool inversion) {
-		float re[SSE_DIV], im[SSE_DIV];
+		float re[SSE_DIV], im[SSE_DIV]; 
 		_mm_storeu_ps(re, *data_re);
 		_mm_storeu_ps(im, *data_re);
 
@@ -94,8 +94,6 @@ public:
 	typedef std::complex<float> value_type;
 	value_type data[N];
 	
-	sse_type data_re[SSE_N], data_im[SSE_N];
-
 	inline void fft(bool inversion) {
 		scramble();
 		load();
@@ -111,6 +109,7 @@ public:
 	}
 
 private:
+	sse_type data_re[SSE_N], data_im[SSE_N];
 	sse_danielson_lanczos<SSE_N, float> next;
 
 	void load() {
