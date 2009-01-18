@@ -56,7 +56,7 @@ struct sse_danielson_lanczos<1, T> {
 	typedef __m128 sse_type;
 	enum { SSE_DIV = sizeof(sse_type) / sizeof(float) };
 
-	typedef danielson_lanczos<2, float> next_type;
+	typedef danielson_lanczos<SSE_DIV, float> next_type;
 
 	static void apply(sse_type * data_re, sse_type * data_im, bool inversion) {
 		float re[SSE_DIV], im[SSE_DIV];
