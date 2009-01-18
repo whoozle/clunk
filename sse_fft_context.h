@@ -40,8 +40,8 @@ struct sse_danielson_lanczos {
 			w_re = _mm_loadu_ps(w_re_buf);
 			w_im = _mm_loadu_ps(w_im_buf);
 			
-			sse_type temp_re = data_re[j] * w_re - data_im[j] * w_im, 
-					 temp_im = data_im[j] * w_re - data_re[j] * w_im;
+			sse_type temp_re = _mm_sub_ps(_mm_mul_ps(data_re[j], w_re), _mm_mul_ps(data_im[j], w_im)), 
+					 temp_im = _mm_add_ps(_mm_mul_ps(data_im[j], w_re), _mm_mul_ps(data_re[j], w_im));
 
 			data_re[j] = data_re[i] - temp_re;
 			data_im[j] = data_im[i] - temp_im;
@@ -54,7 +54,30 @@ struct sse_danielson_lanczos {
 template<typename T>
 struct sse_danielson_lanczos<1, T> {
 	typedef __m128 sse_type;
-	static void apply(sse_type * data_re, sse_type * data_im, bool inversion) {}
+	enum { SSE_DIV = sizeof(sse_type) / sizeof(float) };
+
+	typedef danielson_lanczos<2, float> next_type;
+
+	static void apply(sse_type * data_re, sse_type * data_im, bool inversion) {
+		float re[SSE_DIV], im[SSE_DIV];
+		_mm_store_ps(re, *data_re);
+		_mm_store_ps(im, *data_re);
+
+		std::complex<T> data[SSE_DIV];
+		for(unsigned i = 0; i < SSE_DIV; ++i) {
+			data[i] = std::complex<T>(re[i], im[i]);
+		}
+		
+		next_type::apply(data, inversion);
+
+		for(unsigned i = 0; i < SSE_DIV; ++i) {
+			re[i] = data[i].real();
+			im[i] = data[i].imag();
+		}
+		
+		*data_re = _mm_load_ps(re);
+		*data_im = _mm_load_ps(im);
+	}
 };
 
 
