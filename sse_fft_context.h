@@ -117,8 +117,8 @@ private:
 			float buf_re[SSE_DIV], buf_im[SSE_DIV];
 			for(int j = 0; j < SSE_DIV; ++j) {
 				int idx = i * SSE_DIV + j; 
-				buf_re[j] = idx < N? data[idx].real(): 0;
-				buf_im[j] = idx < N? data[idx].imag(): 0;
+				buf_re[j] = (idx < N)? data[idx].real(): 0;
+				buf_im[j] = (idx < N)? data[idx].imag(): 0;
 			}
 			data_re[i] = _mm_loadu_ps(buf_re);
 			data_im[i] = _mm_loadu_ps(buf_im);
