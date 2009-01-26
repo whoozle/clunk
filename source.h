@@ -84,6 +84,8 @@ public:
 	
 	~Source();
 	
+	enum { WINDOW_BITS = 9 };
+
 private: 
 	typedef const float (*kemar_ptr)[2][512];
 	void get_kemar_data(kemar_ptr & kemar_data, int & samples, const v3<float> &delta_position);
@@ -96,11 +98,10 @@ private:
 	
 	clunk::Buffer sample3d[2];
 	
-	enum { WINDOW_BITS = 9 };
 	typedef mdct_context<WINDOW_BITS, clunk_window_func, float> mdct_type;
-	enum { WINDOW_SIZE = mdct_type::N };
 
 	mdct_type mdct;
+	enum { WINDOW_SIZE = mdct_type::N };
 
 	float overlap_data[2][WINDOW_SIZE / 2];
 };

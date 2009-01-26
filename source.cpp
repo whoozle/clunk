@@ -25,11 +25,16 @@
 #include "buffer.h"
 #include "sample.h"
 #include <assert.h>
+#include "clunk_assert.h"
 
 #if defined _MSC_VER || __APPLE__
 #	define pow10f(x) powf(10.0f, (x))
 #	define log2f(x) (logf(x) / M_LN2)
 #endif
+
+using namespace clunk;
+
+clunk_static_assert(Source::WINDOW_BITS > 2);
 
 template <typename T> inline T clunk_min(T a, T b) {
 	return a < b? a: b;
@@ -39,15 +44,14 @@ template <typename T> inline T clunk_max(T a, T b) {
 	return a > b? a: b;
 }
 
-using namespace clunk;
-
 Source::Source(const Sample * sample, const bool loop, const v3<float> &delta, float gain, float pitch) : 
 	sample(sample), loop(loop), delta_position(delta), gain(gain), pitch(pitch), 
 	position(0), fadeout(0), fadeout_total(0)
 	{
 	for(int i = 0; i < 2; ++i) {
-		for(int j = 0; j < WINDOW_SIZE / 2; ++j)
+		for(int j = 0; j < WINDOW_SIZE / 2; ++j) {
 			overlap_data[i][j] = 0;
+		}
 	}
 	
 	if (sample == NULL)
@@ -80,9 +84,9 @@ void Source::idt(const v3<float> &delta, const v3<float> &dir_vec, float &idt_of
 	//LOG_DEBUG(("relative position = (%g,%g,%g), angle = %g (%g)", delta.x, delta.y, delta.z, angle, angle_gr));
 	
 	float idt_angle = fmodf(angle, 2 * (float)M_PI);
+
 	if (idt_angle < 0)
 		idt_angle += 2 * (float)M_PI;
-
 	if (idt_angle >= float(M_PI_2) && idt_angle < (float)M_PI) {
 		idt_angle = float(M_PI) - idt_angle;
 	} else if (idt_angle >= float(M_PI) && idt_angle < 3 * float(M_PI_2)) {
@@ -275,6 +279,7 @@ float Source::process(clunk::Buffer &buffer, unsigned dst_ch, const v3<float> &d
 
 	const int kemar_idx_right = ((((int)angle_gr  + 180 / (int)angles)/ (360 / (int)angles)) % (int)angles);
 	const int kemar_idx_left = (((360 - (int)angle_gr - 180 / (int)angles) / (360 / (int)angles)) % (int)angles);
+	//LOG_DEBUG(("%g -> left: %d, right: %d", angle_gr, kemar_idx_left, kemar_idx_right));
 	
 	int idt_offset = (int)(t_idt * sample->spec.freq);
 
