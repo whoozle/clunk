@@ -2,6 +2,7 @@
 #define MDCT_CONTEXT_H__
 
 #include "fft_context.h"
+#include "clunk_assert.h"
 #include <string.h>
 
 namespace clunk {
@@ -41,7 +42,8 @@ public:
 	}
 	
 	void mdct(bool inversion) {
-		assert(N / 4 == N4); //we need static_assert :(
+		clunk_static_assert(N / 4 == N4);
+
 		if (!inversion) {
 			T rotate[N];
 			unsigned int t;
