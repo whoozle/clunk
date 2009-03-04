@@ -23,7 +23,7 @@ Export('debug')
 env['prefix'] = ''
 
 env.Append(LIBPATH=['.'])
-env.Append(CPPDEFINES=['DEBUG'])
+env.Append(CPPDEFINES=['DEBUG', '_REENTRANT'])
 if have_sse:
 	env.Append(CPPDEFINES=['USE_SIMD'])
 
