@@ -384,7 +384,7 @@ void Source::fade_out(const float sec) {
 #	include <malloc.h>
 #endif
 
-void *Source::operator new (size_t size) {
+void *Source::allocate (size_t size) {
 	void * ptr = NULL;
 	if (posix_memalign(&ptr, 16, size) == -1 || ptr == NULL)
 		throw std::bad_alloc();
@@ -392,16 +392,16 @@ void *Source::operator new (size_t size) {
 	return ptr;
 }
 
+void *Source::operator new (size_t size) {
+	return allocate(size);
+}
+
 void Source::operator delete (void *ptr) {
 	//LOG_DEBUG(("delete(%p)", ptr));
 	free(ptr);
 }
 void *Source::operator new[] (size_t size) {
-	void * ptr = NULL;
-	if (posix_memalign(&ptr, 16, size) == -1 || ptr == NULL)
-		throw std::bad_alloc();
-	//LOG_DEBUG(("new(%u) = %p", (unsigned)size, ptr));
-	return ptr;
+	return allocate(size);
 }
 
 void Source::operator delete[] (void *ptr) {

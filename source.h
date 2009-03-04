@@ -97,13 +97,15 @@ public:
 	~Source();
 
 #ifdef USE_SIMD
-	void *operator new (size_t size);
+	void* operator new (size_t size);
 	void operator delete (void *ptr);
-	void *operator new[] (size_t size);
+	void* operator new[] (size_t size);
 	void operator delete[] (void *ptr);
 
 	//placement new:
-	void * operator new(size_t, void *p);
+	void* operator new(size_t, void *p);
+	static void* allocate(size_t size);
+
 #endif
 
 
