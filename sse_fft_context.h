@@ -88,8 +88,8 @@ public:
 	enum { SSE_N = (N - 1) / SSE_DIV + 1 };
 
 private:
-	sse_type data_re[SSE_N] __attribute__((aligned(16)));
-	sse_type data_im[SSE_N] __attribute__((aligned(16)));
+	sse_type data_re[SSE_N];
+	sse_type data_im[SSE_N];
 
 public: 
 
@@ -97,7 +97,7 @@ public:
 	value_type data[N];
 	
 	inline void fft(bool inversion) {
-/*		scramble();
+		scramble();
 		load();
 		next.apply(data_re, data_im, inversion);
 		next.apply(data_re + N / 2, data_im + N / 2, inversion);
@@ -109,11 +109,11 @@ public:
 			}
 		}
 		save();
-*/	}
+	}
 
 private:
 	sse_danielson_lanczos<SSE_N / 2, float> next;
-/*
+
 	void load() {
 		for(int i = 0; i < SSE_N; ++i) {
 			float buf_re[SSE_DIV], buf_im[SSE_DIV];
@@ -141,7 +141,7 @@ private:
 			}
 		}
 	}
-*/
+
 	template<typename V>
 	static inline void swap(V &a, V &b) {
 		V t = a;
@@ -163,7 +163,7 @@ private:
 			j += m;
 		}
 	}
-}  __attribute__((aligned(16)));
+};
 
 }
 
