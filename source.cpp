@@ -409,4 +409,10 @@ void Source::operator delete[] (void *ptr) {
 	free(ptr);
 }
 
+void * Source::operator new(size_t, void *p) {
+	long v = (long)p;
+	assert((v & 0x0f) == 0);
+	return p;
+}
+
 #endif

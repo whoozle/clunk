@@ -101,6 +101,9 @@ public:
 	void operator delete (void *ptr);
 	void *operator new[] (size_t size);
 	void operator delete[] (void *ptr);
+
+	//placement new:
+	void * operator new(size_t, void *p);
 #endif
 
 
