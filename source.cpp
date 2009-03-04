@@ -157,8 +157,9 @@ void Source::hrtf(int window, const unsigned channel_idx, clunk::Buffer &result,
 		float m = pow10f(kemar_data[kemar_idx][0][kemar_angle_idx] * v / 20);
 
 		energy0 += v * v;
-		mdct.data[i] = v * m;
-		energy  += v * v * m * m;
+		v *= m;
+		mdct.data[i] = v;
+		energy  += v * v;
 		//fprintf(stderr, "%g ", m);
 	}
 	//energy /= mdct_type::M;
