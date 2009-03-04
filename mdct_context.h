@@ -28,6 +28,7 @@ class mdct_context {
 
 public: 
 	enum { N = 1 << BITS , M = N / 2, N4 =  fft_type::N };
+	clunk_static_assert(N == N4 * 4);
 	
 	typedef T value_type;
 	typedef std::complex<T> complex_type;
@@ -42,8 +43,6 @@ public:
 	}
 	
 	void mdct(bool inversion) {
-		clunk_static_assert(N / 4 == N4);
-
 		if (!inversion) {
 			T rotate[N];
 			unsigned int t;
