@@ -23,6 +23,9 @@
 #include "export_clunk.h"
 #include "v3.h"
 #include "mdct_context.h"
+#ifdef USE_SIMD
+#	include "sse_fft_context.h"
+#endif
 #include "buffer.h"
 
 struct kiss_fftr_state;
@@ -44,7 +47,16 @@ struct clunk_window_func : public clunk::window_func_base<N, T> {
 
 //!class holding information about source. 
 class CLUNKAPI Source {
+public: 
+	enum { WINDOW_BITS = 9 };
+
+private: 
+	typedef mdct_context<WINDOW_BITS, clunk_window_func, float> mdct_type;
+	mdct_type mdct; //must be first - aligned 
+
 public:
+	enum { WINDOW_SIZE = mdct_type::N };
+
 	///pointer to the sample holding audio data
 	const Sample * const sample;
 	
@@ -83,8 +95,14 @@ public:
 	void fade_out(const float sec);
 	
 	~Source();
-	
-	enum { WINDOW_BITS = 9 };
+
+#ifdef USE_SIMD
+	void *operator new (size_t size);
+	void operator delete (void *ptr);
+	void *operator new[] (size_t size);
+	void operator delete[] (void *ptr);
+#endif
+
 
 private: 
 	typedef const float (*kemar_ptr)[2][512];
@@ -97,11 +115,6 @@ private:
 	int position, fadeout, fadeout_total;
 	
 	clunk::Buffer sample3d[2];
-	
-	typedef mdct_context<WINDOW_BITS, clunk_window_func, float> mdct_type;
-
-	mdct_type mdct;
-	enum { WINDOW_SIZE = mdct_type::N };
 
 	float overlap_data[2][WINDOW_SIZE / 2];
 };

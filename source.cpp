@@ -375,3 +375,38 @@ Source::~Source() {}
 void Source::fade_out(const float sec) {
 	fadeout = fadeout_total = (int)(sample->spec.freq * sec);
 }
+
+#ifdef USE_SIMD
+#include <stdexcept>
+#ifdef _WINDOWS
+#else
+#	include <stdlib.h>
+#	include <malloc.h>
+#endif
+
+void *Source::operator new (size_t size) {
+	void * ptr = NULL;
+	if (posix_memalign(&ptr, 16, size) == -1 || ptr == NULL)
+		throw std::bad_alloc();
+	//LOG_DEBUG(("new(%u) = %p", (unsigned)size, ptr));
+	return ptr;
+}
+
+void Source::operator delete (void *ptr) {
+	//LOG_DEBUG(("delete(%p)", ptr));
+	free(ptr);
+}
+void *Source::operator new[] (size_t size) {
+	void * ptr = NULL;
+	if (posix_memalign(&ptr, 16, size) == -1 || ptr == NULL)
+		throw std::bad_alloc();
+	//LOG_DEBUG(("new(%u) = %p", (unsigned)size, ptr));
+	return ptr;
+}
+
+void Source::operator delete[] (void *ptr) {
+	//LOG_DEBUG(("delete(%p)", ptr));
+	free(ptr);
+}
+
+#endif
