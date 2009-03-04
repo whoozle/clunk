@@ -378,6 +378,7 @@ void Source::fade_out(const float sec) {
 
 #ifdef USE_SIMD
 #include <stdexcept>
+
 #ifdef _WINDOWS
 #else
 #	include <stdlib.h>
@@ -386,7 +387,9 @@ void Source::fade_out(const float sec) {
 
 void *Source::allocate (size_t size) {
 	void * ptr = NULL;
-	if (posix_memalign(&ptr, 16, size) == -1 || ptr == NULL)
+	int r = posix_memalign(&ptr, 16, size);
+	//LOG_DEBUG(("posix_memalign = %d", r));
+	if (r == -1 || ptr == NULL)
 		throw std::bad_alloc();
 	//LOG_DEBUG(("new(%u) = %p", (unsigned)size, ptr));
 	return ptr;
