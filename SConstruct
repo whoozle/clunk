@@ -10,7 +10,7 @@ env.MergeFlags(sdl_cflags)
 env.MergeFlags(sdl_libs)
 
 lib_dir = '.'
-have_sse = True
+have_sse = False
 debug = True
 prefix = ''
 
@@ -24,6 +24,10 @@ env['prefix'] = ''
 
 env.Append(LIBPATH=['.'])
 env.Append(CPPDEFINES=['DEBUG'])
+if have_sse:
+	env.Append(CPPDEFINES=['USE_SIMD'])
+
+#env.Append(CXXFLAGS=['-O3'])
 buildmode = 'debug'
 
 clunk = env.SharedLibrary('clunk', 
@@ -35,6 +39,8 @@ clunk = env.SharedLibrary('clunk',
 
 
 if sys.platform != 'win32':
+	env.Append(CFLAGS=['-Wall', '-pedantic'])
+	env.Append(CXXFLAGS=['-Wall', '-pedantic'])
 	env.Append(LINKFLAGS=['-Wl,-rpath,'+ lib_dir])
 	env.Append(LINKFLAGS=['-Wl,-rpath-link,.'])
 
