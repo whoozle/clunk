@@ -7,7 +7,6 @@
 
 #include <xmmintrin.h>
 
-
 namespace clunk {
 
 template<int N, typename T>
@@ -80,24 +79,28 @@ struct sse_danielson_lanczos<1, T> {
 	}
 };
 
-
 template<int BITS>
 class fft_context<BITS, float> {
 public: 
 	typedef __m128 sse_type;
-	
 	enum { N = 1 << BITS };
 	enum { SSE_DIV = sizeof(sse_type) / sizeof(float) };
-	//static assert
 	enum { SSE_N = (N - 1) / SSE_DIV + 1 };
+
+private:
+	sse_type data_re[SSE_N] __attribute__((aligned(16)));
+	sse_type data_im[SSE_N] __attribute__((aligned(16)));
+
+public: 
 
 	typedef std::complex<float> value_type;
 	value_type data[N];
 	
 	inline void fft(bool inversion) {
-		scramble();
+/*		scramble();
 		load();
 		next.apply(data_re, data_im, inversion);
+		next.apply(data_re + N / 2, data_im + N / 2, inversion);
 		if (inversion) {
 			sse_type n = _mm_set_ps1(N);
 			for(unsigned i = 0; i < SSE_N; ++i) {
@@ -106,12 +109,11 @@ public:
 			}
 		}
 		save();
-	}
+*/	}
 
 private:
-	sse_type data_re[SSE_N], data_im[SSE_N];
-	sse_danielson_lanczos<SSE_N, float> next;
-
+	sse_danielson_lanczos<SSE_N / 2, float> next;
+/*
 	void load() {
 		for(int i = 0; i < SSE_N; ++i) {
 			float buf_re[SSE_DIV], buf_im[SSE_DIV];
@@ -139,7 +141,7 @@ private:
 			}
 		}
 	}
-
+*/
 	template<typename V>
 	static inline void swap(V &a, V &b) {
 		V t = a;
@@ -161,7 +163,7 @@ private:
 			j += m;
 		}
 	}
-};
+}  __attribute__((aligned(16)));
 
 }
 
