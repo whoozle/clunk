@@ -23,9 +23,6 @@
 #include "export_clunk.h"
 #include "v3.h"
 #include "mdct_context.h"
-#ifdef USE_SIMD
-#	include "sse_fft_context.h"
-#endif
 #include "buffer.h"
 
 struct kiss_fftr_state;
