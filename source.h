@@ -52,7 +52,7 @@ public:
 
 private: 
 	typedef mdct_context<WINDOW_BITS, clunk_window_func, float> mdct_type;
-	mdct_type mdct; //must be first - aligned 
+	static mdct_type mdct; //must be first - aligned 
 
 public:
 	enum { WINDOW_SIZE = mdct_type::N };
@@ -95,19 +95,6 @@ public:
 	void fade_out(const float sec);
 	
 	~Source();
-
-#ifdef USE_SIMD
-	void* operator new (size_t size);
-	void operator delete (void *ptr);
-	void* operator new[] (size_t size);
-	void operator delete[] (void *ptr);
-
-	//placement new:
-	void* operator new(size_t, void *p);
-	static void* allocate(size_t size);
-
-#endif
-
 
 private: 
 	typedef const float (*kemar_ptr)[2][512];

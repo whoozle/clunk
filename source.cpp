@@ -34,6 +34,8 @@
 
 using namespace clunk;
 
+Source::mdct_type Source::mdct __attribute__ ((aligned (16)));
+
 clunk_static_assert(Source::WINDOW_BITS > 2);
 
 template <typename T> inline T clunk_min(T a, T b) {
@@ -375,47 +377,3 @@ Source::~Source() {}
 void Source::fade_out(const float sec) {
 	fadeout = fadeout_total = (int)(sample->spec.freq * sec);
 }
-
-#ifdef USE_SIMD
-#include <stdexcept>
-
-#ifdef _WINDOWS
-#else
-#	include <stdlib.h>
-#	include <malloc.h>
-#endif
-
-void *Source::allocate (size_t size) {
-	void * ptr = NULL;
-	int r = posix_memalign(&ptr, 16, size);
-	//LOG_DEBUG(("posix_memalign = %d", r));
-	if (r == -1 || ptr == NULL)
-		throw std::bad_alloc();
-	//LOG_DEBUG(("new(%u) = %p", (unsigned)size, ptr));
-	return ptr;
-}
-
-void *Source::operator new (size_t size) {
-	return allocate(size);
-}
-
-void Source::operator delete (void *ptr) {
-	//LOG_DEBUG(("delete(%p)", ptr));
-	free(ptr);
-}
-void *Source::operator new[] (size_t size) {
-	return allocate(size);
-}
-
-void Source::operator delete[] (void *ptr) {
-	//LOG_DEBUG(("delete(%p)", ptr));
-	free(ptr);
-}
-
-void * Source::operator new(size_t, void *p) {
-	long v = (long)p;
-	assert((v & 0x0f) == 0);
-	return p;
-}
-
-#endif
