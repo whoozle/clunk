@@ -12,12 +12,12 @@ struct danielson_lanczos {
 	enum { M = N / 2 };
 	typedef danielson_lanczos<M, T> next_type;
 
-	static void apply(std::complex<T>* data, bool inversion) {
-		next_type::apply(data, inversion);
-		next_type::apply(data + M, inversion);
-			
-		int sign = inversion? -1: 1;
-		T a = (T)(-2 * M_PI / N * sign);
+	template<int SIGN>
+	static void apply(std::complex<T>* data) {
+		next_type::template apply<SIGN>(data);
+		next_type::template apply<SIGN>(data + M);
+		
+		T a = (T)(-2 * M_PI / N * SIGN);
 		T wtemp = sin(a / 2);
 		
 		std::complex<T> wp(-2 * wtemp * wtemp, sin(a)), w(1, 0);
@@ -32,12 +32,13 @@ struct danielson_lanczos {
 
 			w += w * wp;
 		}
-	};
+	}
 };
 
 template<typename T>
 struct danielson_lanczos<1, T> {
-	static void apply(std::complex<T>*, bool) {}
+	template<int SIGN>
+	static void apply(std::complex<T>*) {}
 };
 
 
@@ -47,15 +48,16 @@ public:
 	enum { N = 1 << BITS };
 	typedef std::complex<T> value_type;
 	value_type data[N];
-	
+
+public: 
 	inline void fft() {
 		scramble();
-		next.apply(data, false);
+		next.template apply<1>(data);
 	}
 
 	inline void ifft() {
 		scramble();
-		next.apply(data, true);
+		next.template apply<-1>(data);
 		for(unsigned i = 0; i < N; ++i) {
 			data[i] /= N;
 		}
