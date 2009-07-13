@@ -35,7 +35,7 @@ public:
 
 	T data[N];
 	
-	mdct_context() {
+	mdct_context() : sqrt_N((T)sqrt((T)N)) {
 		window_func.precalculate();
 		for(unsigned t = 0; t < N4; ++t) {
 			angle_cache[t] = std::polar<T>(1, 2 * T(M_PI) * (t + T(0.125)) / N);
@@ -59,7 +59,6 @@ public:
 			fft.data[t] = std::complex<T>(re * a.real() + im * a.imag(), -re * a.imag() + im * a.real());
 		}
 		fft.fft();
-		T sqrt_N = sqrt((T)N);
 
 		for(t = 0; t < N4; ++t) {
 		std::complex<T> a = angle_cache[t];
@@ -82,7 +81,6 @@ public:
 		}
 		
 		fft.fft();
-		T sqrt_N = sqrt((T)N);
 		
 		for(t = 0; t < N4; ++t) {
 			std::complex<T> a = angle_cache[t];
@@ -122,6 +120,7 @@ private:
 	window_func_type<N, T> window_func;
 	
 	std::complex<T> angle_cache[N4];
+	T sqrt_N;
 };
 
 }
