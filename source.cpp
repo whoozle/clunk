@@ -146,8 +146,8 @@ void Source::hrtf(int window, const unsigned channel_idx, clunk::Buffer &result,
 		//fprintf(stderr, "%g ", mdct.data[i]);
 	}
 	
-	mdct.apply();
-	mdct.mdct(false);
+	mdct.apply_window();
+	mdct.mdct();
 		
 	//LOG_DEBUG(("kemar angle index: %d\n", kemar_idx));
 	
@@ -168,8 +168,8 @@ void Source::hrtf(int window, const unsigned channel_idx, clunk::Buffer &result,
 	float energy_k = energy0 / energy;
 	//LOG_DEBUG(("energy_k = %g", energy_k));
 	
-	mdct.mdct(true);
-	mdct.apply();
+	mdct.imdct();
+	mdct.apply_window();
 
 	Sint16 *dst = (Sint16 *)((unsigned char *)result.get_ptr() + result_start);
 	int i;

@@ -42,73 +42,73 @@ public:
 		}
 	}
 	
-	void mdct(bool inversion) {
-		if (!inversion) {
-			T rotate[N];
-			unsigned int t;
-			for(t = 0; t < N4; ++t) {
-				rotate[t] = -data[t + 3 * N4];
-			}
-			for(; t < N; ++t) {
-				rotate[t] = data[t - N4];
-			}
-			for(t = 0; t < N4; ++t) {
-				T re = (rotate[t * 2] - rotate[N - 1 - t * 2]) / 2;
-				T im = (rotate[M + t * 2] - rotate[M - 1 - t * 2]) / -2;
-				
-				std::complex<T> a = angle_cache[t];
-				fft.data[t] = std::complex<T>(re * a.real() + im * a.imag(), -re * a.imag() + im * a.real());
-			}
-			fft.fft(false);
-			T sqrt_N = sqrt((T)N);
-
-			for(t = 0; t < N4; ++t) {
-				std::complex<T> a = angle_cache[t];
-				std::complex<T>& f = fft.data[t];
-				f = std::complex<T>(2 / sqrt_N * (f.real() * a.real() + f.imag() * a.imag()), 2 / sqrt_N * (-f.real() * a.imag() + f.imag() * a.real()));
-			}
-
-			for(t = 0; t < N4; ++t) {
-				data[2 * t] = fft.data[t].real();
-				data[M - 2 * t - 1] = -fft.data[t].imag();
-			}
-		} else {
-			unsigned int t; 
-			for(t = 0; t < N4; ++t) {
-				T re = data[t * 2] / 2, im = data[M - 1 - t * 2] / 2;
-				std::complex<T> a = angle_cache[t];
-				fft.data[t] = std::complex<T>(re * a.real() + im * a.imag(), - re * a.imag() + im * a.real());
-			}
-			fft.fft(false);
-			T sqrt_N = sqrt((T)N);
+	void mdct() {
+		T rotate[N];
+		unsigned int t;
+		for(t = 0; t < N4; ++t) {
+			rotate[t] = -data[t + 3 * N4];
+		}
+		for(; t < N; ++t) {
+			rotate[t] = data[t - N4];
+		}
+		for(t = 0; t < N4; ++t) {
+			T re = (rotate[t * 2] - rotate[N - 1 - t * 2]) / 2;
+			T im = (rotate[M + t * 2] - rotate[M - 1 - t * 2]) / -2;
 			
-			for(t = 0; t < N4; ++t) {
-				std::complex<T> a = angle_cache[t];
-				std::complex<T>& f = fft.data[t];
-				fft.data[t] = std::complex<T>(8 / sqrt_N * (f.real() * a.real() + f.imag() * a.imag()), 8 / sqrt_N * (-f.real() * a.imag() + f.imag() * a.real()));
-			}
+			std::complex<T> a = angle_cache[t];
+			fft.data[t] = std::complex<T>(re * a.real() + im * a.imag(), -re * a.imag() + im * a.real());
+		}
+		fft.fft();
+		T sqrt_N = sqrt((T)N);
 
-			T rotate[N];
-			for(t = 0; t < N4; ++t) {
-				rotate[2 * t] = fft.data[t].real();
-				rotate[M + 2 * t] = fft.data[t].imag();
-			}
-			for(t = 1; t < N; t += 2) {
-				rotate[t] = - rotate[N - t - 1];
-			}
+		for(t = 0; t < N4; ++t) {
+		std::complex<T> a = angle_cache[t];
+			std::complex<T>& f = fft.data[t];
+			f = std::complex<T>(2 / sqrt_N * (f.real() * a.real() + f.imag() * a.imag()), 2 / sqrt_N * (-f.real() * a.imag() + f.imag() * a.real()));
+		}
 
-			//shift
-			for(t = 0; t < 3 * N4; ++t) {
-				data[t] = rotate[t + N4];
-			}
-			for(; t < N; ++t) {
-				data[t] = -rotate[t - 3 * N4];
-			}
+		for(t = 0; t < N4; ++t) {
+			data[2 * t] = fft.data[t].real();
+			data[M - 2 * t - 1] = -fft.data[t].imag();
 		}
 	}
-
 	
-	void apply() {
+	void imdct() {
+		unsigned int t; 
+		for(t = 0; t < N4; ++t) {
+			T re = data[t * 2] / 2, im = data[M - 1 - t * 2] / 2;
+			std::complex<T> a = angle_cache[t];
+			fft.data[t] = std::complex<T>(re * a.real() + im * a.imag(), - re * a.imag() + im * a.real());
+		}
+		
+		fft.fft();
+		T sqrt_N = sqrt((T)N);
+		
+		for(t = 0; t < N4; ++t) {
+			std::complex<T> a = angle_cache[t];
+			std::complex<T>& f = fft.data[t];
+			fft.data[t] = std::complex<T>(8 / sqrt_N * (f.real() * a.real() + f.imag() * a.imag()), 8 / sqrt_N * (-f.real() * a.imag() + f.imag() * a.real()));
+		}
+
+		T rotate[N];
+		for(t = 0; t < N4; ++t) {
+			rotate[2 * t] = fft.data[t].real();
+			rotate[M + 2 * t] = fft.data[t].imag();
+		}
+		for(t = 1; t < N; t += 2) {
+			rotate[t] = - rotate[N - t - 1];
+		}
+
+		//shift
+		for(t = 0; t < 3 * N4; ++t) {
+			data[t] = rotate[t + N4];
+		}
+		for(; t < N; ++t) {
+			data[t] = -rotate[t - 3 * N4];
+		}
+	}
+	
+	void apply_window() {
 		for(unsigned i = 0; i < N; ++i) {
 			data[i] *= window_func.cache[i];
 		}

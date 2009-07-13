@@ -48,13 +48,16 @@ public:
 	typedef std::complex<T> value_type;
 	value_type data[N];
 	
-	inline void fft(bool inversion) {
+	inline void fft() {
 		scramble();
-		next.apply(data, inversion);
-		if (inversion) {
-			for(unsigned i = 0; i < N; ++i) {
-				data[i] /= N;
-			}
+		next.apply(data, false);
+	}
+
+	inline void ifft() {
+		scramble();
+		next.apply(data, true);
+		for(unsigned i = 0; i < N; ++i) {
+			data[i] /= N;
 		}
 	}
 	
