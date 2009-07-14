@@ -222,14 +222,14 @@ float Source::process(clunk::Buffer &buffer, unsigned dst_ch, const v3<float> &d
 	if (src == NULL)
 		throw_ex(("uninitialized sample used (%p)", (void *)sample));
 
-	pitch *= this->pitch;
+	pitch *= this->pitch * sample->pitch;
 	if (pitch <= 0)
 		throw_ex(("pitch %g could not be negative or zero", pitch));
 		
 	unsigned src_ch = sample->spec.channels; 
 	unsigned src_n = sample->data.get_size() / src_ch / 2;
 
-	float vol = fx_volume * gain;
+	float vol = fx_volume * gain * sample->gain;
 	
 	if (vol > 1)
 		vol = 1;
