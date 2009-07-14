@@ -30,6 +30,11 @@ class Context;
 //!Holds raw wave data. 
 class CLUNKAPI Sample {
 public: 
+	///gain
+	float gain;
+	///pitch, 2.0f - pitching up one octave
+	float pitch;
+
 	~Sample();
 	/*!
 		\brief initializes sample

@@ -27,7 +27,7 @@
 
 using namespace clunk;
 
-Sample::Sample(Context *context) : context(context) {}
+Sample::Sample(Context *context) : context(context), gain(1.0f), pitch(1.0f) {}
 
 void Sample::generateSine(const int freq, const float len) {
 	AudioLocker l;
