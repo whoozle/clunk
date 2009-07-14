@@ -261,9 +261,16 @@ float Source::process(clunk::Buffer &buffer, unsigned dst_ch, const v3<float> &d
 						v = src[p * src_ch];//expand mono channel if needed
 					}
 
-					bool left = c == 0;
 					if (panning != 0 && c < 2) {
-						v = (Sint16) ((1 + panning * (left? -1: 1)) * v);
+						bool left = c == 0;
+						int v0 = (int)((1.0f + panning * (left? -1: 1)) * v);
+						if (v0 > 32767) {
+							v = 32767;
+						} else if (v0 < -32767) {
+							v = -32767;
+						} else {
+							v = (Sint16)v0;
+						}
 					}
 				}
 				dst[i * dst_ch + c] = v;
