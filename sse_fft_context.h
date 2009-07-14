@@ -1,5 +1,5 @@
-#ifndef PARALLELIZE_H__
-#define PARALLELIZE_H__
+#ifndef CLUNK_SSE_FFT_CONTEXT_H__
+#define CLUNK_SSE_FFT_CONTEXT_H__
 
 #ifndef USE_SIMD
 #	error turn on SSE support with USE_SIMD macro
