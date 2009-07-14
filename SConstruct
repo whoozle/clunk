@@ -30,11 +30,15 @@ if have_sse:
 #env.Append(CXXFLAGS=['-O3'])
 buildmode = 'debug'
 
+clunk_src = [
+	'context.cpp', 'sample.cpp', 'object.cpp', 'source.cpp', 'sdl_ex.cpp', 'stream.cpp', 
+	'kemar.c', 'buffer.cpp', 'distance_model.cpp', 'logger.cpp', 'clunk_ex.cpp',
+]
+if have_sse:
+	clunk_src.append('sse_fft_context.cpp')
+
 clunk = env.SharedLibrary('clunk', 
-	[
-		'context.cpp', 'sample.cpp', 'object.cpp', 'source.cpp', 'sdl_ex.cpp', 'stream.cpp', 
-		'kemar.c', 'buffer.cpp', 'distance_model.cpp', 'logger.cpp', 'clunk_ex.cpp', 
-	], 
+	clunk_src, 
 	LIBS=['SDL'])
 
 
