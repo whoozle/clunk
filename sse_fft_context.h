@@ -5,9 +5,24 @@
 #	error turn on SSE support with USE_SIMD macro
 #endif
 
+#include <math.h>
+#include <sys/types.h>
 #include <xmmintrin.h>
+#include <complex>
 
 namespace clunk {
+
+struct aligned_allocator {
+	static void * allocate(size_t size, size_t alignment);
+	static void deallocate(void *ptr);
+};
+
+template<typename T, int N>
+class aligned_array {
+	T * _data;
+public: 
+	
+};
 
 template<int N, typename T>
 struct sse_danielson_lanczos {
