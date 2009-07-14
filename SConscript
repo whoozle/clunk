@@ -21,12 +21,14 @@ if sys.platform != 'win32':
 
 env.MergeFlags(sdl_cflags, sdl_libs)
 
-clunk = env.SharedLibrary('clunk', 
-	[
-		'context.cpp', 'sample.cpp', 'object.cpp', 'source.cpp', 'sdl_ex.cpp', 'stream.cpp', 
-		'kemar.c', 'buffer.cpp', 'distance_model.cpp', 'logger.cpp', 'clunk_ex.cpp', 
-	], 
-	LIBS=clunk_libs)
+clunk_src = [
+	'context.cpp', 'sample.cpp', 'object.cpp', 'source.cpp', 'sdl_ex.cpp', 'stream.cpp', 
+	'kemar.c', 'buffer.cpp', 'distance_model.cpp', 'logger.cpp', 'clunk_ex.cpp', ]
+	
+if have_sse:
+	clunk_src.append('sse_fft_context.cpp')
+
+clunk = env.SharedLibrary('clunk', clunk_src, LIBS=clunk_libs)
 
 if sys.platform != 'win32' and len(env['prefix']) > 0:
 	Import('install_targets')
