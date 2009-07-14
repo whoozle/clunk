@@ -27,7 +27,7 @@
 
 using namespace clunk;
 
-Sample::Sample(Context *context) : context(context), gain(1.0f), pitch(1.0f) {}
+Sample::Sample(Context *context) : gain(1.0f), pitch(1.0f), context(context) {}
 
 void Sample::generateSine(const int freq, const float len) {
 	AudioLocker l;
@@ -73,6 +73,8 @@ void Sample::load(const std::string &file) {
 	clunk::Buffer wav;
 	wav.set_data(buf, len, true);
 	context->convert(data, wav, spec.freq, spec.format, spec.channels);
+	
+	name = file;
 }
 
 

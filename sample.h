@@ -30,6 +30,8 @@ class Context;
 //!Holds raw wave data. 
 class CLUNKAPI Sample {
 public: 
+	///name - for general purpose
+	std::string name;
 	///gain
 	float gain;
 	///pitch, 2.0f - pitching up one octave
