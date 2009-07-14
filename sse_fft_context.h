@@ -16,12 +16,12 @@ struct sse_danielson_lanczos {
 
 	typedef sse_danielson_lanczos<N / 2, float> next_type;
 
-	static void apply(sse_type * data_re, sse_type * data_im, bool inversion) {
-		next_type::apply(data_re, data_im, inversion);
-		next_type::apply(data_re + N / 2, data_im + N / 2, inversion);
+	template<int SIGN>
+	static void apply(sse_type * data_re, sse_type * data_im) {
+		next_type::template apply<SIGN>(data_re, data_im);
+		next_type::template apply<SIGN>(data_re + N / 2, data_im + N / 2);
 			
-		int sign = inversion? -1: 1;
-		T a = (T)(-2 * M_PI / N * sign);
+		T a = (T)(-2 * M_PI / N * SIGN);
 		T wtemp = sin(a / 2);
 		
 		std::complex<T> wp (-2 * wtemp * wtemp, sin(a)), w(1, 0);
@@ -47,7 +47,7 @@ struct sse_danielson_lanczos {
 			data_re[i] = _mm_add_ps(data_re[i], temp_re);
 			data_im[i] = _mm_add_ps(data_im[i], temp_im);
 		}
-	};
+	}
 };
 
 template<typename T>
@@ -57,7 +57,8 @@ struct sse_danielson_lanczos<1, T> {
 
 	typedef danielson_lanczos<SSE_DIV, T> next_type;
 
-	static void apply(sse_type * data_re, sse_type * data_im, bool inversion) {
+	template<int SIGN>
+	static void apply(sse_type * data_re, sse_type * data_im) {
 		float re[SSE_DIV], im[SSE_DIV]; 
 		_mm_storeu_ps(re, *data_re);
 		_mm_storeu_ps(im, *data_re);
@@ -67,7 +68,7 @@ struct sse_danielson_lanczos<1, T> {
 			data[i] = std::complex<T>(re[i], im[i]);
 		}
 		
-		next_type::apply(data, inversion);
+		next_type::template apply<SIGN>(data);
 
 		for(unsigned i = 0; i < SSE_DIV; ++i) {
 			re[i] = data[i].real();
@@ -96,17 +97,24 @@ public:
 	typedef std::complex<float> value_type;
 	value_type data[N];
 	
-	inline void fft(bool inversion) {
+	inline void fft() {
 		scramble();
 		load();
-		next.apply(data_re, data_im, inversion);
-		next.apply(data_re + N / 2, data_im + N / 2, inversion);
-		if (inversion) {
-			sse_type n = _mm_set_ps1(N);
-			for(unsigned i = 0; i < SSE_N; ++i) {
-				data_re[i] = _mm_div_ps(data_re[i], n);
-				data_im[i] = _mm_div_ps(data_im[i], n);
-			}
+		next.template apply<1>(data_re, data_im);
+		next.template apply<1>(data_re + N / 2, data_im + N / 2);
+		save();
+	}
+
+	inline void ifft() {
+		scramble();
+		load();
+		next.template apply<-1>(data_re, data_im);
+		next.template apply<-1>(data_re + N / 2, data_im + N / 2);
+
+		sse_type n = _mm_set_ps1(N);
+		for(unsigned i = 0; i < SSE_N; ++i) {
+			data_re[i] = _mm_div_ps(data_re[i], n);
+			data_im[i] = _mm_div_ps(data_im[i], n);
 		}
 		save();
 	}
