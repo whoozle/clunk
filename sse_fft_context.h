@@ -19,9 +19,12 @@ struct aligned_allocator {
 
 template<typename T, int N>
 class aligned_array {
-	T * _data;
+	T * data;
 public: 
-	
+	aligned_array() : data((T*)aligned_allocator::allocate(sizeof(T) * N, sizeof(T))) {}
+	operator T*() { return data; }
+	operator const T*() const { return data; }
+	~aligned_array() { aligned_allocator::deallocate(data); }
 };
 
 template<int N, typename T>
@@ -104,8 +107,8 @@ public:
 	enum { SSE_N = (N - 1) / SSE_DIV + 1 };
 
 private:
-	sse_type data_re[SSE_N];
-	sse_type data_im[SSE_N];
+	aligned_array<sse_type, SSE_N> data_re;
+	aligned_array<sse_type, SSE_N> data_im;
 
 public: 
 
@@ -116,7 +119,7 @@ public:
 		scramble();
 		load();
 		next.template apply<1>(data_re, data_im);
-		next.template apply<1>(data_re + N / 2, data_im + N / 2);
+		next.template apply<1>(data_re + SSE_N / 2, data_im + SSE_N / 2);
 		save();
 	}
 
@@ -124,7 +127,7 @@ public:
 		scramble();
 		load();
 		next.template apply<-1>(data_re, data_im);
-		next.template apply<-1>(data_re + N / 2, data_im + N / 2);
+		next.template apply<-1>(data_re + SSE_N / 2, data_im + SSE_N / 2);
 
 		sse_type n = _mm_set_ps1(N);
 		for(unsigned i = 0; i < SSE_N; ++i) {
