@@ -46,8 +46,8 @@ template <typename T> inline T clunk_max(T a, T b) {
 	return a > b? a: b;
 }
 
-Source::Source(const Sample * sample, const bool loop, const v3<float> &delta, float gain, float pitch) : 
-	sample(sample), loop(loop), delta_position(delta), gain(gain), pitch(pitch), 
+Source::Source(const Sample * sample, const bool loop, const v3<float> &delta, float gain, float pitch, float panning) : 
+	sample(sample), loop(loop), delta_position(delta), gain(gain), pitch(pitch), panning(panning), 
 	position(0), fadeout(0), fadeout_total(0)
 	{
 	for(int i = 0; i < 2; ++i) {

@@ -65,6 +65,11 @@ public:
 	float gain;
 	///pitch, 2.0f - pitching up one octave
 	float pitch;
+	/*!
+		panning. -1.0f = 2 * vol in left channel, 0 in right. +1.0f = no sound in left channel, 2 * vol in right.
+		note: panning is actually applied on mono samples in center(listener) position.
+	*/
+	float panning;
 	/*! 
 		\brief constructs new source
 		\param[in] sample audio data
@@ -73,7 +78,7 @@ public:
 		\param[in] gain gain
 		\param[in] pitch pitch
 	*/
-	Source(const Sample * sample, const bool loop = false, const v3<float> &delta = v3<float>(), float gain = 1, float pitch = 1);
+	Source(const Sample * sample, const bool loop = false, const v3<float> &delta = v3<float>(), float gain = 1, float pitch = 1, float panning = 0);
 	/*! 
 		\brief for the internal use only. DO NOT USE IT. 
 		\internal for the internal use only. 
