@@ -40,7 +40,7 @@ struct sse_danielson_lanczos {
 		next_type::template apply<SIGN>(data_re, data_im);
 		next_type::template apply<SIGN>(data_re + N / 2, data_im + N / 2);
 			
-		T a = (T)(-2 * M_PI / N * SIGN);
+		T a = (T)(-2 * M_PI / N * SIGN / SSE_DIV);
 		T wtemp = sin(a / 2);
 		
 		std::complex<T> wp (-2 * wtemp * wtemp, sin(a)), w(1, 0);
