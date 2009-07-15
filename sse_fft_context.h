@@ -35,6 +35,21 @@ struct sse_danielson_lanczos {
 
 	typedef sse_danielson_lanczos<N / 2, float> next_type;
 
+	static void scramble(sse_type * data) {
+		int j = 0;
+		for(int i = 0; i < N; ++i) {
+			if (i > j) {
+				std::swap(data[i], data[j]);
+			}
+			int m = N / 2;
+			while(j >= m && m >= 2) {
+				j -= m;
+				m >>= 1;
+			}
+			j += m;
+		}
+	}
+
 	template<int SIGN>
 	static void apply(sse_type * data_re, sse_type * data_im) {
 		next_type::template apply<SIGN>(data_re, data_im);
@@ -87,6 +102,7 @@ struct sse_danielson_lanczos<1, T> {
 			data[i] = std::complex<T>(re[i], im[i]);
 		}
 		
+		next_type::scramble(data);
 		next_type::template apply<SIGN>(data);
 
 		for(unsigned i = 0; i < SSE_DIV; ++i) {
@@ -107,7 +123,7 @@ public:
 	enum { SSE_DIV = sizeof(sse_type) / sizeof(float) };
 	enum { SSE_N = (N - 1) / SSE_DIV + 1 };
 
-	clunk_static_assert(SSE_DIV == 4);
+	//clunk_static_assert(SSE_DIV == 4);
 
 private:
 	aligned_array<sse_type, SSE_N> data_re;
@@ -119,7 +135,8 @@ public:
 	value_type data[N];
 	
 	inline void fft() {
-		scramble();
+		next.scramble(data_re);
+		next.scramble(data_im);
 		load();
 		next.template apply<1>(data_re, data_im);
 		next.template apply<1>(data_re + SSE_N / 2, data_im + SSE_N / 2);
@@ -127,7 +144,8 @@ public:
 	}
 
 	inline void ifft() {
-		scramble();
+		next.scramble(data_re);
+		next.scramble(data_im);
 		load();
 		next.template apply<-1>(data_re, data_im);
 		next.template apply<-1>(data_re + SSE_N / 2, data_im + SSE_N / 2);
@@ -171,27 +189,6 @@ private:
 		}
 	}
 
-	template<typename V>
-	static inline void swap(V &a, V &b) {
-		V t = a;
-		a = b; 
-		b = t;
-	}
-
-	void scramble() {
-		int j = 0;
-		for(int i = 0; i < N; ++i) {
-			if (i > j) {
-				swap(data[i], data[j]);
-			}
-			int m = N / 2;
-			while(j >= m && m >= 2) {
-				j -= m;
-				m >>= 1;
-			}
-			j += m;
-		}
-	}
 };
 
 }

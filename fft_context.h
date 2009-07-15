@@ -12,6 +12,21 @@ struct danielson_lanczos {
 	enum { M = N / 2 };
 	typedef danielson_lanczos<M, T> next_type;
 
+	static void scramble(std::complex<T> * data) {
+		int j = 0;
+		for(int i = 0; i < N; ++i) {
+			if (i > j) {
+				std::swap(data[i], data[j]);
+			}
+			int m = N / 2;
+			while(j >= m && m >= 2) {
+				j -= m;
+				m >>= 1;
+			}
+			j += m;
+		}
+	}
+
 	template<int SIGN>
 	static void apply(std::complex<T>* data) {
 		next_type::template apply<SIGN>(data);
@@ -51,12 +66,12 @@ public:
 
 public: 
 	inline void fft() {
-		scramble();
+		next.scramble(data);
 		next.template apply<1>(data);
 	}
 
 	inline void ifft() {
-		scramble();
+		next.scramble(data);
 		next.template apply<-1>(data);
 		for(unsigned i = 0; i < N; ++i) {
 			data[i] /= N;
@@ -66,29 +81,14 @@ public:
 private:
 	danielson_lanczos<N, T> next;
 	
-	template<typename V>
-	static inline void swap(V &a, V &b) {
-		V t = a;
-		a = b; 
-		b = t;
-	}
-
-	void scramble() {
-		int j = 0;
-		for(int i = 0; i < N; ++i) {
-			if (i > j) {
-				swap(data[i], data[j]);
-			}
-			int m = N / 2;
-			while(j >= m && m >= 2) {
-				j -= m;
-				m >>= 1;
-			}
-			j += m;
-		}
-	}
 };
 
 }
+
+/*
+#ifdef USE_SIMD
+#	include "sse_fft_context.h"
+#endif
+*/
 
 #endif
