@@ -9,6 +9,7 @@
 #include <sys/types.h>
 #include <xmmintrin.h>
 #include <complex>
+#include "clunk_assert.h"
 
 namespace clunk {
 
@@ -105,6 +106,8 @@ public:
 	enum { N = 1 << BITS };
 	enum { SSE_DIV = sizeof(sse_type) / sizeof(float) };
 	enum { SSE_N = (N - 1) / SSE_DIV + 1 };
+
+	clunk_static_assert(SSE_DIV == 4);
 
 private:
 	aligned_array<sse_type, SSE_N> data_re;
