@@ -71,9 +71,15 @@ void Object::cancel(const std::string &name, const float fadeout) {
 	AudioLocker l;
 	Sources::iterator b = sources.lower_bound(name);
 	Sources::iterator e = sources.upper_bound(name);
-	for(Sources::iterator i = b; i != e; ++i) {
-		if (i->second->loop)
+	for(Sources::iterator i = b; i != e; ) {
+		if (fadeout == 0) {
+			//quickly destroy source
+			delete i->second;
+			sources.erase(i++);
+			continue;
+		} else if (i->second->loop)
 			i->second->fade_out(fadeout);
+		++i;
 	}
 }
 
