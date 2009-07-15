@@ -86,10 +86,8 @@ private:
 
 }
 
-/*
 #ifdef USE_SIMD
 #	include "sse_fft_context.h"
 #endif
-*/
 
 #endif
