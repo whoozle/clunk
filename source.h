@@ -49,7 +49,7 @@ public:
 
 private: 
 	typedef mdct_context<WINDOW_BITS, clunk_window_func, float> mdct_type;
-	static mdct_type mdct; //must be first - aligned 
+	static mdct_type mdct;
 
 public:
 	enum { WINDOW_SIZE = mdct_type::N };
