@@ -80,7 +80,7 @@ struct sse_danielson_lanczos<1, T> {
 	static void apply(sse_type * data_re, sse_type * data_im) {
 		float re[SSE_DIV], im[SSE_DIV]; 
 		_mm_storeu_ps(re, *data_re);
-		_mm_storeu_ps(im, *data_re);
+		_mm_storeu_ps(im, *data_im);
 
 		std::complex<T> data[SSE_DIV];
 		for(unsigned i = 0; i < SSE_DIV; ++i) {
