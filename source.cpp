@@ -165,7 +165,7 @@ void Source::hrtf(int window, const unsigned channel_idx, clunk::Buffer &result,
 		//fprintf(stderr, "%g ", m);
 	}
 	//energy /= mdct_type::M;
-	float energy_k = energy0 / energy;
+	float energy_k = energy > 0? sqrtf(energy0 / energy): 1;
 	//LOG_DEBUG(("energy_k = %g", energy_k));
 	
 	mdct.imdct();
