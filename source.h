@@ -35,7 +35,7 @@ class Buffer;
 
 //window function used in ogg/vorbis
 template<int N, typename T>
-struct clunk_window_func : public clunk::window_func_base<N, T> {
+struct vorbis_window_func : public clunk::window_func_base<N, T> {
 	inline T operator()(int x) const {
 		T s = sin(T(M_PI) * (x + 0.5f) / N);
 		return sin(T(M_PI_2) * s * s); 
@@ -48,7 +48,7 @@ public:
 	enum { WINDOW_BITS = 9 };
 
 private: 
-	typedef mdct_context<WINDOW_BITS, clunk_window_func, float> mdct_type;
+	typedef mdct_context<WINDOW_BITS, vorbis_window_func, float> mdct_type;
 	static mdct_type mdct;
 
 public:
