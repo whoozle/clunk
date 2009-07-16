@@ -10,8 +10,10 @@ env.MergeFlags(sdl_cflags)
 env.MergeFlags(sdl_libs)
 
 lib_dir = '.'
-have_sse = False
-debug = True
+Ehave_sse = False
+have_sse = True
+#debug = True
+debug = False
 prefix = ''
 
 Export('sdl_cflags')
@@ -27,8 +29,12 @@ env.Append(CPPDEFINES=['DEBUG', '_REENTRANT'])
 if have_sse:
 	env.Append(CPPDEFINES=['USE_SIMD'])
 
-#env.Append(CXXFLAGS=['-O3'])
-buildmode = 'debug'
+if debug:
+	buildmode = 'debug'
+	env.Append(CXXFLAGS=['-ggdb'])
+else:
+	buildmode = 'release'
+	env.Append(CXXFLAGS=['-O3', '-mtune=native', '-march=native'])
 
 clunk_src = [
 	'context.cpp', 'sample.cpp', 'object.cpp', 'source.cpp', 'sdl_ex.cpp', 'stream.cpp', 
