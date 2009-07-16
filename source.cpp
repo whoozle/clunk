@@ -150,37 +150,41 @@ void Source::hrtf(int window, const unsigned channel_idx, clunk::Buffer &result,
 	mdct.mdct();
 		
 	//LOG_DEBUG(("kemar angle index: %d\n", kemar_idx));
-	
-	float energy0 = 0, energy = 0;
 	for(int i = 0; i < mdct_type::M; ++i) {
 		float v = mdct.data[i];
 		const int kemar_angle_idx = i * 512 / mdct_type::M;
 		assert(kemar_angle_idx < 512);
 		float m = pow10f(kemar_data[kemar_idx][0][kemar_angle_idx] * v / 20);
 
-		energy0 += v * v;
-		v *= m;
-		mdct.data[i] = v;
-		energy  += v * v;
+		mdct.data[i] = v * m;
 		//fprintf(stderr, "%g ", m);
 	}
-	//energy /= mdct_type::M;
-	float energy_k = energy > 0? sqrtf(energy0 / energy): 1;
-	//LOG_DEBUG(("energy_k = %g", energy_k));
 	
 	mdct.imdct();
 	mdct.apply_window();
 
 	Sint16 *dst = (Sint16 *)((unsigned char *)result.get_ptr() + result_start);
 	int i;
+
+	float max_v = 1.0f, min_v = -1.0f;
+	
 	for(i = 0; i < WINDOW_SIZE / 2; ++i) {
-		float v = (mdct.data[i] + overlap_data[channel_idx][i]) * energy_k;
+		float v = (mdct.data[i] + overlap_data[channel_idx][i]);
+
+		if (v < min_v)
+			min_v = v;
+		else if (v > max_v)
+			max_v = v;
+	}
+
+	for(i = 0; i < WINDOW_SIZE / 2; ++i) {
+		float v = ((mdct.data[i] + overlap_data[channel_idx][i]) - min_v) / (max_v - min_v) * 2 - 1;
 		
 		if (v < -1) {
-			LOG_DEBUG(("clipping %g", v));
+			LOG_DEBUG(("clipping %f [%f-%f]", v, min_v, max_v));
 			v = -1;
 		} else if (v > 1) {
-			LOG_DEBUG(("clipping %g", v));
+			LOG_DEBUG(("clipping %f [%f-%f]", v, min_v, max_v));
 			v = 1;
 		}
 		*dst++ = (int)(v * 32767);
