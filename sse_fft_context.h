@@ -18,11 +18,11 @@ struct aligned_allocator {
 	static void deallocate(void *ptr);
 };
 
-template<typename T, int N>
+template<typename T, int N, int ALIGNMENT = sizeof(T)>
 class aligned_array {
 	T * data;
 public: 
-	aligned_array() : data((T*)aligned_allocator::allocate(sizeof(T) * N, sizeof(T))) {}
+	aligned_array() : data((T*)aligned_allocator::allocate(sizeof(T) * N, ALIGNMENT)) {}
 	operator T*() { return data; }
 	operator const T*() const { return data; }
 	~aligned_array() { aligned_allocator::deallocate(data); }
