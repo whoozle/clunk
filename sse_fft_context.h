@@ -31,9 +31,9 @@ public:
 template<int N, typename T>
 struct sse_danielson_lanczos {
 	typedef __m128 sse_type;
-	enum { SSE_DIV = sizeof(sse_type) / sizeof(float) };
+	enum { SSE_DIV = sizeof(sse_type) / sizeof(T) };
 
-	typedef sse_danielson_lanczos<N / 2, float> next_type;
+	typedef sse_danielson_lanczos<N / 2, T> next_type;
 	next_type next;
 	
 	aligned_array<sse_type, N / 2> angle_re;
@@ -45,7 +45,7 @@ struct sse_danielson_lanczos {
 		
 		std::complex<T> wp (-2 * wtemp * wtemp, sin(a)), w(1, 0);
 		for (unsigned i = 0; i < N / 2 ; ++i) {
-			float w_re_buf[SSE_DIV], w_im_buf[SSE_DIV];
+			T w_re_buf[SSE_DIV], w_im_buf[SSE_DIV];
 			for (unsigned k = 0; k < SSE_DIV; ++k) {
 				w_re_buf[k] = w.real();
 				w_im_buf[k] = w.imag();
@@ -87,7 +87,7 @@ struct sse_danielson_lanczos<1, T> {
 
 	template<int SIGN>
 	static void apply(sse_type * data_re, sse_type * data_im) {
-		float re[SSE_DIV], im[SSE_DIV]; 
+		T re[SSE_DIV], im[SSE_DIV]; 
 		_mm_storeu_ps(re, *data_re);
 		_mm_storeu_ps(im, *data_im);
 
