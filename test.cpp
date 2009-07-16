@@ -2,7 +2,42 @@
 #include "source.h"
 #include <stdlib.h>
 
-int main() {
+#define WINDOW_BITS 9
+
+typedef clunk::mdct_context<WINDOW_BITS, clunk::clunk_window_func, float> mdct_type;
+typedef clunk::fft_context<WINDOW_BITS - 2, float> fft_type;
+
+int main(int argc, char *argv[]) {
+	if (argc > 1 && argv[1][0] == 'b' && argv[1][1] == 'm') {
+		mdct_type mdct;
+		for(int i = 0; i < 100000; ++i) 
+			mdct.mdct();
+		return 0;
+	}
+	if (argc > 1 && argv[1][0] == 'b' && argv[1][1] == 'f') {
+		fft_type fft;
+		for(int i = 0; i < 2000000; ++i) 
+			fft.fft();
+		return 0;
+	}
+	if (argc > 1 && argv[1][0] == 't') {
+		fft_type fft;
+		for(int i = 0; i < fft_type::N; ++i) {
+			fft.data[i] = std::complex<float>((i / 4) & 1, 0);
+		}
+		fft.fft();
+		for(int i = 0; i < fft_type::N; ++i) {
+			printf("%f, %f = %f\n", fft.data[i].real(), fft.data[i].imag(), std::abs(fft.data[i]));
+		}
+		fft.ifft();
+
+		for(int i = 0; i < fft_type::N; ++i) {
+			fft.data[i] -= std::complex<float>((i / 4) & 1, 0);
+			printf("%f, %f\n", fft.data[i].real(), fft.data[i].imag());
+		}
+		
+		return 0;
+	}
 	clunk::Context context;
 	context.init(44100, 2, 1024);
 	
