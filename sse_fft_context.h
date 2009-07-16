@@ -34,29 +34,38 @@ struct sse_danielson_lanczos {
 	enum { SSE_DIV = sizeof(sse_type) / sizeof(float) };
 
 	typedef sse_danielson_lanczos<N / 2, float> next_type;
-
-	template<int SIGN>
-	static void apply(sse_type * data_re, sse_type * data_im) {
-		next_type::template apply<SIGN>(data_re, data_im);
-		next_type::template apply<SIGN>(data_re + N / 2, data_im + N / 2);
-			
-		T a = (T)(-2 * M_PI / N * SIGN / SSE_DIV);
+	next_type next;
+	
+	aligned_array<sse_type, N / 2> angle_re;
+	aligned_array<sse_type, N / 2> angle_im;
+	
+	sse_danielson_lanczos() {
+		T a = (T)(-2 * M_PI / N / SSE_DIV);
 		T wtemp = sin(a / 2);
 		
 		std::complex<T> wp (-2 * wtemp * wtemp, sin(a)), w(1, 0);
-
 		for (unsigned i = 0; i < N / 2 ; ++i) {
-			int j = i + N / 2;
-			
 			float w_re_buf[SSE_DIV], w_im_buf[SSE_DIV];
 			for (unsigned k = 0; k < SSE_DIV; ++k) {
 				w_re_buf[k] = w.real();
 				w_im_buf[k] = w.imag();
 				w += w * wp;
 			}
-			sse_type w_re, w_im;
-			w_re = _mm_loadu_ps(w_re_buf);
-			w_im = _mm_loadu_ps(w_im_buf);
+
+			angle_re[i] = _mm_loadu_ps(w_re_buf);
+			angle_im[i] = _mm_loadu_ps(w_im_buf);
+		}
+	}
+
+	template<int SIGN>
+	void apply(sse_type * data_re, sse_type * data_im) {
+		next.template apply<SIGN>(data_re, data_im);
+		next.template apply<SIGN>(data_re + N / 2, data_im + N / 2);
+			
+		for (unsigned i = 0; i < N / 2 ; ++i) {
+			int j = i + N / 2;
+			
+			sse_type w_re = angle_re[i], w_im = _mm_mul_ps(_mm_set_ps1(SIGN), angle_im[i]);
 			
 			sse_type temp_re = _mm_sub_ps(_mm_mul_ps(data_re[j], w_re), _mm_mul_ps(data_im[j], w_im)), 
 					 temp_im = _mm_add_ps(_mm_mul_ps(data_im[j], w_re), _mm_mul_ps(data_re[j], w_im));
