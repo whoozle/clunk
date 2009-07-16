@@ -4,7 +4,7 @@
 
 #define WINDOW_BITS 9
 
-typedef clunk::mdct_context<WINDOW_BITS, clunk::clunk_window_func, float> mdct_type;
+typedef clunk::mdct_context<WINDOW_BITS, clunk::vorbis_window_func, float> mdct_type;
 typedef clunk::fft_context<WINDOW_BITS - 2, float> fft_type;
 
 int main(int argc, char *argv[]) {
