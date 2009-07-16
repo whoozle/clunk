@@ -49,22 +49,23 @@ public:
 	enum { N = 1 << BITS };
 	typedef std::complex<T> value_type;
 	value_type data[N];
-
-public: 
+	
 	inline void fft() {
 		scramble(data);
-		next.template apply<1>(data);
+		next_type::template apply<1>(data);
 	}
 
 	inline void ifft() {
 		scramble(data);
-		next.template apply<-1>(data);
+		next_type::template apply<-1>(data);
 		for(unsigned i = 0; i < N; ++i) {
 			data[i] /= N;
 		}
 	}
 	
 private:
+	typedef danielson_lanczos<N, T> next_type;
+
 	static void scramble(std::complex<T> * data) {
 		int j = 0;
 		for(int i = 0; i < N; ++i) {
@@ -79,9 +80,6 @@ private:
 			j += m;
 		}
 	}
-
-	danielson_lanczos<N, T> next;
-	
 };
 
 }
