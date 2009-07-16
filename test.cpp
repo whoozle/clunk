@@ -10,7 +10,7 @@ typedef clunk::fft_context<WINDOW_BITS - 2, float> fft_type;
 int main(int argc, char *argv[]) {
 	if (argc > 1 && argv[1][0] == 'b' && argv[1][1] == 'm') {
 		mdct_type mdct;
-		for(int i = 0; i < 100000; ++i) 
+		for(int i = 0; i < 1000000; ++i) 
 			mdct.mdct();
 		return 0;
 	}

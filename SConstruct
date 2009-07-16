@@ -10,7 +10,7 @@ env.MergeFlags(sdl_cflags)
 env.MergeFlags(sdl_libs)
 
 lib_dir = '.'
-Ehave_sse = False
+#have_sse = False
 have_sse = True
 #debug = True
 debug = False
