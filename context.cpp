@@ -25,6 +25,7 @@
 #include "logger.h"
 #include "source.h"
 #include <assert.h>
+#define _USE_MATH_DEFINES
 #include <math.h>
 #include <map>
 #include <algorithm>
@@ -140,7 +141,7 @@ void Context::process(Sint16 *stream, int size) {
 				}
 			}
 		}
-		int buf_size = stream_info.buffer.get_size();
+		int buf_size = (int)stream_info.buffer.get_size();
 		//LOG_DEBUG(("buffered %d bytes", buf_size));
 		if (buf_size == 0) {
 			//all data buffered. continue;

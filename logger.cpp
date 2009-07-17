@@ -30,6 +30,9 @@ void clunk::log_debug(const char *fmt, ...) {
 }
 
 #define FORMAT_BUFFER_SIZE 1024
+#ifdef _WINDOWS
+#define vsnprintf _vsnprintf
+#endif
 
 const std::string clunk::format_string(const char *fmt, ...) {
 	va_list ap;

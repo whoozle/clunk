@@ -5,6 +5,9 @@
 #	error turn on SSE support with USE_SIMD macro
 #endif
 
+#ifndef _USE_MATH_DEFINES
+#define _USE_MATH_DEFINES
+#endif
 #include <math.h>
 #include <sys/types.h>
 #include <xmmintrin.h>

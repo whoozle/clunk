@@ -164,11 +164,10 @@ void Source::hrtf(int window, const unsigned channel_idx, clunk::Buffer &result,
 	mdct.apply_window();
 
 	Sint16 *dst = (Sint16 *)((unsigned char *)result.get_ptr() + result_start);
-	int i;
 
 	float max_v = 1.0f, min_v = -1.0f;
 	
-	for(i = 0; i < WINDOW_SIZE / 2; ++i) {
+	for(int i = 0; i < WINDOW_SIZE / 2; ++i) {
 		float v = (mdct.data[i] + overlap_data[channel_idx][i]);
 
 		if (v < min_v)
@@ -177,20 +176,24 @@ void Source::hrtf(int window, const unsigned channel_idx, clunk::Buffer &result,
 			max_v = v;
 	}
 
-	for(i = 0; i < WINDOW_SIZE / 2; ++i) {
-		float v = ((mdct.data[i] + overlap_data[channel_idx][i]) - min_v) / (max_v - min_v) * 2 - 1;
-		
-		if (v < -1) {
-			LOG_DEBUG(("clipping %f [%f-%f]", v, min_v, max_v));
-			v = -1;
-		} else if (v > 1) {
-			LOG_DEBUG(("clipping %f [%f-%f]", v, min_v, max_v));
-			v = 1;
+	{
+		//stupid msvc
+		int i;
+		for(i = 0; i < WINDOW_SIZE / 2; ++i) {
+			float v = ((mdct.data[i] + overlap_data[channel_idx][i]) - min_v) / (max_v - min_v) * 2 - 1;
+			
+			if (v < -1) {
+				LOG_DEBUG(("clipping %f [%f-%f]", v, min_v, max_v));
+				v = -1;
+			} else if (v > 1) {
+				LOG_DEBUG(("clipping %f [%f-%f]", v, min_v, max_v));
+				v = 1;
+			}
+			*dst++ = (int)(v * 32767);
 		}
-		*dst++ = (int)(v * 32767);
-	}
-	for(; i < WINDOW_SIZE; ++i) {
-		overlap_data[channel_idx][i - WINDOW_SIZE / 2] = mdct.data[i];
+		for(; i < WINDOW_SIZE; ++i) {
+			overlap_data[channel_idx][i - WINDOW_SIZE / 2] = mdct.data[i];
+		}
 	}
 }
 
@@ -203,7 +206,7 @@ void Source::update_position(const int dp) {
 		buf.pop(dp * 2);
 	}
 	
-	int src_n = sample->data.get_size() / sample->spec.channels / 2;
+	int src_n = (int)sample->data.get_size() / sample->spec.channels / 2;
 	if (loop) {
 		position %= src_n;
 		//LOG_DEBUG(("position %d", position));
@@ -221,7 +224,7 @@ void Source::update_position(const int dp) {
 
 float Source::process(clunk::Buffer &buffer, unsigned dst_ch, const v3<float> &delta_position, const v3<float> &direction, float fx_volume, float pitch) {
 	Sint16 * dst = (Sint16*) buffer.get_ptr();
-	unsigned dst_n = buffer.get_size() / dst_ch / 2;
+	unsigned dst_n = (unsigned)buffer.get_size() / dst_ch / 2;
 	const Sint16 * src = (Sint16*) sample->data.get_ptr();
 	if (src == NULL)
 		throw_ex(("uninitialized sample used (%p)", (void *)sample));
@@ -231,7 +234,7 @@ float Source::process(clunk::Buffer &buffer, unsigned dst_ch, const v3<float> &d
 		throw_ex(("pitch %g could not be negative or zero", pitch));
 		
 	unsigned src_ch = sample->spec.channels; 
-	unsigned src_n = sample->data.get_size() / src_ch / 2;
+	unsigned src_n = (unsigned)sample->data.get_size() / src_ch / 2;
 
 	float vol = fx_volume * gain * sample->gain;
 	
