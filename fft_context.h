@@ -38,6 +38,7 @@ struct danielson_lanczos {
 	}
 };
 
+
 template<typename T>
 struct danielson_lanczos<8, T> {
 	typedef danielson_lanczos<4, T> next_type;
@@ -57,9 +58,9 @@ struct danielson_lanczos<8, T> {
 		next_type::template apply<SIGN>(data + 4);
 		
 		rotate(data, 0, std::complex<T>(1, 0));
-		rotate(data, 1, std::complex<T>(M_SQRT1_2, -M_SQRT1_2));
+		rotate(data, 1, std::complex<T>(M_SQRT1_2, -M_SQRT1_2 * SIGN));
 		rotate(data, 2, std::complex<T>(0, -1));
-		rotate(data, 3, std::complex<T>(-M_SQRT1_2, -M_SQRT1_2));
+		rotate(data, 3, std::complex<T>(-M_SQRT1_2, -M_SQRT1_2 * SIGN));
 	}
 };
 
@@ -77,7 +78,7 @@ struct danielson_lanczos<4, T> {
 		data[2] = data[0] - temp;
 		data[0] += temp;
 
-		temp = data[3] * std::complex<T>(0, -1);
+		temp = data[3] * std::complex<T>(0, -SIGN);
 		data[3] = data[1] - temp;
 		data[1] += temp;
 	}
