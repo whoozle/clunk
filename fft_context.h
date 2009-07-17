@@ -9,22 +9,21 @@ namespace clunk {
 
 template<int N, typename T>
 struct danielson_lanczos {
-	enum { M = N / 2 };
-	typedef danielson_lanczos<M, T> next_type;
+	typedef danielson_lanczos<N / 2, T> next_type;
 
 
 	template<int SIGN>
 	static void apply(std::complex<T>* data) {
 		next_type::template apply<SIGN>(data);
-		next_type::template apply<SIGN>(data + M);
+		next_type::template apply<SIGN>(data + N / 2);
 		
 		T a = (T)(-2 * M_PI / N * SIGN);
 		T wtemp = sin(a / 2);
 		
 		std::complex<T> wp(-2 * wtemp * wtemp, sin(a)), w(1, 0);
 
-		for (unsigned i = 0; i < M ; ++i) {
-			int j = i + M;
+		for (unsigned i = 0; i < N / 2 ; ++i) {
+			int j = i + N / 2;
 
 			std::complex<T> temp = data[j] * w;
 
@@ -37,9 +36,67 @@ struct danielson_lanczos {
 };
 
 template<typename T>
+struct danielson_lanczos<8, T> {
+	typedef danielson_lanczos<4, T> next_type;
+
+	static inline void rotate(std::complex<T>* data, const int i, const std::complex<T>& w) {
+		int j = i + 4;
+
+		std::complex<T> temp = data[j] * w;
+
+		data[j] = data[i] - temp;
+		data[i] += temp;
+	}
+
+	template<int SIGN>
+	static inline void apply(std::complex<T>* data) {
+		next_type::template apply<SIGN>(data);
+		next_type::template apply<SIGN>(data + 4);
+		
+		rotate(data, 0, std::complex<T>(1, 0));
+		rotate(data, 1, std::complex<T>(M_SQRT1_2, -M_SQRT1_2));
+		rotate(data, 2, std::complex<T>(0, -1));
+		rotate(data, 3, std::complex<T>(-M_SQRT1_2, -M_SQRT1_2));
+	}
+};
+
+
+template<typename T>
+struct danielson_lanczos<4, T> {
+	typedef danielson_lanczos<2, T> next_type;
+
+	template<int SIGN>
+	static inline void apply(std::complex<T>* data) {
+		next_type::template apply<SIGN>(data);
+		next_type::template apply<SIGN>(data + 2);
+		
+		std::complex<T> temp = data[2];
+		data[2] = data[0] - temp;
+		data[0] += temp;
+
+		temp = data[3] * std::complex<T>(0, -1);
+		data[3] = data[1] - temp;
+		data[1] += temp;
+	}
+};
+
+
+template<typename T>
+struct danielson_lanczos<2, T> {
+	template<int SIGN>
+	static inline void apply(std::complex<T>* data) {
+		std::complex<T> temp = data[1];
+
+		data[1] = data[0] - temp;
+		data[0] += temp;
+	}
+};
+
+
+template<typename T>
 struct danielson_lanczos<1, T> {
 	template<int SIGN>
-	static void apply(std::complex<T>*) {}
+	static inline void apply(std::complex<T>*) {}
 };
 
 
@@ -66,7 +123,7 @@ public:
 private:
 	typedef danielson_lanczos<N, T> next_type;
 
-	static void scramble(std::complex<T> * data) {
+	static inline void scramble(std::complex<T> * data) {
 		int j = 0;
 		for(int i = 0; i < N; ++i) {
 			if (i > j) {
