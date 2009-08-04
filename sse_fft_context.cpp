@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <malloc.h>
 #include <stdio.h>
 #include <new>
@@ -10,13 +11,11 @@ void * aligned_allocator::allocate(size_t size, size_t alignment) {
 	void * ptr;
 #ifdef _WINDOWS
 	ptr = _aligned_malloc(size, alignment);
+#else
+	ptr = memalign(alignment, size);
+#endif
 	if (ptr == NULL)
 		throw std::bad_alloc();
-#else
-	if (posix_memalign(&ptr, alignment, size) != 0) 
-		throw std::bad_alloc();
-	
-#endif
 	return ptr;
 }
 
