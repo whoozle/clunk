@@ -45,7 +45,7 @@ void Context::callback(void *userdata, Uint8 *bstream, int len) {
 	Sint16 *stream = (Sint16*)bstream;
 	TRY {
 		self->process(stream, len);
-	} CATCH("callback", )
+	} CATCH("callback", {})
 }
 
 namespace clunk {
@@ -148,7 +148,7 @@ void Context::process(Sint16 *stream, int size) {
 			LOG_DEBUG(("stream %d finished. dropping.", i->first));
 			TRY {
 				delete stream_info.stream;
-			} CATCH("mixing stream", );
+			} CATCH("mixing stream", {});
 			streams.erase(i++);
 			continue;
 		}
