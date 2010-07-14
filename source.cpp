@@ -99,7 +99,7 @@ void Source::idt_iit(const v3<float> &delta, const v3<float> &dir_vec, float &id
 
 	//LOG_DEBUG(("idt_angle = %g (%d)", idt_angle, (int)(idt_angle * 180 / M_PI)));
 	idt_offset = - head_r * (idt_angle + sin(idt_angle)) / 344;
-	left_to_right_amp_db = atan(idt_angle) * 20;
+	left_to_right_amp_db = sin(idt_angle) * 20;
 	//LOG_DEBUG(("idt_offset %g, left_to_right_amp: %g", idt_offset, left_to_right_amp_db));
 }
 
