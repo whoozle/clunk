@@ -10,8 +10,8 @@ env.MergeFlags(sdl_cflags)
 env.MergeFlags(sdl_libs)
 
 lib_dir = '.'
-#have_sse = False
-have_sse = True
+have_sse = False
+#have_sse = True
 #debug = True
 debug = False
 prefix = ''

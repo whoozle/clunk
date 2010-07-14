@@ -73,7 +73,7 @@ bool Source::playing() const {
 	return position < (int)(sample->data.get_size() / sample->spec.channels / 2);
 }
 	
-void Source::idt(const v3<float> &delta, const v3<float> &dir_vec, float &idt_offset, float &angle_gr) {
+void Source::idt_iit(const v3<float> &delta, const v3<float> &dir_vec, float &idt_offset, float &angle_gr, float &left_to_right_amp_db) {
 	float head_r = 0.093f;
 
 	float direction = dir_vec.is0()? float(M_PI_2): (float)atan2f(dir_vec.y, dir_vec.x);
@@ -97,9 +97,10 @@ void Source::idt(const v3<float> &delta, const v3<float> &dir_vec, float &idt_of
 		idt_angle -= (float)M_PI * 2;
 	}
 
-	//printf("idt_angle = %g (%d)\n", idt_angle, (int)(idt_angle * 180 / M_PI));
-	idt_offset = - head_r / 343 * (idt_angle + sin(idt_angle));
-	//printf("idt_offset %g", idt_offset);
+	//LOG_DEBUG(("idt_angle = %g (%d)", idt_angle, (int)(idt_angle * 180 / M_PI)));
+	idt_offset = - head_r * (idt_angle + sin(idt_angle)) / 344;
+	left_to_right_amp_db = atan(idt_angle) * 20;
+	//LOG_DEBUG(("idt_offset %g, left_to_right_amp: %g", idt_offset, left_to_right_amp_db));
 }
 
 void Source::hrtf(int window, const unsigned channel_idx, clunk::Buffer &result, const Sint16 *src, int src_ch, int src_n, int idt_offset, const kemar_ptr& kemar_data, int kemar_idx) {
@@ -295,8 +296,8 @@ float Source::process(clunk::Buffer &buffer, unsigned dst_ch, const v3<float> &d
 		return 0;
 	}
 
-	float t_idt, angle_gr;
-	idt(delta_position, direction, t_idt, angle_gr);
+	float t_idt, angle_gr, left_to_right_amp_db;
+	idt_iit(delta_position, direction, t_idt, angle_gr, left_to_right_amp_db);
 
 	const int kemar_idx_right = ((((int)angle_gr  + 180 / (int)angles)/ (360 / (int)angles)) % (int)angles);
 	const int kemar_idx_left = (((360 - (int)angle_gr - 180 / (int)angles) / (360 / (int)angles)) % (int)angles);
