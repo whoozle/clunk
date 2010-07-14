@@ -73,7 +73,7 @@ bool Source::playing() const {
 	return position < (int)(sample->data.get_size() / sample->spec.channels / 2);
 }
 	
-void Source::idt_iit(const v3<float> &delta, const v3<float> &dir_vec, float &idt_offset, float &angle_gr, float &left_to_right_amp_db) {
+void Source::idt_iit(const v3<float> &delta, const v3<float> &dir_vec, float &idt_offset, float &angle_gr, float &left_to_right_amp) {
 	float head_r = 0.093f;
 
 	float direction = dir_vec.is0()? float(M_PI_2): (float)atan2f(dir_vec.y, dir_vec.x);
@@ -99,11 +99,11 @@ void Source::idt_iit(const v3<float> &delta, const v3<float> &dir_vec, float &id
 
 	//LOG_DEBUG(("idt_angle = %g (%d)", idt_angle, (int)(idt_angle * 180 / M_PI)));
 	idt_offset = - head_r * (idt_angle + sin(idt_angle)) / 344;
-	left_to_right_amp_db = sin(idt_angle) * 20;
-	//LOG_DEBUG(("idt_offset %g, left_to_right_amp: %g", idt_offset, left_to_right_amp_db));
+	left_to_right_amp = pow10f(-sin(idt_angle));
+	//LOG_DEBUG(("idt_offset %g, left_to_right_amp: %g", idt_offset, left_to_right_amp));
 }
 
-void Source::hrtf(int window, const unsigned channel_idx, clunk::Buffer &result, const Sint16 *src, int src_ch, int src_n, int idt_offset, const kemar_ptr& kemar_data, int kemar_idx) {
+void Source::hrtf(int window, const unsigned channel_idx, clunk::Buffer &result, const Sint16 *src, int src_ch, int src_n, int idt_offset, const kemar_ptr& kemar_data, int kemar_idx, float freq_decay) {
 	assert(channel_idx < 2);
 	
 	//LOG_DEBUG(("%d bytes, %d actual window size, %d windows", dst_n, CLUNK_ACTUAL_WINDOW, n));
@@ -111,7 +111,7 @@ void Source::hrtf(int window, const unsigned channel_idx, clunk::Buffer &result,
 	size_t result_start = result.get_size();
 	result.reserve(WINDOW_SIZE);
 	
-	//LOG_DEBUG(("channel %d: window %d: adding %d, buffer size: %u", channel_idx, window, WINDOW_SIZE, (unsigned)result.get_size()));
+	//LOG_DEBUG(("channel %d: window %d: adding %d, buffer size: %u, decay: %g", channel_idx, window, WINDOW_SIZE, (unsigned)result.get_size(), freq_decay));
 
 	if (channel_idx <= 1) {
 		bool left = channel_idx == 0;
@@ -151,14 +151,16 @@ void Source::hrtf(int window, const unsigned channel_idx, clunk::Buffer &result,
 	mdct.mdct();
 		
 	//LOG_DEBUG(("kemar angle index: %d\n", kemar_idx));
+	assert(freq_decay >= 1);
 	for(int i = 0; i < mdct_type::M; ++i) {
 		float v = mdct.data[i];
 		const int kemar_angle_idx = i * 512 / mdct_type::M;
+		const float decay = 1 + i * (freq_decay - 1) / mdct_type::M;
 		assert(kemar_angle_idx < 512);
-		float m = pow10f(kemar_data[kemar_idx][0][kemar_angle_idx] * v / 20);
+		float m = pow10f(-kemar_data[kemar_idx][0][kemar_angle_idx] * v / 20) / decay;
 
 		mdct.data[i] = v * m;
-		//fprintf(stderr, "%g ", m);
+		//fprintf(stderr, "%g d: %g", m, decay);
 	}
 	
 	mdct.imdct();
@@ -296,8 +298,8 @@ float Source::process(clunk::Buffer &buffer, unsigned dst_ch, const v3<float> &d
 		return 0;
 	}
 
-	float t_idt, angle_gr, left_to_right_amp_db;
-	idt_iit(delta_position, direction, t_idt, angle_gr, left_to_right_amp_db);
+	float t_idt, angle_gr, left_to_right_amp;
+	idt_iit(delta_position, direction, t_idt, angle_gr, left_to_right_amp);
 
 	const int kemar_idx_right = ((((int)angle_gr  + 180 / (int)angles)/ (360 / (int)angles)) % (int)angles);
 	const int kemar_idx_left = (((360 - (int)angle_gr - 180 / (int)angles) / (360 / (int)angles)) % (int)angles);
@@ -307,8 +309,8 @@ float Source::process(clunk::Buffer &buffer, unsigned dst_ch, const v3<float> &d
 
 	int window = 0;
 	while(sample3d[0].get_size() < dst_n * 2 || sample3d[1].get_size() < dst_n * 2) {
-		hrtf(window, 0, sample3d[0], src, src_ch, src_n, idt_offset, kemar_data, kemar_idx_left);
-		hrtf(window, 1, sample3d[1], src, src_ch, src_n, idt_offset, kemar_data, kemar_idx_right);
+		hrtf(window, 0, sample3d[0], src, src_ch, src_n, idt_offset, kemar_data, kemar_idx_left, left_to_right_amp > 1? 1: 1 / left_to_right_amp);
+		hrtf(window, 1, sample3d[1], src, src_ch, src_n, idt_offset, kemar_data, kemar_idx_right, left_to_right_amp > 1? left_to_right_amp: 1);
 		++window;
 	}
 	assert(sample3d[0].get_size() >= dst_n * 2 && sample3d[1].get_size() >= dst_n * 2);

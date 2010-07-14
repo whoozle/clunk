@@ -106,9 +106,9 @@ private:
 	typedef const float (*kemar_ptr)[2][512];
 	void get_kemar_data(kemar_ptr & kemar_data, int & samples, const v3<float> &delta_position);
 
-	static void idt_iit(const v3<float> &delta, const v3<float> &direction, float &idt_offset, float &angle_gr, float &left_to_right_amp_db);
+	static void idt_iit(const v3<float> &delta, const v3<float> &direction, float &idt_offset, float &angle_gr, float &left_to_right_amp);
 	//generate hrtf response for channel idx (0 left), in result.
-	void hrtf(int window, const unsigned channel_idx, clunk::Buffer &result, const Sint16 *src, int src_ch, int src_n, int idt_offset, const kemar_ptr& kemar_data, int kemar_idx);
+	void hrtf(int window, const unsigned channel_idx, clunk::Buffer &result, const Sint16 *src, int src_ch, int src_n, int idt_offset, const kemar_ptr& kemar_data, int kemar_idx, float freq_decay);
 
 	int position, fadeout, fadeout_total;
 	
