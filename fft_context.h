@@ -145,7 +145,7 @@ private:
 
 }
 
-#ifdef USE_SIMD
+#ifdef CLUNK_USES_SSE
 #	include "sse_fft_context.h"
 #endif
 

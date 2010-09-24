@@ -11,7 +11,7 @@ env.Append(CPPPATH=['..', '.'])
 env.Append(LIBPATH=['.'])
 env.Append(CPPDEFINES=['CLUNKAPI=DLLEXPORT'])
 if have_sse: 
-	env.Append(CPPDEFINES=['USE_SIMD'])
+	env.Append(CPPDEFINES=['CLUNK_USES_SSE'])
 
 clunk_libs = ['SDL']
 

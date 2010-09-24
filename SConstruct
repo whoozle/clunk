@@ -27,7 +27,7 @@ env['prefix'] = ''
 env.Append(LIBPATH=['.'])
 env.Append(CPPDEFINES=['DEBUG', '_REENTRANT'])
 if have_sse:
-	env.Append(CPPDEFINES=['USE_SIMD'])
+	env.Append(CPPDEFINES=['CLUNK_USES_SSE'])
 
 if debug:
 	buildmode = 'debug'

@@ -1,8 +1,8 @@
 #ifndef CLUNK_SSE_FFT_CONTEXT_H__
 #define CLUNK_SSE_FFT_CONTEXT_H__
 
-#ifndef USE_SIMD
-#	error turn on SSE support with USE_SIMD macro
+#ifndef CLUNK_USES_SSE
+#	error turn on SSE support with CLUNK_USES_SSE macro
 #endif
 
 #ifndef _USE_MATH_DEFINES

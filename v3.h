@@ -277,7 +277,7 @@ template <typename T>
 		return v3<T>(a / v.x, a / v.y, a / v.z);
 	}
 
-#if 0 //defined USE_SIMD
+#if 0 //defined CLUNK_USES_SSE
 #	include <xmmintrin.h>
 
 template <> 
@@ -520,7 +520,7 @@ public:
 	}
 };
 
-#endif //USE_SIMD
+#endif //CLUNK_USES_SSE
 	
 } //namespace clunk
 
