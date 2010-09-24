@@ -21,7 +21,6 @@ set(SOURCES
 	clunk_ex.cpp
 	context.cpp
 	distance_model.cpp
-	fftw.c
 	kemar.c
 	logger.cpp
 	object.cpp
