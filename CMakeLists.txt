@@ -12,7 +12,7 @@ endif ( NOT SDL_FOUND )
 set(clunk_VERSION_MAJOR 1)
 set(clunk_VERSION_MINOR 0)
 
-add_definitions(-DCLUNKAPI=DLLEXPORT)
+add_definitions(-DCLUNKAPI=DLLEXPORT -D_CRT_SECURE_NO_WARNINGS)
 set(CMAKE_INCLUDE_CURRENT_DIR TRUE)
 include_directories(${SDL_INCLUDE_DIR})
 
