@@ -33,6 +33,25 @@ set(SOURCES
 	source.cpp
 	stream.cpp
 )
+set(PUBLIC_HEADERS
+	buffer.h
+	clunk.h
+	clunk_assert.h
+	context.h
+	distance_model.h
+	export_clunk.h
+	fft_context.h
+	locker.h
+	logger.h
+	mdct_context.h
+	object.h
+	sample.h
+	source.h
+	sse_fft_context.h
+	stream.h
+	v3.h
+)
+
 if (WITH_SSE)
 	set(SOURCES ${SOURCES} sse_fft_context.cpp)
 	add_definitions(-DCLUNK_USES_SSE)
@@ -41,5 +60,8 @@ endif(WITH_SSE)
 add_library(clunk SHARED
 	${SOURCES}
 )
+
+install(TARGETS clunk DESTINATION lib)
+install(FILES ${PUBLIC_HEADERS} DESTINATION include/clunk)
 
 target_link_libraries(clunk ${SDL_LIBRARY})
