@@ -112,7 +112,7 @@ void Context::process(Sint16 *stream, int size) {
 				}
 				//LOG_DEBUG(("%u: source: %s", (unsigned)lsources.size(), name.c_str()));
 			} else {
-				s->update_position(n);
+				s->_update_position(n);
 			}
 			++j;
 		}
@@ -188,7 +188,7 @@ void Context::process(Sint16 *stream, int size) {
 		if (sdl_v <= 0)
 			continue;
 		//check for 0
-		volume = source->process(buf, spec.channels, source_info.s_pos, source_info.s_dir, volume, dpitch);
+		volume = source->_process(buf, spec.channels, source_info.s_pos, source_info.s_dir, volume, dpitch);
 		sdl_v = (int)floor(SDL_MIX_MAXVOLUME * volume + 0.5f);
 		//LOG_DEBUG(("%u: mixing source with volume %g (%d)", i, volume, sdl_v));
 		if (sdl_v <= 0)

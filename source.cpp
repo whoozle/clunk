@@ -200,7 +200,7 @@ void Source::hrtf(int window, const unsigned channel_idx, clunk::Buffer &result,
 	}
 }
 
-void Source::update_position(const int dp) {
+void Source::_update_position(const int dp) {
 	//LOG_DEBUG(("update_position(%d)", dp));
 	position += dp;
 	
@@ -225,7 +225,7 @@ void Source::update_position(const int dp) {
 	}
 }
 
-float Source::process(clunk::Buffer &buffer, unsigned dst_ch, const v3<float> &delta_position, const v3<float> &direction, float fx_volume, float pitch) {
+float Source::_process(clunk::Buffer &buffer, unsigned dst_ch, const v3<float> &delta_position, const v3<float> &direction, float fx_volume, float pitch) {
 	Sint16 * dst = (Sint16*) buffer.get_ptr();
 	unsigned dst_n = (unsigned)buffer.get_size() / dst_ch / 2;
 	const Sint16 * src = (Sint16*) sample->data.get_ptr();
@@ -245,7 +245,7 @@ float Source::process(clunk::Buffer &buffer, unsigned dst_ch, const v3<float> &d
 		vol = 1;
 
 	if (vol < 0 || (int)floor(SDL_MIX_MAXVOLUME * vol + 0.5f) <= 0) {
-		update_position((int)(dst_n * pitch));
+		_update_position((int)(dst_n * pitch));
 		return 0;
 	}
 	
@@ -286,12 +286,12 @@ float Source::process(clunk::Buffer &buffer, unsigned dst_ch, const v3<float> &d
 				dst[i * dst_ch + c] = v;
 			}
 		}
-		update_position((int)(dst_n * pitch));
+		_update_position((int)(dst_n * pitch));
 		return vol;
 	}
 	
 	//LOG_DEBUG(("data: %p, angles: %d", (void *) kemar_data, angles));
-	update_position(0);
+	_update_position(0);
 	
 	if (position >= (int)src_n) {
 		//LOG_ERROR(("process called on inactive source"));
@@ -327,7 +327,7 @@ float Source::process(clunk::Buffer &buffer, unsigned dst_ch, const v3<float> &d
 		}
 	}
 	
-	update_position((int)(dst_n * pitch));
+	_update_position((int)(dst_n * pitch));
 	//LOG_DEBUG(("size2: %u, %u, needed: %u", (unsigned)sample3d[0].get_size(), (unsigned)sample3d[1].get_size(), dst_n));
 	return vol;
 }

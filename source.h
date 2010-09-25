@@ -83,24 +83,25 @@ public:
 		\param[in] pitch pitch
 	*/
 	Source(const Sample * sample, const bool loop = false, const v3<float> &delta = v3<float>(), float gain = 1, float pitch = 1, float panning = 0);
-	/*! 
-		\brief for the internal use only. DO NOT USE IT. 
-		\internal for the internal use only. 
-	*/
-	float process(clunk::Buffer &buffer, unsigned ch, const v3<float> &position, const v3<float> &direction, float fx_volume, float pitch);
 	///returns current source's status.
 	bool playing() const;
-
-	/*! 
-		\brief for the internal use only. DO NOT USE IT. 
-		\internal for the internal use only. 
-	*/
-	void update_position(const int dp);
 
 	///fades out source. usually you do not need this method
 	void fade_out(const float sec);
 	
 	~Source();
+
+	/*! 
+		\brief for the internal use only. DO NOT USE IT. 
+		\internal for the internal use only. 
+	*/
+	void _update_position(const int dp);
+
+	/*! 
+		\brief for the internal use only. DO NOT USE IT. 
+		\internal for the internal use only. 
+	*/
+	float _process(clunk::Buffer &buffer, unsigned ch, const v3<float> &position, const v3<float> &direction, float fx_volume, float pitch);
 
 private: 
 	typedef const float (*kemar_ptr)[2][512];
