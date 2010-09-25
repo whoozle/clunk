@@ -43,7 +43,7 @@ template<typename T>
 struct danielson_lanczos<8, T> {
 	typedef danielson_lanczos<4, T> next_type;
 
-	static inline void rotate(std::complex<T>* data, const int i, const std::complex<T>& w) {
+	static inline void rotate(std::complex<T>* data, int i, const std::complex<T>& w) {
 		int j = i + 4;
 
 		std::complex<T> temp = data[j] * w;

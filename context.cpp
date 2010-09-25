@@ -48,75 +48,65 @@ void Context::callback(void *userdata, Uint8 *bstream, int len) {
 	} CATCH("callback", {})
 }
 
-namespace clunk {
-struct source_t {
-	Source *source;
+template<class Sources>
+bool Context::process_object(Object *o, Sources &sset, std::vector<source_t> &lsources, unsigned n) {
+	typedef typename std::map<typename Sources::key_type, unsigned> stats_type;
+	stats_type sources_stats;
 	
-	v3<float> s_pos;
-	v3<float> s_vel;
-	v3<float> s_dir;
-	v3<float> l_vel;
+	for(typename Sources::iterator j = sset.begin(); j != sset.end(); ) {
+		const typename Sources::key_type &name = j->first;
+		Source *s = j->second;
+		if (!s->playing()) {
+			//LOG_DEBUG(("purging inactive source %s", j->first.c_str()));
+			delete j->second;
+			sset.erase(j++);
+			continue;
+		}
+		
+		typename stats_type::iterator s_i = sources_stats.find(name);
+		unsigned same_sounds_n = (s_i != sources_stats.end())? s_i->second: 0;
+		if (lsources.size() < max_sources && same_sounds_n < distance_model.same_sounds_limit) {
+			lsources.push_back(source_t(s, o->position + s->delta_position - listener->position, o->velocity, o->direction, listener->velocity));
+			if (same_sounds_n == 0) {
+				sources_stats.insert(typename stats_type::value_type(name, 1));
+			} else {
+				++s_i->second;
+			}
+			//LOG_DEBUG(("%u: source: %s", (unsigned)lsources.size(), name.c_str()));
+		} else {
+			s->_update_position(n);
+		}
+		++j;
+	}
 
-	inline source_t(Source *source, const v3<float> &s_pos, const v3<float> &s_vel, const v3<float>& s_dir, const v3<float>& l_vel) : 
-		source(source), s_pos(s_pos), s_vel(s_vel), s_dir(s_dir), l_vel(l_vel) {}
-};
+	if (sset.empty() && o->dead) 
+		return false;
+
+	return true;
 }
 
 void Context::process(Sint16 *stream, int size) {
 	//TIMESPY(("total"));
 
-	v3<float> l_pos, l_vel;
-	if (listener != NULL) {
-		l_pos = listener->position;
-		l_vel = listener->velocity;
-	}
 	{
 		//TIMESPY(("sorting objects"));
-		std::sort(objects.begin(), objects.end(), Object::DistanceOrder(l_pos));
+		std::sort(objects.begin(), objects.end(), Object::DistanceOrder(listener->position));
 	}
 	//LOG_DEBUG(("sorted %u objects", (unsigned)objects.size()));
 	
 	std::vector<source_t> lsources;
 	int n = size / 2 / spec.channels;
-	typedef std::map<const std::string, unsigned> stats_type;
-	stats_type sources_stats;
-	
+
 	for(objects_type::iterator i = objects.begin(); i != objects.end(); ) {
 		Object *o = *i;
-		Object::Sources & sset = o->sources;
-		if (sset.empty() && o->dead) {
-			//autodeleted object
+		//bool _process_object(Object *o, Sources &sset, std::vector<source_t> &lsources, unsigned max_sources, const DistanceModel &distance_model, Object *listener, unsigned n) {
+		if (process_object<Object::NamedSources>(o, o->named_sources, lsources, n) || 
+			process_object<Object::IndexedSources>(o, o->indexed_sources, lsources, n))
+			++i;
+		else {
 			delete o;
 			i = objects.erase(i);
-			continue;
 		}
-		for(Object::Sources::iterator j = sset.begin(); j != sset.end(); ) {
-			const std::string &name = j->first;
-			Source *s = j->second;
-			if (!s->playing()) {
-				//LOG_DEBUG(("purging inactive source %s", j->first.c_str()));
-				delete j->second;
-				sset.erase(j++);
-				continue;
-			}
-			
-			stats_type::iterator s_i = sources_stats.find(name);
-			unsigned same_sounds_n = (s_i != sources_stats.end())? s_i->second: 0;
-
-			if (lsources.size() < max_sources && same_sounds_n < distance_model.same_sounds_limit) {
-				lsources.push_back(source_t(s, o->position + s->delta_position - l_pos, o->velocity, o->direction, l_vel));
-				if (same_sounds_n == 0) {
-					sources_stats.insert(stats_type::value_type(name, 1));
-				} else {
-					++s_i->second;
-				}
-				//LOG_DEBUG(("%u: source: %s", (unsigned)lsources.size(), name.c_str()));
-			} else {
-				s->_update_position(n);
-			}
-			++j;
-		}
-		++i;
 	}
 
 	memset(stream, 0, size);

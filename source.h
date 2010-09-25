@@ -87,7 +87,7 @@ public:
 	bool playing() const;
 
 	///fades out source. usually you do not need this method
-	void fade_out(const float sec);
+	void fade_out(float sec);
 	
 	~Source();
 
@@ -95,7 +95,7 @@ public:
 		\brief for the internal use only. DO NOT USE IT. 
 		\internal for the internal use only. 
 	*/
-	void _update_position(const int dp);
+	void _update_position(int dp);
 
 	/*! 
 		\brief for the internal use only. DO NOT USE IT. 

@@ -77,30 +77,60 @@ public:
 		\param[in] source source to be played, do not delete it, clunk::Object will delete it automatically.
 	*/
 	void play(const std::string &name, Source *source);
+
+	/*! 
+		\brief plays given source
+		\param[in] index any int index
+		\param[in] source source to be played, do not delete it, clunk::Object will delete it automatically.
+	*/
+	void play(int index, Source *source);
+
 	/*!
 		\brief returns status of the given source. 
-		\param[in] name source name
+		\param[in] index source name
 	*/
 	bool playing(const std::string &name) const;
+
+	/*!
+		\brief returns status of the given source. 
+		\param[in] index source index
+	*/
+	bool playing(int index) const;
+
 	/*! 
 		\brief cancels given source
 		\param[in] name source name
 		\param[in] fadeout length of the fadeout effect to avoid clicks. 
 	*/
-	void cancel(const std::string &name, const float fadeout = 0.1f);
+	void cancel(const std::string &name, float fadeout = 0.1f);
+
+	/*! 
+		\brief cancels given source
+		\param[in] index source index
+		\param[in] fadeout length of the fadeout effect to avoid clicks. 
+	*/
+	void cancel(int index, float fadeout = 0.1f);
 
 	/*! 
 		\brief cancels all sources for this object.
 		\param[in] force quick fadeout for the all sources.
 		\param[in] fadeout length of the fadeout effect to avoid clicks. seconds.
 	*/
-	void cancel_all(bool force = false, const float fadeout = 0.1f);
+	void cancel_all(bool force = false, float fadeout = 0.1f);
+
 	/*! 
 		\brief fades out given source
 		\param[in] name source name
 		\param[in] fadeout length of the fadeout effect. seconds.
 	*/
-	void fade_out(const std::string &name, const float fadeout = 0.1f);
+	void fade_out(const std::string &name, float fadeout = 0.1f);
+
+	/*! 
+		\brief fades out given source
+		\param[in] index source name
+		\param[in] fadeout length of the fadeout effect. seconds.
+	*/
+	void fade_out(int index, float fadeout = 0.1f);
 
 	/// returns if any sources are playing now.
 	bool active() const;
@@ -113,17 +143,32 @@ public:
 		sources stop.
 	*/
 	void autodelete();
+
 	/*! 
 		\brief sets loop flag
 		\param[in] name source name
 		\param[in] loop repeat source's sound
 	*/
 	void set_loop(const std::string &name, const bool loop);
+
+	/*! 
+		\brief sets loop flag
+		\param[in] index source index
+		\param[in] loop repeat source's sound
+	*/
+	void set_loop(int index, const bool loop);
+
 	/*!
 		\brief returns loop status
 		\param[in] name source name
 	*/
 	bool get_loop(const std::string &name);
+
+	/*!
+		\brief returns loop status
+		\param[in] index source index
+	*/
+	bool get_loop(int index);
 
 private: 
 	friend class Context;
@@ -132,8 +177,10 @@ private:
 	Context *context;
 	v3<float> position, velocity, direction;
 
-	typedef std::multimap<const std::string, Source *> Sources;
-	Sources sources;
+	typedef std::multimap<const std::string, Source *> NamedSources;
+	NamedSources named_sources;
+	typedef std::multimap<const int, Source *> IndexedSources;
+	IndexedSources indexed_sources;
 	
 	bool dead;
 };

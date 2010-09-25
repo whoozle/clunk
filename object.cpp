@@ -50,32 +50,67 @@ void Object::set_direction(const v3<float> &dir) {
 
 void Object::play(const std::string &name, Source *source) {
 	AudioLocker l;
-	sources.insert(Sources::value_type(name, source));
+	named_sources.insert(NamedSources::value_type(name, source));
+}
+
+void Object::play(int index, Source *source) {
+	AudioLocker l;
+	indexed_sources.insert(IndexedSources::value_type(index, source));
 }
 
 bool Object::playing(const std::string &name) const {
 	AudioLocker l;
-	return sources.find(name) != sources.end();
+	return named_sources.find(name) != named_sources.end();
 }
 
-void Object::fade_out(const std::string &name, const float fadeout) {
+bool Object::playing(int index) const {
 	AudioLocker l;
-	Sources::iterator b = sources.lower_bound(name);
-	Sources::iterator e = sources.upper_bound(name);
-	for(Sources::iterator i = b; i != e; ++i) {
+	return indexed_sources.find(index) != indexed_sources.end();
+}
+
+void Object::fade_out(const std::string &name, float fadeout) {
+	AudioLocker l;
+	NamedSources::iterator b = named_sources.lower_bound(name);
+	NamedSources::iterator e = named_sources.upper_bound(name);
+	for(NamedSources::iterator i = b; i != e; ++i) {
 		i->second->fade_out(fadeout);
 	}
 }
 
-void Object::cancel(const std::string &name, const float fadeout) {
+void Object::fade_out(int index, float fadeout) {
 	AudioLocker l;
-	Sources::iterator b = sources.lower_bound(name);
-	Sources::iterator e = sources.upper_bound(name);
-	for(Sources::iterator i = b; i != e; ) {
+	IndexedSources::iterator b = indexed_sources.lower_bound(index);
+	IndexedSources::iterator e = indexed_sources.upper_bound(index);
+	for(IndexedSources::iterator i = b; i != e; ++i) {
+		i->second->fade_out(fadeout);
+	}
+}
+
+void Object::cancel(const std::string &name, float fadeout) {
+	AudioLocker l;
+	NamedSources::iterator b = named_sources.lower_bound(name);
+	NamedSources::iterator e = named_sources.upper_bound(name);
+	for(NamedSources::iterator i = b; i != e; ) {
 		if (fadeout == 0) {
 			//quickly destroy source
 			delete i->second;
-			sources.erase(i++);
+			named_sources.erase(i++);
+			continue;
+		} else if (i->second->loop)
+			i->second->fade_out(fadeout);
+		++i;
+	}
+}
+
+void Object::cancel(int index, float fadeout) {
+	AudioLocker l;
+	IndexedSources::iterator b = indexed_sources.lower_bound(index);
+	IndexedSources::iterator e = indexed_sources.upper_bound(index);
+	for(IndexedSources::iterator i = b; i != e; ) {
+		if (fadeout == 0) {
+			//quickly destroy source
+			delete i->second;
+			indexed_sources.erase(i++);
 			continue;
 		} else if (i->second->loop)
 			i->second->fade_out(fadeout);
@@ -85,9 +120,20 @@ void Object::cancel(const std::string &name, const float fadeout) {
 
 bool Object::get_loop(const std::string &name) {
 	AudioLocker l;
-	Sources::iterator b = sources.lower_bound(name);
-	Sources::iterator e = sources.upper_bound(name);
-	for(Sources::iterator i = b; i != e; ++i) {
+	NamedSources::iterator b = named_sources.lower_bound(name);
+	NamedSources::iterator e = named_sources.upper_bound(name);
+	for(NamedSources::iterator i = b; i != e; ++i) {
+		if (i->second->loop)
+			return true;
+	}
+	return false;
+}
+
+bool Object::get_loop(int index) {
+	AudioLocker l;
+	IndexedSources::iterator b = indexed_sources.lower_bound(index);
+	IndexedSources::iterator e = indexed_sources.upper_bound(index);
+	for(IndexedSources::iterator i = b; i != e; ++i) {
 		if (i->second->loop)
 			return true;
 	}
@@ -97,16 +143,25 @@ bool Object::get_loop(const std::string &name) {
 
 void Object::set_loop(const std::string &name, const bool loop) {
 	AudioLocker l;
-	Sources::iterator b = sources.lower_bound(name);
-	Sources::iterator e = sources.upper_bound(name);
-	for(Sources::iterator i = b; i != e; ++i) {
+	NamedSources::iterator b = named_sources.lower_bound(name);
+	NamedSources::iterator e = named_sources.upper_bound(name);
+	for(NamedSources::iterator i = b; i != e; ++i) {
 		i->second->loop = i == b? loop: false; //set loop only for the first. disable others. 
 	}
 }
 
-void Object::cancel_all(bool force, const float fadeout) {
+void Object::set_loop(int index, const bool loop) {
 	AudioLocker l;
-	for(Sources::iterator i = sources.begin(); i != sources.end(); ++i) {
+	IndexedSources::iterator b = indexed_sources.lower_bound(index);
+	IndexedSources::iterator e = indexed_sources.upper_bound(index);
+	for(IndexedSources::iterator i = b; i != e; ++i) {
+		i->second->loop = i == b? loop: false; //set loop only for the first. disable others. 
+	}
+}
+
+template<class Sources>
+void _cancel_all(Sources &sources, bool force, float fadeout) {
+	for(typename Sources::iterator i = sources.begin(); i != sources.end(); ++i) {
 		if (force) {
 			delete i->second;
 		} else {
@@ -119,6 +174,12 @@ void Object::cancel_all(bool force, const float fadeout) {
 	}
 }
 
+void Object::cancel_all(bool force, float fadeout) {
+	AudioLocker l;
+	_cancel_all(indexed_sources, force, fadeout);
+	_cancel_all(named_sources, force, fadeout);
+}
+
 Object::~Object() {
 	if (dead)
 		return;
@@ -129,7 +190,7 @@ Object::~Object() {
 
 bool Object::active() const {
 	AudioLocker l;
-	return !sources.empty();
+	return !indexed_sources.empty() || !named_sources.empty();
 }
 
 void Object::autodelete() {

@@ -42,7 +42,7 @@ public:
 		\brief Instantly allocates 'size' memory
 		\param[in] size size of the memory buffer 
 	*/ 
-	inline Buffer(const int size): ptr(NULL), size(0) { set_size(size); }
+	inline Buffer(int size): ptr(NULL), size(0) { set_size(size); }
 
 	//! Destructor, deallocates buffer if needed
 	inline ~Buffer() { free(); }
@@ -90,7 +90,7 @@ public:
 	void set_data(void *p, const size_t s, const bool own = false);
 
 	//! Fills contents of the buffer with given byte.
-	void fill(const int b);
+	void fill(int b);
 
 	//! Appends given buffer.	
 	void append(const Buffer &other);
@@ -101,7 +101,7 @@ public:
 		\brief Add more bytes to the end of the buffer.
 		\param[in] more number of bytes to be allocated.
 	*/
-	void *reserve(const int more);
+	void *reserve(int more);
 
 	//! Returns nice string representation for the buffer. Useful for debugging.
 	const std::string dump() const;

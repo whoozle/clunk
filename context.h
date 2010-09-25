@@ -22,6 +22,7 @@
 
 #include <map>
 #include <deque>
+#include <vector>
 #include <stdio.h>
 #include <SDL_audio.h>
 
@@ -51,7 +52,7 @@ public:
 		\param[in] channels audio output channels number, supported values 1 or 2 for now. 
 		\param[out] period_size minimal processing unit (bytes). Less period - less latency.
 	*/
-	void init(const int sample_rate, const Uint8 channels, int period_size);
+	void init(int sample_rate, const Uint8 channels, int period_size);
 	/*! 
 		\brief Sets maximum simultaneous sources number. 
 		Do not use values that are too high. Use reasonable default such as 8 or 16 
@@ -93,19 +94,19 @@ public:
 		\param[in] stream stream object, see clunk::Stream documentation for the details.
 		\param[in] loop auto rewind stream after it ends
 	*/
-	void play(const int id, Stream *stream, bool loop);
+	void play(int id, Stream *stream, bool loop);
 	///returns stream's status
-	bool playing(const int id) const;
+	bool playing(int id) const;
 	///pauses stream with given id
-	void pause(const int id);
+	void pause(int id);
 	///stops stream with given id
-	void stop(const int id);
+	void stop(int id);
 	/*!
 		\brief sets volume for stream
 		\param[in] id stream id
 		\param[in] volume volume (0.0 - 1.0)
 	*/
-	void set_volume(const int id, float volume);
+	void set_volume(int id, float volume);
 	
 	/*! 
 		\brief sets volume of the generated sound
@@ -166,6 +167,20 @@ private:
 	DistanceModel distance_model;
 	
 	FILE * fdump;
+
+	struct source_t {
+		Source *source;
+	
+		v3<float> s_pos;
+		v3<float> s_vel;
+		v3<float> s_dir;
+		v3<float> l_vel;
+
+		inline source_t(Source *source, const v3<float> &s_pos, const v3<float> &s_vel, const v3<float>& s_dir, const v3<float>& l_vel) : 
+		source(source), s_pos(s_pos), s_vel(s_vel), s_dir(s_dir), l_vel(l_vel) {}
+	};
+	template<class Sources>
+	bool process_object(Object *o, Sources &sset, std::vector<source_t> &lsources, unsigned n);
 };
 }
 

@@ -55,7 +55,7 @@ public:
 		\param[in] freq frequency
 		\param[in] len of the sample in seconds
 	*/
-	void generateSine(const int freq, const float len);
+	void generateSine(int freq, float len);
 	
 	float length() const {
 		return 1.0f * data.get_size() / spec.freq / spec.channels / 2;
