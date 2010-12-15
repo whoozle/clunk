@@ -1,0 +1,2 @@
+- add propertiless api with virtual calls like get_position() get_velocity().
+- separate SoundScene with objects/listener/setup, switching scenes
