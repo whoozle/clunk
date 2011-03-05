@@ -100,8 +100,9 @@ void Context::process(Sint16 *stream, int size) {
 	for(objects_type::iterator i = objects.begin(); i != objects.end(); ) {
 		Object *o = *i;
 		//bool _process_object(Object *o, Sources &sset, std::vector<source_t> &lsources, unsigned max_sources, const DistanceModel &distance_model, Object *listener, unsigned n) {
-		if (process_object<Object::NamedSources>(o, o->named_sources, lsources, n) || 
-			process_object<Object::IndexedSources>(o, o->indexed_sources, lsources, n))
+		bool ok_1 = process_object<Object::NamedSources>(o, o->named_sources, lsources, n),
+			ok_2 = process_object<Object::IndexedSources>(o, o->indexed_sources, lsources, n);
+		if (ok_1 || ok_2) 
 			++i;
 		else {
 			delete o;
