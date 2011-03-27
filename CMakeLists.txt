@@ -32,6 +32,7 @@ set(SOURCES
 	sdl_ex.cpp
 	source.cpp
 	stream.cpp
+	clunk_c.cpp
 )
 set(PUBLIC_HEADERS
 	buffer.h
@@ -50,6 +51,7 @@ set(PUBLIC_HEADERS
 	sse_fft_context.h
 	stream.h
 	v3.h
+	clunk_c.h
 )
 
 if (WITH_SSE)

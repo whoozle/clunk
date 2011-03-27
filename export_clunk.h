@@ -1,7 +1,7 @@
 #ifndef CLUNK_EXPORT_H__
 #define CLUNK_EXPORT_H__
 
-// Shared library support
+/* Shared library support */
 #ifdef _MSC_VER
 #	pragma warning(disable:4251)  /* needs to have dll-interface used by client */
 #	pragma warning(disable:4275)  /* non dll-interface struct */
@@ -27,6 +27,14 @@
 
 #ifndef CLUNKAPI
 #	define CLUNKAPI DLLIMPORT
+#endif
+
+#ifndef CLUNKCAPI
+#       ifdef __cplusplus
+#               define CLUNKCAPI extern "C" CLUNKAPI
+#       else
+#               define CLUNKCAPI CLUNKAPI
+#       endif
 #endif
 
 #endif

@@ -38,7 +38,7 @@ else:
 
 clunk_src = [
 	'context.cpp', 'sample.cpp', 'object.cpp', 'source.cpp', 'sdl_ex.cpp', 'stream.cpp', 
-	'kemar.c', 'buffer.cpp', 'distance_model.cpp', 'logger.cpp', 'clunk_ex.cpp',
+	'kemar.c', 'buffer.cpp', 'distance_model.cpp', 'logger.cpp', 'clunk_ex.cpp', 'clunk_c.cpp'
 ]
 if have_sse:
 	clunk_src.append('sse_fft_context.cpp')
@@ -55,3 +55,4 @@ if sys.platform != 'win32':
 	env.Append(LINKFLAGS=['-Wl,-rpath-link,.'])
 
 env.Program('clunk_test', ['test.cpp'], LIBS=['clunk'])
+env.Program('clunk_c_test', ['test_c.c'], LIBS=['clunk'])
