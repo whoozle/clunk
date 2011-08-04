@@ -1,5 +1,4 @@
 #include <stdlib.h>
-#include <malloc.h>
 #include <stdio.h>
 #include <new>
 #include "fft_context.h"
@@ -10,12 +9,12 @@ using namespace clunk;
 void * aligned_allocator::allocate(size_t size, size_t alignment) {
 	void * ptr;
 #ifdef _WINDOWS
-	ptr = _aligned_malloc(size, alignment);
-#else
-	ptr = memalign(alignment, size);
-#endif
-	if (ptr == NULL)
+	if ((ptr = _aligned_malloc(size, alignment)) == NULL)
 		throw std::bad_alloc();
+#else
+	if (posix_memalign(&ptr, alignment, size) != 0)
+		throw std::bad_alloc();
+#endif
 	return ptr;
 }
 
