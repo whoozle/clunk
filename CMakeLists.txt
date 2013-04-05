@@ -67,3 +67,7 @@ install(TARGETS clunk DESTINATION lib)
 install(FILES ${PUBLIC_HEADERS} DESTINATION include/clunk)
 
 target_link_libraries(clunk ${SDL_LIBRARY})
+if(BUILD_TEST)
+	add_executable(clunk-test test.cpp)
+	target_link_libraries(clunk-test clunk)
+endif(BUILD_TEST)
