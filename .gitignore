@@ -1,0 +1,5 @@
+CMake*
+Makefile
+cmake_*.cmake
+*.so
+test
