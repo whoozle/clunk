@@ -5,14 +5,15 @@
 #	error turn on SSE support with CLUNK_USES_SSE macro
 #endif
 
+#include "types.h"
+#include "clunk_assert.h"
+
 #ifndef _USE_MATH_DEFINES
-#define _USE_MATH_DEFINES
+#	define _USE_MATH_DEFINES
 #endif
-#include <math.h>
-#include <sys/types.h>
+
 #include <xmmintrin.h>
 #include <complex>
-#include "clunk_assert.h"
 
 namespace clunk {
 

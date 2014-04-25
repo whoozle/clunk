@@ -52,7 +52,7 @@ public:
 		\param[in] channels audio output channels number, supported values 1 or 2 for now. 
 		\param[out] period_size minimal processing unit (bytes). Less period - less latency.
 	*/
-	void init(int sample_rate, const Uint8 channels, int period_size);
+	void init(int sample_rate, const u8 channels, int period_size);
 	/*! 
 		\brief Sets maximum simultaneous sources number. 
 		Do not use values that are too high. Use reasonable default such as 8 or 16 
@@ -87,7 +87,7 @@ public:
 	/*!
 		\internal generate next 'len' bytes
 	*/
-	void process(Sint16 *stream, int len);
+	void process(s16 *stream, int len);
 	/*! 
 		\brief plays stream with given id. 
 		\param[in] id stream id - any integer you want. 
@@ -126,7 +126,7 @@ public:
 		\param[in] format SDL audio format. See SDL_audio.h or SDL documentation for the details.
 		\param[in] channels source channels. 
 	*/
-	void convert(clunk::Buffer &dst, const clunk::Buffer &src, int rate, const Uint16 format, const Uint8 channels);
+	void convert(clunk::Buffer &dst, const clunk::Buffer &src, int rate, const u16 format, const u8 channels);
 	
 	///returns object associated to the current listener position
 	Object *get_listener() { return listener; }
@@ -139,7 +139,7 @@ private:
 	SDL_AudioSpec spec;
 	int period_size;
 
-	static void callback(void *userdata, Uint8 *stream, int len);
+	static void callback(void *userdata, u8 *stream, int len);
 	void delete_object(Object *o);
 
 	friend clunk::Object::~Object();

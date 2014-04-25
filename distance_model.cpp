@@ -17,8 +17,6 @@
 */
 
 #include "distance_model.h"
-#define _USE_MATH_DEFINES
-#include <math.h>
 
 float clunk::DistanceModel::gain(float distance) const {
 	float gain = 0;

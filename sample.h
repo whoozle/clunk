@@ -45,7 +45,7 @@ public:
 		\param[in] format SDL audio format. Look SDL_audio.h or SDL documentation. 
 		\param[in] channels audio channels
 	*/	
-	void init(const clunk::Buffer &data, int rate, const Uint16 format, const Uint8 channels);
+	void init(const clunk::Buffer &data, int rate, const u16 format, const u8 channels);
 	/*!
 		\brief loads sample from file
 	*/

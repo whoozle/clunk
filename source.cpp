@@ -17,8 +17,6 @@
 */
 
 
-#define _USE_MATH_DEFINES
-#include <math.h>
 #include "source.h"
 #include <SDL.h>
 #include "clunk_ex.h"
@@ -103,11 +101,11 @@ void Source::idt_iit(const v3<float> &delta, const v3<float> &dir_vec, float &id
 	//LOG_DEBUG(("idt_offset %g, left_to_right_amp: %g", idt_offset, left_to_right_amp));
 }
 
-void Source::hrtf(int window, const unsigned channel_idx, clunk::Buffer &result, const Sint16 *src, int src_ch, int src_n, int idt_offset, const kemar_ptr& kemar_data, int kemar_idx, float freq_decay) {
+void Source::hrtf(int window, const unsigned channel_idx, clunk::Buffer &result, const s16 *src, int src_ch, int src_n, int idt_offset, const kemar_ptr& kemar_data, int kemar_idx, float freq_decay) {
 	assert(channel_idx < 2);
 	
 	//LOG_DEBUG(("%d bytes, %d actual window size, %d windows", dst_n, CLUNK_ACTUAL_WINDOW, n));
-	//result.set_size(2 * WINDOW_SIZE / 2); //sizeof(Sint16) * window  / 2
+	//result.set_size(2 * WINDOW_SIZE / 2); //sizeof(s16) * window  / 2
 	size_t result_start = result.get_size();
 	result.reserve(WINDOW_SIZE);
 	
@@ -166,7 +164,7 @@ void Source::hrtf(int window, const unsigned channel_idx, clunk::Buffer &result,
 	mdct.imdct();
 	mdct.apply_window();
 
-	Sint16 *dst = (Sint16 *)((unsigned char *)result.get_ptr() + result_start);
+	s16 *dst = (s16 *)((unsigned char *)result.get_ptr() + result_start);
 
 	float max_v = 1.0f, min_v = -1.0f;
 	
@@ -226,9 +224,9 @@ void Source::_update_position(const int dp) {
 }
 
 float Source::_process(clunk::Buffer &buffer, unsigned dst_ch, const v3<float> &delta_position, const v3<float> &direction, float fx_volume, float pitch) {
-	Sint16 * dst = (Sint16*) buffer.get_ptr();
+	s16 * dst = (s16*) buffer.get_ptr();
 	unsigned dst_n = (unsigned)buffer.get_size() / dst_ch / 2;
-	const Sint16 * src = (Sint16*) sample->data.get_ptr();
+	const s16 * src = (s16*) sample->data.get_ptr();
 	if (src == NULL)
 		throw_ex(("uninitialized sample used (%p)", (void *)sample));
 
@@ -259,7 +257,7 @@ float Source::_process(clunk::Buffer &buffer, unsigned dst_ch, const v3<float> &
 			for(unsigned c = 0; c < dst_ch; ++c) {
 				int p = position + (int)(i * pitch);
 			
-				Sint16 v = 0;
+				s16 v = 0;
 				if (loop || (p >= 0 && p < (int)src_n)) {
 					p %= src_n;
 					if (p < 0)
@@ -279,7 +277,7 @@ float Source::_process(clunk::Buffer &buffer, unsigned dst_ch, const v3<float> &
 						} else if (v0 < -32767) {
 							v = -32767;
 						} else {
-							v = (Sint16)v0;
+							v = (s16)v0;
 						}
 					}
 				}
@@ -317,7 +315,7 @@ float Source::_process(clunk::Buffer &buffer, unsigned dst_ch, const v3<float> &
 	
 	//LOG_DEBUG(("angle: %g", angle_gr));
 	//LOG_DEBUG(("idt offset %d samples", idt_offset));
-	Sint16 * src_3d[2] = { (Sint16 *)sample3d[0].get_ptr(), (Sint16 *)sample3d[1].get_ptr() };
+	s16 * src_3d[2] = { (s16 *)sample3d[0].get_ptr(), (s16 *)sample3d[1].get_ptr() };
 	
 	//LOG_DEBUG(("size1: %u, %u, needed: %u\n%s", (unsigned)sample3d[0].get_size(), (unsigned)sample3d[1].get_size(), dst_n, sample3d[0].dump().c_str()));
 	

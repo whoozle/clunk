@@ -1,6 +1,5 @@
 #include "clunk_c.h"
 #include <stdlib.h>
-#include <math.h>
 #include <unistd.h>
 
 int main(int argc, char *argv[])

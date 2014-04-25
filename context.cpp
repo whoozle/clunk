@@ -25,8 +25,6 @@
 #include "logger.h"
 #include "source.h"
 #include <assert.h>
-#define _USE_MATH_DEFINES
-#include <math.h>
 #include <map>
 #include <algorithm>
 #include <vector>
@@ -39,10 +37,10 @@ using namespace clunk;
 Context::Context() : period_size(0), listener(NULL), max_sources(8), fx_volume(1), distance_model(DistanceModel::Inverse, true, 128), fdump(NULL) {
 }
 
-void Context::callback(void *userdata, Uint8 *bstream, int len) {
+void Context::callback(void *userdata, u8 *bstream, int len) {
 	Context *self = (Context *)userdata;
 	assert(self != NULL);
-	Sint16 *stream = (Sint16*)bstream;
+	s16 *stream = (s16*)bstream;
 	TRY {
 		self->process(stream, len);
 	} CATCH("callback", {})
@@ -85,7 +83,7 @@ bool Context::process_object(Object *o, Sources &sset, std::vector<source_t> &ls
 	return true;
 }
 
-void Context::process(Sint16 *stream, int size) {
+void Context::process(s16 *stream, int size) {
 	//TIMESPY(("total"));
 
 	{
@@ -148,10 +146,10 @@ void Context::process(Sint16 *stream, int size) {
 			buf_size = size;
 
 		int sdl_v = (int)floor(SDL_MIX_MAXVOLUME * stream_info.gain + 0.5f);
-		SDL_MixAudio((Uint8 *)stream, (Uint8 *)stream_info.buffer.get_ptr(), buf_size, sdl_v);
+		SDL_MixAudio((u8 *)stream, (u8 *)stream_info.buffer.get_ptr(), buf_size, sdl_v);
 		
 		if ((int)stream_info.buffer.get_size() > size) {
-			memmove(stream_info.buffer.get_ptr(), ((Uint8 *)stream_info.buffer.get_ptr()) + size, stream_info.buffer.get_size() - size);
+			memmove(stream_info.buffer.get_ptr(), ((u8 *)stream_info.buffer.get_ptr()) + size, stream_info.buffer.get_size() - size);
 			stream_info.buffer.set_size(stream_info.buffer.get_size() - size);
 		} else {
 			stream_info.buffer.free();
@@ -187,7 +185,7 @@ void Context::process(Sint16 *stream, int size) {
 		if (sdl_v > SDL_MIX_MAXVOLUME)
 			sdl_v = SDL_MIX_MAXVOLUME;
 		
-		SDL_MixAudio((Uint8 *)stream, (Uint8 *)buf.get_ptr(), size, sdl_v);
+		SDL_MixAudio((u8 *)stream, (u8 *)buf.get_ptr(), size, sdl_v);
 	}
 	
 	if (fdump != NULL) {
@@ -223,7 +221,7 @@ void Context::save(const std::string &file) {
 	fdump = fopen(file.c_str(), "wb");
 }
 
-void Context::init(const int sample_rate, const Uint8 channels, int period_size) {
+void Context::init(const int sample_rate, const u8 channels, int period_size) {
 	if (!SDL_WasInit(SDL_INIT_AUDIO)) {
 		if (SDL_InitSubSystem(SDL_INIT_AUDIO) == -1)
 			throw_sdl(("SDL_InitSubSystem"));
@@ -361,14 +359,14 @@ void Context::set_max_sources(int sources) {
 	max_sources = sources;
 }
 
-void Context::convert(clunk::Buffer &dst, const clunk::Buffer &src, int rate, const Uint16 format, const Uint8 channels) {
+void Context::convert(clunk::Buffer &dst, const clunk::Buffer &src, int rate, const u16 format, const u8 channels) {
 	SDL_AudioCVT cvt;
 	memset(&cvt, 0, sizeof(cvt));
 	if (SDL_BuildAudioCVT(&cvt, format, channels, rate, spec.format, channels, spec.freq) == -1) {
 		throw_sdl(("DL_BuildAudioCVT(%d, %04x, %u)", rate, format, channels));
 	}
 	size_t buf_size = (size_t)(src.get_size() * cvt.len_mult);
-	cvt.buf = (Uint8 *)malloc(buf_size);
+	cvt.buf = (u8 *)malloc(buf_size);
 	cvt.len = (int)src.get_size();
 
 	assert(buf_size >= src.get_size());

@@ -20,9 +20,9 @@
 */
 
 
-#include <sys/types.h>
-#include <string>
+#include "types.h"
 #include "export_clunk.h"
+#include <string>
 
 namespace clunk {
 

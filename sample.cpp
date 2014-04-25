@@ -17,8 +17,6 @@
 */
 
 
-#define _USE_MATH_DEFINES
-#include <math.h>
 #include <SDL_rwops.h>
 #include "sample.h"
 #include "sdl_ex.h"
@@ -54,7 +52,7 @@ void Sample::generateSine(const int freq, const float len) {
 	LOG_DEBUG(("generated %u bytes", (unsigned)data.get_size()));
 }
 
-void Sample::init(const clunk::Buffer &src_data, int rate, const Uint16 format, const Uint8 channels) {
+void Sample::init(const clunk::Buffer &src_data, int rate, const Uint16 format, const u8 channels) {
 	AudioLocker l;
 
 	spec.freq = context->get_spec().freq;
@@ -64,9 +62,9 @@ void Sample::init(const clunk::Buffer &src_data, int rate, const Uint16 format, 
 }
 
 void Sample::load(const std::string &file) {
-	Uint8 *buf;
-	Uint32 len;
-	//SDL_AudioSpec * SDLCALL SDL_LoadWAV_RW(SDL_RWops *src, int freesrc, SDL_AudioSpec *spec, Uint8 **audio_buf, Uint32 *audio_len);
+	u8 *buf;
+	u32 len;
+	//SDL_AudioSpec * SDLCALL SDL_LoadWAV_RW(SDL_RWops *src, int freesrc, SDL_AudioSpec *spec, u8 **audio_buf, u32 *audio_len);
 	if (SDL_LoadWAV(file.c_str(), &spec, &buf, &len) == NULL)
 		throw_sdl(("SDL_LoadWav"));
 

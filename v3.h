@@ -19,14 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 */
 
-#ifndef _USE_MATH_DEFINES
-#define _USE_MATH_DEFINES
-#endif
-#include <math.h>
-
-#if !(defined(__GNUC__) || defined(__GNUG__) || defined(__attribute__))
-#	define __attribute__(p) /* nothing */
-#endif
+#include "types.h"
 
 namespace clunk {
 /*! 

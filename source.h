@@ -18,10 +18,6 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 */
-#ifndef _USE_MATH_DEFINES
-#define _USE_MATH_DEFINES
-#endif
-#include <math.h>
 
 #include <SDL_audio.h>
 #include "export_clunk.h"
@@ -109,7 +105,7 @@ private:
 
 	static void idt_iit(const v3<float> &delta, const v3<float> &direction, float &idt_offset, float &angle_gr, float &left_to_right_amp);
 	//generate hrtf response for channel idx (0 left), in result.
-	void hrtf(int window, const unsigned channel_idx, clunk::Buffer &result, const Sint16 *src, int src_ch, int src_n, int idt_offset, const kemar_ptr& kemar_data, int kemar_idx, float freq_decay);
+	void hrtf(int window, const unsigned channel_idx, clunk::Buffer &result, const s16 *src, int src_ch, int src_n, int idt_offset, const kemar_ptr& kemar_data, int kemar_idx, float freq_decay);
 
 	int position, fadeout, fadeout_total;
 	

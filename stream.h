@@ -21,7 +21,7 @@
 
 
 #include "export_clunk.h"
-#include <SDL_audio.h>
+#include "types.h"
 
 namespace clunk {
 class Context;
@@ -57,10 +57,10 @@ protected:
 	int sample_rate;
 	///stream audio format 
 	/*! initialize it from your open() method */
-	Uint16 format;
+	u16 format;
 	///stream channels. 
 	/*! initialize it from your open() method */
-	Uint8 channels;
+	u8 channels;
 
 	friend class Context;
 };
