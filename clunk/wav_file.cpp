@@ -4,6 +4,7 @@
 #include <clunk/logger.h>
 #include <stdio.h>
 #include <stdexcept>
+#include <memory>
 
 namespace clunk {
 	WavFile::WavFile(FILE *f) : _f(f) {}
@@ -60,9 +61,18 @@ namespace clunk {
 				Buffer fmt;
 				read(fmt, size);
 				read_format(fmt);
-			} else if (id == 0x61746164)
+			} else if (id == 0x61746164) {
 				read(_data, size);
-			else
+
+#if __BYTE_ORDER == __BIG_ENDIAN
+				if (_spec.bytes_per_sample() == 2)
+				{
+					u8 *ptr = static_cast<u8 *>(_data.get_ptr());
+					for(size_t i = 0; i + 1 < _data.get_size(); i += 2, ptr += 2)
+						std::swap(ptr[0], ptr[1]);
+				}
+#endif
+			} else
 				fseek(_f, size, SEEK_CUR);
 		}
 	}
@@ -73,6 +83,8 @@ namespace clunk {
 			throw std::runtime_error("cannot open file: " + fname);
 		WavFile wav(f);
 		wav.read();
-		return 0;
+		std::auto_ptr<Sample> sample(context.create_sample());
+		sample->init(wav._data, wav._spec);
+		return sample.release();
 	}
 }

@@ -47,7 +47,6 @@ int main(int argc, char *argv[]) {
 	
 	clunk::Object * o = context.create_object();
 	clunk::Sample * s = clunk::WavFile::load(context, "scissors.wav");
-	return 0;
 
 	static const int d = 2, n = 6;
 	
