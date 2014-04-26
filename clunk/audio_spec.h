@@ -2,6 +2,7 @@
 #define	CLUNK_AUDIO_SPEC_H
 
 #include <clunk/types.h>
+#include <clunk/export_clunk.h>
 
 namespace clunk {
 

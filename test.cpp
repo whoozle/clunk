@@ -1,6 +1,7 @@
 #include <clunk/context.h>
 #include <clunk/backend/sdl/backend.h>
 #include <clunk/source.h>
+#include <clunk/wav_file.h>
 #include <stdlib.h>
 #include <unistd.h>
 
@@ -45,7 +46,8 @@ int main(int argc, char *argv[]) {
 	clunk::Context &context = backend.get_context();
 	
 	clunk::Object * o = context.create_object();
-	clunk::Sample * s = backend.load("scissors.wav");
+	clunk::Sample * s = clunk::WavFile::load(context, "scissors.wav");
+	return 0;
 
 	static const int d = 2, n = 6;
 	
