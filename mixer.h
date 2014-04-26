@@ -15,6 +15,7 @@ namespace clunk {
 			typedef typename Format::DoubleType		DoubleType;
 
 			static void mix(void *dst_, const void *src_, size_t size, int volume) {
+				size /= sizeof(Type);
 				Type *dst = static_cast<Type *>(dst_);
 				const Type *src = static_cast<const Type *>(src_);
 				while(size--)
