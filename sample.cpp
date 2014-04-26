@@ -21,6 +21,7 @@
 #include "context.h"
 #include "locker.h"
 #include "logger.h"
+#include "resample.h"
 #include <stdexcept>
 
 using namespace clunk;
@@ -56,9 +57,9 @@ void Sample::init(const clunk::Buffer &src_data, const AudioSpec &spec) {
 	AudioLocker l;
 
 	_spec.freq = _context->get_spec().freq;
-	_spec.channels = spec.channels;
+	_spec.channels = 1;
 	_spec.format = _context->get_spec().format;
-	_context->convert(_data, src_data, spec);
+	Resample::resample(_spec, _data, spec, src_data);
 }
 
 Sample::~Sample() { }

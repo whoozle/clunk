@@ -26,6 +26,7 @@
 #include <algorithm>
 #include <vector>
 #include "locker.h"
+#include "logger.h"
 #include "stream.h"
 #include "object.h"
 #include "clunk_ex.h"
@@ -110,8 +111,7 @@ void Context::process(void *stream_, int size) {
 			clunk::Buffer data;
 			bool eos = !stream_info.stream->read(data, size);
 			if (!data.empty() && stream_info.stream->_spec.freq != _spec.freq) {
-				//LOG_DEBUG(("converting audio data from %u to %u", stream_info.stream->sample_rate, spec.freq));
-				convert(data, data, stream_info.stream->_spec);
+				Resample::resample(_spec, data, stream_info.stream->_spec, data);
 			}
 			stream_info.buffer.append(data);
 			//LOG_DEBUG(("read %u bytes", (unsigned)data.get_size()));
@@ -318,10 +318,6 @@ void Context::stop_all() {
 void Context::set_max_sources(int sources) {
 	AudioLocker l;
 	max_sources = sources;
-}
-
-void Context::convert(clunk::Buffer &dst, const clunk::Buffer &src, const AudioSpec &spec) {
-	Resample::resample(_spec, dst, spec, src);
 }
 
 /*!

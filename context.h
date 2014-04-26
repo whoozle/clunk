@@ -115,16 +115,6 @@ public:
 	*/
 	void stop_all();
 
-	/*!
-		\brief converts raw audio data from one format to the current audio format
-		\param[out] dst destination data
-		\param[in] src source data
-		\param[in] rate sample rate of the source data
-		\param[in] format audio format
-		\param[in] channels source channels. 
-	*/
-	void convert(clunk::Buffer &dst, const clunk::Buffer &src, const AudioSpec &spec);
-	
 	///returns object associated to the current listener position
 	Object *get_listener() { return _listener; }
 	
