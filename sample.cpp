@@ -17,65 +17,48 @@
 */
 
 
-#include <SDL_rwops.h>
 #include "sample.h"
-#include "sdl_ex.h"
 #include "context.h"
 #include "locker.h"
+#include "logger.h"
+#include <stdexcept>
 
 using namespace clunk;
 
-Sample::Sample(Context *context) : gain(1.0f), pitch(1.0f), context(context) {}
+Sample::Sample(Context *context) : gain(1.0f), pitch(1.0f), _context(context) {}
 
 void Sample::generateSine(const int freq, const float len) {
 	AudioLocker l;
 	
-	spec.freq = context->get_spec().freq;
-	spec.channels = 1;
-	spec.format = context->get_spec().format;
+	_spec.freq = _context->get_spec().freq;
+	_spec.channels = 1;
+	_spec.format = _context->get_spec().format;
 
-	unsigned size = ((int)(len * spec.freq)) * 2;
-	data.set_size(size);
+	unsigned size = ((int)(len * _spec.freq)) * 2;
+	_data.set_size(size);
 
 	static double a = 0;
-	double da = freq * 2 * M_PI / spec.freq;
+	double da = freq * 2 * M_PI / _spec.freq;
 	//LOG_DEBUG(("da = %g", da));
 	
 	int n = size / 2;
 
-	Sint16 * stream = (Sint16 *)data.get_ptr();
+	Sint16 * stream = (Sint16 *)_data.get_ptr();
 	for(int i = 0; i < n; ++i) {
 		*stream++ = (Sint16)(32767 * sin(a));
 		//*stream++ = 0;
 		a += da;
 	}
-	LOG_DEBUG(("generated %u bytes", (unsigned)data.get_size()));
+	LOG_DEBUG(("generated %u bytes", (unsigned)_data.get_size()));
 }
 
-void Sample::init(const clunk::Buffer &src_data, int rate, const Uint16 format, const u8 channels) {
+void Sample::init(const clunk::Buffer &src_data, const AudioSpec &spec) {
 	AudioLocker l;
 
-	spec.freq = context->get_spec().freq;
-	spec.channels = channels;
-	spec.format = context->get_spec().format;
-	context->convert(data, src_data, rate, format, channels);
+	_spec.freq = _context->get_spec().freq;
+	_spec.channels = spec.channels;
+	_spec.format = _context->get_spec().format;
+	_context->convert(_data, src_data, spec);
 }
 
-void Sample::load(const std::string &file) {
-	u8 *buf;
-	u32 len;
-	//SDL_AudioSpec * SDLCALL SDL_LoadWAV_RW(SDL_RWops *src, int freesrc, SDL_AudioSpec *spec, u8 **audio_buf, u32 *audio_len);
-	if (SDL_LoadWAV(file.c_str(), &spec, &buf, &len) == NULL)
-		throw_sdl(("SDL_LoadWav"));
-
-	clunk::Buffer wav;
-	wav.set_data(buf, len, true);
-	context->convert(data, wav, spec.freq, spec.format, spec.channels);
-	
-	name = file;
-}
-
-
-Sample::~Sample() {
-	
-}
+Sample::~Sample() { }

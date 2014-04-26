@@ -17,11 +17,8 @@
 */
 
 
-#include <SDL.h>
-#include <SDL_audio.h>
 #include "context.h"
 #include <string.h>
-#include "sdl_ex.h"
 #include "logger.h"
 #include "source.h"
 #include <assert.h>
@@ -31,19 +28,12 @@
 #include "locker.h"
 #include "stream.h"
 #include "object.h"
+#include "clunk_ex.h"
+#include <stdexcept>
 
 using namespace clunk;
 
-Context::Context() : period_size(0), listener(NULL), max_sources(8), fx_volume(1), distance_model(DistanceModel::Inverse, true, 128), fdump(NULL) {
-}
-
-void Context::callback(void *userdata, u8 *bstream, int len) {
-	Context *self = (Context *)userdata;
-	assert(self != NULL);
-	s16 *stream = (s16*)bstream;
-	TRY {
-		self->process(stream, len);
-	} CATCH("callback", {})
+Context::Context() : _listener(NULL), max_sources(8), fx_volume(1), distance_model(DistanceModel::Inverse, true, 128), _fdump(NULL) {
 }
 
 template<class Sources>
@@ -64,7 +54,7 @@ bool Context::process_object(Object *o, Sources &sset, std::vector<source_t> &ls
 		typename stats_type::iterator s_i = sources_stats.find(name);
 		unsigned same_sounds_n = (s_i != sources_stats.end())? s_i->second: 0;
 		if (lsources.size() < max_sources && same_sounds_n < distance_model.same_sounds_limit) {
-			lsources.push_back(source_t(s, o->position + s->delta_position - listener->position, o->velocity, o->direction, listener->velocity));
+			lsources.push_back(source_t(s, o->position + s->delta_position - _listener->position, o->velocity, o->direction, _listener->velocity));
 			if (same_sounds_n == 0) {
 				sources_stats.insert(typename stats_type::value_type(name, 1));
 			} else {
@@ -83,17 +73,18 @@ bool Context::process_object(Object *o, Sources &sset, std::vector<source_t> &ls
 	return true;
 }
 
-void Context::process(s16 *stream, int size) {
+void Context::process(void *stream_, int size) {
+	u16 *stream = static_cast<u16 *>(stream_);
 	//TIMESPY(("total"));
 
 	{
 		//TIMESPY(("sorting objects"));
-		std::sort(objects.begin(), objects.end(), Object::DistanceOrder(listener->position));
+		std::sort(objects.begin(), objects.end(), Object::DistanceOrder(_listener->position));
 	}
 	//LOG_DEBUG(("sorted %u objects", (unsigned)objects.size()));
 	
 	std::vector<source_t> lsources;
-	int n = size / 2 / spec.channels;
+	int n = size / 2 / _spec.channels;
 
 	for(objects_type::iterator i = objects.begin(); i != objects.end(); ) {
 		Object *o = *i;
@@ -116,9 +107,9 @@ void Context::process(s16 *stream, int size) {
 		while ((int)stream_info.buffer.get_size() < size) {
 			clunk::Buffer data;
 			bool eos = !stream_info.stream->read(data, size);
-			if (!data.empty() && stream_info.stream->sample_rate != spec.freq) {
+			if (!data.empty() && stream_info.stream->_spec.freq != _spec.freq) {
 				//LOG_DEBUG(("converting audio data from %u to %u", stream_info.stream->sample_rate, spec.freq));
-				convert(data, data, stream_info.stream->sample_rate, stream_info.stream->format, stream_info.stream->channels);
+				convert(data, data, stream_info.stream->_spec);
 			}
 			stream_info.buffer.append(data);
 			//LOG_DEBUG(("read %u bytes", (unsigned)data.get_size()));
@@ -177,7 +168,7 @@ void Context::process(s16 *stream, int size) {
 		if (sdl_v <= 0)
 			continue;
 		//check for 0
-		volume = source->_process(buf, spec.channels, source_info.s_pos, source_info.s_dir, volume, dpitch);
+		volume = source->_process(buf, _spec.channels, source_info.s_pos, source_info.s_dir, volume, dpitch);
 		sdl_v = (int)floor(SDL_MIX_MAXVOLUME * volume + 0.5f);
 		//LOG_DEBUG(("%u: mixing source with volume %g (%d)", i, volume, sdl_v));
 		if (sdl_v <= 0)
@@ -188,10 +179,10 @@ void Context::process(s16 *stream, int size) {
 		SDL_MixAudio((u8 *)stream, (u8 *)buf.get_ptr(), size, sdl_v);
 	}
 	
-	if (fdump != NULL) {
-		if (fwrite(stream, size, 1, fdump) != 1) {
-			fclose(fdump);
-			fdump = NULL;
+	if (_fdump != NULL) {
+		if (fwrite(stream, size, 1, _fdump) != 1) {
+			fclose(_fdump);
+			_fdump = NULL;
 		}
 	}
 }
@@ -211,45 +202,20 @@ Sample *Context::create_sample() {
 
 void Context::save(const std::string &file) {
 	AudioLocker l;
-	if (fdump != NULL) {
-		fclose(fdump);
-		fdump = NULL;
+	if (_fdump != NULL) {
+		fclose(_fdump);
+		_fdump = NULL;
 	}
 	if (file.empty())
 		return;
 	
-	fdump = fopen(file.c_str(), "wb");
+	_fdump = fopen(file.c_str(), "wb");
 }
 
-void Context::init(const int sample_rate, const u8 channels, int period_size) {
-	if (!SDL_WasInit(SDL_INIT_AUDIO)) {
-		if (SDL_InitSubSystem(SDL_INIT_AUDIO) == -1)
-			throw_sdl(("SDL_InitSubSystem"));
-	}
-	
-	SDL_AudioSpec src;
-	memset(&src, 0, sizeof(src));
-	src.freq = sample_rate;
-	src.channels = channels;
-	src.format = AUDIO_S16SYS;
-	src.samples = period_size;
-	src.callback = &Context::callback;
-	src.userdata = (void *) this;
-	
-	this->period_size = period_size;
-	
-	if ( SDL_OpenAudio(&src, &spec) < 0 )
-		throw_sdl(("SDL_OpenAudio(%d, %u, %d)", sample_rate, channels, period_size));
-	if (spec.format != AUDIO_S16SYS)
-		throw_ex(("SDL_OpenAudio(%d, %u, %d) returned format %d", sample_rate, channels, period_size, spec.format));
-	if (spec.channels < 2)
-		LOG_ERROR(("Could not operate on %d channels", spec.channels));
-
-	LOG_DEBUG(("opened audio device, sample rate: %d, period: %d, channels: %d", spec.freq, spec.samples, spec.channels));
-	SDL_PauseAudio(0);
-	
+void Context::init(const AudioSpec &spec) {
 	AudioLocker l;
-	listener = create_object();
+	_spec = spec;
+	_listener = create_object();
 }
 
 void Context::delete_object(Object *o) {
@@ -260,21 +226,14 @@ void Context::delete_object(Object *o) {
 }
 
 void Context::deinit() {
-	//cleanup objects here too.
-	if (!SDL_WasInit(SDL_INIT_AUDIO))
-		return;
-	
 	AudioLocker l;
-	delete listener;
-	listener = NULL;
-	SDL_CloseAudio();
+	delete _listener;
+	_listener = NULL;
 	
-	if (fdump != NULL) {
-		fclose(fdump);
-		fdump = NULL;
+	if (_fdump != NULL) {
+		fclose(_fdump);
+		_fdump = NULL;
 	}
-
-	SDL_QuitSubSystem(SDL_INIT_AUDIO);
 }
 	
 Context::~Context() {
@@ -359,23 +318,8 @@ void Context::set_max_sources(int sources) {
 	max_sources = sources;
 }
 
-void Context::convert(clunk::Buffer &dst, const clunk::Buffer &src, int rate, const u16 format, const u8 channels) {
-	SDL_AudioCVT cvt;
-	memset(&cvt, 0, sizeof(cvt));
-	if (SDL_BuildAudioCVT(&cvt, format, channels, rate, spec.format, channels, spec.freq) == -1) {
-		throw_sdl(("DL_BuildAudioCVT(%d, %04x, %u)", rate, format, channels));
-	}
-	size_t buf_size = (size_t)(src.get_size() * cvt.len_mult);
-	cvt.buf = (u8 *)malloc(buf_size);
-	cvt.len = (int)src.get_size();
-
-	assert(buf_size >= src.get_size());
-	memcpy(cvt.buf, src.get_ptr(), src.get_size());
-
-	if (SDL_ConvertAudio(&cvt) == -1) 
-		throw_sdl(("SDL_ConvertAudio"));
-
-	dst.set_data(cvt.buf, (size_t)(cvt.len * cvt.len_ratio), true);
+void Context::convert(clunk::Buffer &dst, const clunk::Buffer &src, const AudioSpec &spec) {
+	throw std::runtime_error("implement me");
 }
 
 /*!

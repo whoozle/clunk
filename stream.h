@@ -22,6 +22,7 @@
 
 #include "export_clunk.h"
 #include "types.h"
+#include "audio_spec.h"
 
 namespace clunk {
 class Context;
@@ -54,13 +55,7 @@ public:
 protected: 
 	///stream sample rate
 	/*! initialize it from your open() method */
-	int sample_rate;
-	///stream audio format 
-	/*! initialize it from your open() method */
-	u16 format;
-	///stream channels. 
-	/*! initialize it from your open() method */
-	u8 channels;
+	AudioSpec _spec;
 
 	friend class Context;
 };

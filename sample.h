@@ -20,9 +20,9 @@
 */
 
 
-#include <SDL_audio.h>
 #include "export_clunk.h"
 #include "buffer.h"
+#include "audio_spec.h"
 
 namespace clunk {
 class Context;
@@ -45,11 +45,7 @@ public:
 		\param[in] format SDL audio format. Look SDL_audio.h or SDL documentation. 
 		\param[in] channels audio channels
 	*/	
-	void init(const clunk::Buffer &data, int rate, const u16 format, const u8 channels);
-	/*!
-		\brief loads sample from file
-	*/
-	void load(const std::string &file);
+	void init(const clunk::Buffer &data, const AudioSpec &spec);
 	/*! 
 		\brief generate sine wave with given length (seconds)
 		\param[in] freq frequency
@@ -58,7 +54,7 @@ public:
 	void generateSine(int freq, float len);
 	
 	float length() const {
-		return 1.0f * data.get_size() / spec.freq / spec.channels / 2;
+		return 1.0f * _data.get_size() / _spec.freq / _spec.channels / 2;
 	}
 	
 private: 	
@@ -70,9 +66,9 @@ private:
 	Sample(const Sample &);
 	const Sample& operator=(const Sample &);
 
-	Context *context;
-	SDL_AudioSpec spec;
-	clunk::Buffer data;
+	Context *		_context;
+	AudioSpec		_spec;
+	clunk::Buffer	_data;
 };
 }
 

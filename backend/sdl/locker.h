@@ -1,3 +1,6 @@
+#ifndef CLUNK_LOCKER_H__
+#define CLUNK_LOCKER_H__
+
 /* libClunk - cross-platform 3D audio API built on top SDL library
  * Copyright (C) 2007-2008 Netive Media Group
  *
@@ -16,10 +19,28 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 */
 
-#include "stream.h"
+#include <SDL_audio.h>
+#include "export_clunk.h"
+namespace clunk { namespace sdl {
 
-using namespace clunk;
+/*! 
+	\brief Audio callback locker
+	This struct locks audio in ctor and releases lock from the dtor. 
+	This prevents audio callback from being called while clunk::AudioLocker is in the scope. 
+*/
 
-Stream::Stream() : _spec() {}
+struct CLUNKAPI AudioLocker {
+	///locks audio 
+	AudioLocker () {
+		SDL_LockAudio();
+	}
+	///unlocks audio 
+	~AudioLocker() {
+		SDL_UnlockAudio();
+	}
+};
+}}
 
-Stream::~Stream() {}
+
+#endif
+

@@ -5,12 +5,12 @@ set(CMAKE_USE_RELATIVE_PATHS TRUE)
 find_package(SDL REQUIRED)
 option(WITH_SSE "Use highly optimized SSE FFT/MDCT routines" false)
 
-if ( NOT SDL_FOUND )
-	message ( FATAL_ERROR "SDL not found!" )
-endif ( NOT SDL_FOUND )
-
 set(clunk_VERSION_MAJOR 1)
-set(clunk_VERSION_MINOR 0)
+set(clunk_VERSION_MINOR 1)
+
+if (CMAKE_BUILD_TYPE MATCHES Debug)
+	add_definitions(-ggdb)
+endif (CMAKE_BUILD_TYPE MATCHES Debug)
 
 if(WIN32)
 	add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_WINDOWS)
@@ -29,11 +29,19 @@ set(SOURCES
 	logger.cpp
 	object.cpp
 	sample.cpp
-	sdl_ex.cpp
 	source.cpp
 	stream.cpp
-	clunk_c.cpp
+#	clunk_c.cpp
 )
+
+if (SDL_FOUND )
+	add_definitions(-DBACKEND_SDL=1)
+	list(APPEND SOURCES
+		backend/sdl/sdl_ex.cpp
+		backend/sdl/backend.cpp
+	)
+endif (SDL_FOUND )
+
 set(PUBLIC_HEADERS
 	buffer.h
 	clunk.h

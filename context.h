@@ -48,11 +48,9 @@ public:
 	
 	/*! 
 		\brief Initializes clunk context. 
-		\param[in] sample_rate sample rate of the audio output
-		\param[in] channels audio output channels number, supported values 1 or 2 for now. 
-		\param[out] period_size minimal processing unit (bytes). Less period - less latency.
+		\param[in] spec specification of audio format
 	*/
-	void init(int sample_rate, const u8 channels, int period_size);
+	void init(const AudioSpec &spec);
 	/*! 
 		\brief Sets maximum simultaneous sources number. 
 		Do not use values that are too high. Use reasonable default such as 8 or 16 
@@ -79,15 +77,15 @@ public:
 		\brief returns audio specification for output
 		\return output audio specification in SDL format. 
 	*/
-	const SDL_AudioSpec & get_spec() const {
-		return spec;
+	const AudioSpec & get_spec() const {
+		return _spec;
 	}
 	
 	///internal: NEVER USE IT !
 	/*!
 		\internal generate next 'len' bytes
 	*/
-	void process(s16 *stream, int len);
+	void process(void *stream, int len);
 	/*! 
 		\brief plays stream with given id. 
 		\param[in] id stream id - any integer you want. 
@@ -123,23 +121,21 @@ public:
 		\param[out] dst destination data
 		\param[in] src source data
 		\param[in] rate sample rate of the source data
-		\param[in] format SDL audio format. See SDL_audio.h or SDL documentation for the details.
+		\param[in] format audio format
 		\param[in] channels source channels. 
 	*/
-	void convert(clunk::Buffer &dst, const clunk::Buffer &src, int rate, const u16 format, const u8 channels);
+	void convert(clunk::Buffer &dst, const clunk::Buffer &src, const AudioSpec &spec);
 	
 	///returns object associated to the current listener position
-	Object *get_listener() { return listener; }
+	Object *get_listener() { return _listener; }
 	
 	///Sets distance model
 	inline void set_distance_model(const DistanceModel &model) { distance_model = model; }
 	DistanceModel &get_distance_model() { return distance_model; }
 
 private: 
-	SDL_AudioSpec spec;
-	int period_size;
+	AudioSpec _spec;
 
-	static void callback(void *userdata, u8 *stream, int len);
 	void delete_object(Object *o);
 
 	friend clunk::Object::~Object();
@@ -160,13 +156,13 @@ private:
 	typedef std::map<const int, stream_info> streams_type;
 	streams_type streams;
 
-	Object *listener;
+	Object *_listener;
 	unsigned max_sources;
 	float fx_volume;
 	
 	DistanceModel distance_model;
 	
-	FILE * fdump;
+	FILE * _fdump;
 
 	struct source_t {
 		Source *source;

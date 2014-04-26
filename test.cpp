@@ -1,4 +1,5 @@
 #include "context.h"
+#include "backend/sdl/backend.h"
 #include "source.h"
 #include <stdlib.h>
 #include <unistd.h>
@@ -39,13 +40,13 @@ int main(int argc, char *argv[]) {
 		
 		return 0;
 	}
-	clunk::Context context;
-	context.init(44100, 2, 1024);
+
+	clunk::sdl::Backend backend(44100, 2, 1024);
+	clunk::Context &context = backend.get_context();
 	
 	clunk::Object * o = context.create_object();
-	clunk::Sample * s = context.create_sample();
+	clunk::Sample * s = backend.load("scissors.wav");
 
-	s->load("scissors.wav");
 	static const int d = 2, n = 6;
 	
 	context.save("test_out.raw");
