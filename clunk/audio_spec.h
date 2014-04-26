@@ -17,6 +17,15 @@ struct CLUNKAPI AudioSpec {
 	int		sample_rate;
 	u8		channels;
 
+	int bytes_per_sample() {
+		switch(format)
+		{
+			case S8: case U8: return 1;
+			case S16: case U16: return 2;
+			default: return -1;
+		}
+	}
+
 	AudioSpec(): format(S16), sample_rate(), channels() {}
 	AudioSpec(Format format, int freq, u8 channels): format(format), sample_rate(freq), channels(channels) {}
 };
