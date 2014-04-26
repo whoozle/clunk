@@ -110,6 +110,7 @@ namespace clunk {
 					case AudioSpec::S16:	Resampler2<DstAudioFormat, AudioFormat<AudioSpec::S16> >::resample(dst_format, dst, src_format, src); break;
 					case AudioSpec::U8:		Resampler2<DstAudioFormat, AudioFormat<AudioSpec::U8> >::resample(dst_format, dst, src_format, src); break;
 					case AudioSpec::U16:	Resampler2<DstAudioFormat, AudioFormat<AudioSpec::U16> >::resample(dst_format, dst, src_format, src); break;
+					default: throw std::runtime_error("invalid src format");
 				}
 			}
 		};
@@ -123,6 +124,7 @@ namespace clunk {
 				case AudioSpec::S16:	impl::Resampler1<AudioFormat<AudioSpec::S16> >::resample(dst_format, dst, src_format, src); break;
 				case AudioSpec::U8:		impl::Resampler1<AudioFormat<AudioSpec::U8> >::resample(dst_format, dst, src_format, src); break;
 				case AudioSpec::U16:	impl::Resampler1<AudioFormat<AudioSpec::U16> >::resample(dst_format, dst, src_format, src); break;
+				default: throw std::runtime_error("invalid dst format");
 			}
 		}
 	};
