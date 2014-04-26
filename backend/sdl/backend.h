@@ -24,6 +24,8 @@ public:
 		\brief loads sample from file
 	*/
 	Sample *load(const std::string &fname);
+	void start();
+	void stop();
 
 	///gets context
 	Context &get_context() { return _context; }

@@ -24,7 +24,7 @@ Backend::Backend(int sample_rate, const u8 channels, int period_size) {
 	src.format = AUDIO_S16SYS;
 	src.samples = period_size;
 	src.callback = &Backend::callback;
-	src.userdata = (void *) this;
+	src.userdata = this;
 	
 	if ( SDL_OpenAudio(&src, &_spec) < 0 )
 		throw_sdl(("SDL_OpenAudio(%d, %u, %d)", sample_rate, channels, period_size));
@@ -35,17 +35,26 @@ Backend::Backend(int sample_rate, const u8 channels, int period_size) {
 
 	LOG_DEBUG(("opened audio device, sample rate: %d, period: %d, channels: %d", _spec.freq, _spec.samples, _spec.channels));
 	_context.init(convert(_spec));
+}
+void Backend::start()
+{
+	LOG_DEBUG(("starting output"));
+	SDL_PauseAudio(0);
+}
+
+void Backend::stop()
+{
+	LOG_DEBUG(("stopping output"));
 	SDL_PauseAudio(0);
 }
 
 Backend::~Backend() {
-	LOG_DEBUG(("DTOR"));
+	LOG_DEBUG(("shutting down backend"));
 	if (!SDL_WasInit(SDL_INIT_AUDIO))
 		return;
 
-	AudioLocker l;
-	SDL_PauseAudio(1);
-	
+	stop();
+
 	SDL_CloseAudio();
 
 	SDL_QuitSubSystem(SDL_INIT_AUDIO);
