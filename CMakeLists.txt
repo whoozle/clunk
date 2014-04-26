@@ -34,6 +34,7 @@ set(SOURCES
 	clunk/sample.cpp
 	clunk/source.cpp
 	clunk/stream.cpp
+	clunk/wav_file.cpp
 #	clunk/clunk_c.cpp
 )
 
