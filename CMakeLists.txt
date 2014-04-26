@@ -12,6 +12,7 @@ if (CMAKE_BUILD_TYPE MATCHES Debug)
 	add_definitions(-DDEBUG)
 	if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX)
 		add_definitions(-ggdb -Wall -pedantic)
+		set(CMAKE_CXX_FLAGS "-fvisibility=hidden -fvisibility-inlines-hidden -DGCC_HASCLASSVISIBILITY=1")
 	endif (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX)
 endif (CMAKE_BUILD_TYPE MATCHES Debug)
 
