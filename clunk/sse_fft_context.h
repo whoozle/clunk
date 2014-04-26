@@ -7,6 +7,7 @@
 
 #include <clunk/types.h>
 #include <clunk/clunk_assert.h>
+#include <clunk/export_clunk.h>
 
 #ifndef _USE_MATH_DEFINES
 #	define _USE_MATH_DEFINES
@@ -17,7 +18,7 @@
 
 namespace clunk {
 
-struct aligned_allocator {
+struct CLUNKAPI aligned_allocator {
 	static void * allocate(size_t size, size_t alignment);
 	static void deallocate(void *ptr);
 };
