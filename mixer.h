@@ -2,6 +2,7 @@
 #define CLUNK_MIXER_H
 
 #include "audio_spec.h"
+#include <limits>
 
 namespace clunk {
 
@@ -20,7 +21,11 @@ namespace clunk {
 				const Type *src = static_cast<const Type *>(src_);
 				while(size--)
 				{
-					DoubleType value = (((DoubleType)*dst << MaxMixVolumeShift) + ((DoubleType)*src++ << MaxMixVolumeShift)) >> (MaxMixVolumeShift + 1);
+					DoubleType value = (((DoubleType)*dst << MaxMixVolumeShift) + (volume * (DoubleType)*src++ )) >> MaxMixVolumeShift;
+					if (value > std::numeric_limits<Type>::max())
+						value = std::numeric_limits<Type>::max();
+					if (value < std::numeric_limits<Type>::min())
+						value = std::numeric_limits<Type>::min();
 					*dst++ = value;
 				}
 			}
