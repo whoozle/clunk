@@ -30,6 +30,7 @@
 #include "object.h"
 #include "clunk_ex.h"
 #include "mixer.h"
+#include "resample.h"
 #include <stdexcept>
 
 using namespace clunk;
@@ -320,7 +321,7 @@ void Context::set_max_sources(int sources) {
 }
 
 void Context::convert(clunk::Buffer &dst, const clunk::Buffer &src, const AudioSpec &spec) {
-	throw std::runtime_error("implement me");
+	Resample::resample(_spec, dst, spec, src);
 }
 
 /*!
