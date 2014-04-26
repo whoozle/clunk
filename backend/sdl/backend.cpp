@@ -34,6 +34,7 @@ Backend::Backend(int sample_rate, const u8 channels, int period_size) {
 		LOG_ERROR(("Could not operate on %d channels", _spec.channels));
 
 	LOG_DEBUG(("opened audio device, sample rate: %d, period: %d, channels: %d", _spec.freq, _spec.samples, _spec.channels));
+	_context.init(convert(_spec));
 	SDL_PauseAudio(0);
 }
 
