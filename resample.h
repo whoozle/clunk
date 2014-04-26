@@ -10,20 +10,20 @@ namespace clunk {
 		template<int DstChannels, int SrcChannels>
 		struct ChannelResampler {
 			template<typename DstType, typename SrcType>
-			static void resample(DstType * &dst, SrcType *src);
+			static void resample(DstType * &dst, const SrcType *src);
 		};
 
 		template<>
 		struct ChannelResampler<1, 1> {
 			template<typename DstType, typename SrcType>
-			static void resample(DstType * &dst, SrcType *src) {
+			static void resample(DstType * &dst, const SrcType *src) {
 				*dst++ = *src;
 			}
 		};
 		template<>
 		struct ChannelResampler<2, 2> {
 			template<typename DstType, typename SrcType>
-			static void resample(DstType * &dst, SrcType *src) {
+			static void resample(DstType * &dst, const SrcType *src) {
 				*dst++ = *src++;
 				*dst++ = *src++;
 			}
@@ -31,14 +31,16 @@ namespace clunk {
 		template<>
 		struct ChannelResampler<1, 2> {
 			template<typename DstType, typename SrcType>
-			static void resample(DstType * &dst, SrcType *src) {
-				*dst++ = (*src++ >> 1) + (*src++ >> 1);
+			static void resample(DstType * &dst, const SrcType *src) {
+				SrcType v = (*src++ >> 1);
+				v += (*src++ >> 1);
+				*dst++ = v;
 			}
 		};
 		template<>
 		struct ChannelResampler<2, 1> {
 			template<typename DstType, typename SrcType>
-			static void resample(DstType * &dst, SrcType *src) {
+			static void resample(DstType * &dst, const SrcType *src) {
 				*dst++ = *src;
 				*dst++ = *src;
 			}
