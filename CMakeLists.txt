@@ -9,7 +9,10 @@ set(clunk_VERSION_MAJOR 1)
 set(clunk_VERSION_MINOR 1)
 
 if (CMAKE_BUILD_TYPE MATCHES Debug)
-	add_definitions(-ggdb)
+	add_definitions(-DDEBUG)
+	if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX)
+		add_definitions(-ggdb)
+	endif (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX)
 endif (CMAKE_BUILD_TYPE MATCHES Debug)
 
 if(WIN32)
