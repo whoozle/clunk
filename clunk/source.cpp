@@ -164,7 +164,7 @@ void Source::hrtf(int window, const unsigned channel_idx, clunk::Buffer &result,
 	mdct.imdct();
 	mdct.apply_window();
 
-	s16 *dst = (s16 *)((unsigned char *)result.get_ptr() + result_start);
+	s16 *dst = static_cast<s16 *>(static_cast<void *>((static_cast<u8 *>(result.get_ptr()) + result_start)));
 
 	float max_v = 1.0f, min_v = -1.0f;
 	
@@ -224,9 +224,9 @@ void Source::_update_position(const int dp) {
 }
 
 float Source::_process(clunk::Buffer &buffer, unsigned dst_ch, const v3<float> &delta_position, const v3<float> &direction, float fx_volume, float pitch) {
-	s16 * dst = (s16*) buffer.get_ptr();
+	s16 * dst = static_cast<s16*>(buffer.get_ptr());
 	unsigned dst_n = (unsigned)buffer.get_size() / dst_ch / 2;
-	const s16 * src = (s16*) sample->_data.get_ptr();
+	const s16 * src = static_cast<const s16 *>(sample->_data.get_ptr());
 	if (src == NULL)
 		throw_ex(("uninitialized sample used (%p)", (void *)sample));
 
@@ -315,7 +315,7 @@ float Source::_process(clunk::Buffer &buffer, unsigned dst_ch, const v3<float> &
 	
 	//LOG_DEBUG(("angle: %g", angle_gr));
 	//LOG_DEBUG(("idt offset %d samples", idt_offset));
-	s16 * src_3d[2] = { (s16 *)sample3d[0].get_ptr(), (s16 *)sample3d[1].get_ptr() };
+	s16 * src_3d[2] = { static_cast<s16 *>(sample3d[0].get_ptr()), static_cast<s16 *>(sample3d[1].get_ptr()) };
 	
 	//LOG_DEBUG(("size1: %u, %u, needed: %u\n%s", (unsigned)sample3d[0].get_size(), (unsigned)sample3d[1].get_size(), dst_n, sample3d[0].dump().c_str()));
 	

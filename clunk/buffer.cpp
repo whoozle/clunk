@@ -101,7 +101,7 @@ void Buffer::append(const Buffer &other) {
 	if (s2 == 0)
 		return;
 	set_size(s1 + s2);
-	memcpy((char *) ptr + s1, other.ptr, s2);
+	memcpy(static_cast<char *>(ptr) + s1, other.ptr, s2);
 }
 
 void Buffer::append(const void *data, const size_t data_size) {
@@ -110,7 +110,7 @@ void Buffer::append(const void *data, const size_t data_size) {
 
 	size_t s = size;
 	set_size(s + data_size);
-	memcpy((char *) ptr + s, data, data_size);
+	memcpy(static_cast<char *>(ptr) + s, data, data_size);
 }
 
 
@@ -141,7 +141,7 @@ const std::string Buffer::dump() const {
 			m = 16;
 		
 		for(j = 0; j < m; ++j) {
-			const unsigned char *p = ((unsigned char *)ptr) + i*16 + j;
+			const u8 *p = static_cast<u8 *>(ptr) + i*16 + j;
 			result += clunk::format_string("%02x ", *p);
 			if (j == 7) 
 				result += " ";
@@ -154,7 +154,7 @@ const std::string Buffer::dump() const {
 		result += "\t\t";
 
 		for(j = 0; j < m; ++j) {
-			const unsigned char *p = ((unsigned char *)ptr) + i*16 + j;
+			const u8 *p = static_cast<u8 *>(ptr) + i*16 + j;
 			result += clunk::format_string("%c", (*p>=32 && *p < 127)? *p: '.');
 			if (j == 7) 
 				result += " ";
@@ -177,6 +177,6 @@ void Buffer::pop(size_t n) {
 		return;
 	}
 	
-	memmove(ptr, (unsigned char *)ptr + n, size - n);
+	memmove(ptr, static_cast<u8 *>(ptr) + n, size - n);
 	set_size(size - n);
 }

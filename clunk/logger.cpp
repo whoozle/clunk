@@ -54,10 +54,10 @@ const std::string clunk::format_string(const char *fmt, ...) {
     while(true) {
 		buf.set_size(size);
 	    va_start(ap, fmt);    
-    	int r = vsnprintf ((char *)buf.get_ptr(), size - 1, fmt, ap);
+    	int r = vsnprintf (static_cast<char *>(buf.get_ptr()), size - 1, fmt, ap);
 	    va_end(ap);
 	    if (r > -1 && r <= size) 
-    		return std::string((char *)buf.get_ptr(), r);
+    		return std::string(static_cast<char *>(buf.get_ptr()), r);
     	size *= 2;
     }
 }

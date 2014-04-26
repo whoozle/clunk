@@ -27,7 +27,7 @@ template<typename T, int N, int ALIGNMENT = sizeof(T)>
 class aligned_array {
 	T * data;
 public: 
-	aligned_array() : data((T*)aligned_allocator::allocate(sizeof(T) * N, ALIGNMENT)) {}
+	aligned_array() : data(static_cast<T *>(aligned_allocator::allocate(sizeof(T) * N, ALIGNMENT))) {}
 	operator T*() { return data; }
 	operator const T*() const { return data; }
 	~aligned_array() { aligned_allocator::deallocate(data); }
