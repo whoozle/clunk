@@ -1,8 +1,8 @@
 #ifndef CLUNK_BACKEND_SDL_H
 #define CLUNK_BACKEND_SDL_H
 
-#include "sample.h"
-#include "context.h"
+#include "../../sample.h"
+#include "../../context.h"
 #include <SDL.h>
 #include <SDL_audio.h>
 
