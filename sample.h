@@ -41,9 +41,7 @@ public:
 	/*!
 		\brief initializes sample
 		\param[in] data raw audio data
-		\param[in] rate sample rate
-		\param[in] format SDL audio format. Look SDL_audio.h or SDL documentation. 
-		\param[in] channels audio channels
+		\param[in] spec audio format specification
 	*/	
 	void init(const clunk::Buffer &data, const AudioSpec &spec);
 	/*! 
