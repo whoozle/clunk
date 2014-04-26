@@ -6,7 +6,6 @@
 #include "sdl_ex.h"
 #include "context.h"
 #include "locker.h"
-#include <memory>
 #include <stdexcept>
 
 namespace clunk { namespace sdl {
@@ -60,21 +59,44 @@ void Backend::callback(void *userdata, u8 *stream, int len) {
 
 
 Sample* Backend::load(const std::string &file) {
-	/*
-	u8 *buf;
-	u32 len;
+	Uint8 *buf;
+	Uint32 len;
+	SDL_AudioSpec spec;
 	//SDL_AudioSpec * SDLCALL SDL_LoadWAV_RW(SDL_RWops *src, int freesrc, SDL_AudioSpec *spec, u8 **audio_buf, u32 *audio_len);
-	if (SDL_LoadWAV(file.c_str(), &_spec, &buf, &len) == NULL)
+	if (SDL_LoadWAV(file.c_str(), &spec, &buf, &len) == NULL)
 		throw_sdl(("SDL_LoadWav"));
-
 	clunk::Buffer wav;
 	wav.set_data(buf, len, true);
-	_context->convert(_data, wav, _spec.freq, _spec.format, _spec.channels);
-	
-	name = file;
-	 */
-	throw std::runtime_error("port me");
+	Sample *sample = _context.create_sample();
+	sample->init(wav, convert(spec));
+	sample->name = file;
+	return sample;
 }
 
+SDL_AudioSpec Backend::convert(const AudioSpec &spec) {
+	SDL_AudioSpec r = {};
+	r.channels = spec.channels;
+	r.freq = spec.freq;
+	switch(spec.format) {
+		case AudioSpec::S8:		r.format = AUDIO_S8; break;
+		case AudioSpec::U8:		r.format = AUDIO_U8; break;
+		case AudioSpec::S16:	r.format = AUDIO_S16SYS; break;
+		case AudioSpec::U16:	r.format = AUDIO_U16SYS; break;
+		default: throw std::runtime_error("invalid audio format");
+	}
+	return r;
+}
+
+AudioSpec Backend::convert(const SDL_AudioSpec &spec) {
+	AudioSpec::Format format;
+	switch(spec.format) {
+		case AUDIO_S8:	format = AudioSpec::S8; break;
+		case AUDIO_U8:	format = AudioSpec::U8; break;
+		case AUDIO_S16:	format = AudioSpec::S16; break;
+		case AUDIO_U16:	format = AudioSpec::U16; break;
+		default: throw std::runtime_error("invalid sdl audio format");
+	}
+	return AudioSpec(format, spec.freq, spec.channels);
+}
 
 }}

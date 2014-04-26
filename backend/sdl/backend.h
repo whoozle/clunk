@@ -26,6 +26,9 @@ public:
 	///gets context
 	Context &get_context() { return _context; }
 
+	SDL_AudioSpec convert(const AudioSpec &spec);
+	AudioSpec convert(const SDL_AudioSpec &spec);
+
 private:
 	static void callback(void *userdata, u8 *stream, int len);
 	SDL_AudioSpec _spec;
