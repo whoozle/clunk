@@ -5,7 +5,8 @@
 
 namespace clunk {
 
-	static const u8 MaxMixVolume = 128;
+	static const int MaxMixVolumeShift = 7;
+	static const u8 MaxMixVolume = (1 << MaxMixVolumeShift);
 
 	namespace impl {
 		template<typename Format> struct Mixer {
@@ -18,7 +19,7 @@ namespace clunk {
 				const Type *src = static_cast<const Type *>(src_);
 				while(size--)
 				{
-					DoubleType value = ((DoubleType)*dst * MaxMixVolume + (DoubleType)*src++ * volume) >> 8;
+					DoubleType value = (((DoubleType)*dst << MaxMixVolumeShift) + ((DoubleType)*src++ << MaxMixVolumeShift)) >> (MaxMixVolumeShift + 1);
 					*dst++ = value;
 				}
 			}
