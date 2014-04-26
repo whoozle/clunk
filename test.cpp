@@ -1,6 +1,6 @@
-#include "context.h"
-#include "backend/sdl/backend.h"
-#include "source.h"
+#include <clunk/context.h>
+#include <clunk/backend/sdl/backend.h>
+#include <clunk/source.h>
 #include <stdlib.h>
 #include <unistd.h>
 

@@ -8,7 +8,7 @@
 #include <vorbis/codec.h>
 #include <vorbis/vorbisenc.h>
 #include <vorbis/vorbisfile.h>
-#include "clunk/stream.h"
+#include <clunk/stream.h>
 #include <stdio.h>
 
 namespace clunk {

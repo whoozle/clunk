@@ -1,5 +1,5 @@
 #include "ogg_stream.h"
-#include "clunk/sample.h"
+#include <clunk/sample.h>
 #include <assert.h>
 #include <stdexcept>
 
@@ -60,10 +60,10 @@ OggStream::OggStream(const std::string &fname) {
 	
 	_vorbis_info = ov_info(&_ogg_stream, -1);
 
-	sample_rate = _vorbis_info->rate;
+	_spec.sample_rate = _vorbis_info->rate;
 	//LOG_DEBUG(("open(%s) : %d", fname.c_str(), sample_rate));
-	format = AUDIO_S16LSB;
-	channels = _vorbis_info->channels;
+	_spec.format = clunk::AudioSpec::S16;
+	_spec.channels = _vorbis_info->channels;
 
 	//_vorbis_comment = ov_comment(&_ogg_stream, -1);
 	assert(_vorbis_info != NULL);
