@@ -19,7 +19,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 */
 
-#include <SDL_audio.h>
 #include "export_clunk.h"
 #include "v3.h"
 #include "mdct_context.h"

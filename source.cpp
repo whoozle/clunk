@@ -18,12 +18,12 @@
 
 
 #include "source.h"
-#include <SDL.h>
 #include "clunk_ex.h"
 #include "buffer.h"
 #include "sample.h"
 #include <assert.h>
 #include "clunk_assert.h"
+#include "resample.h"
 
 #if defined _MSC_VER || __APPLE__ || __FreeBSD__
 #	define pow10f(x) powf(10.0f, (x))
@@ -242,7 +242,7 @@ float Source::_process(clunk::Buffer &buffer, unsigned dst_ch, const v3<float> &
 	if (vol > 1)
 		vol = 1;
 
-	if (vol < 0 || (int)floor(SDL_MIX_MAXVOLUME * vol + 0.5f) <= 0) {
+	if (vol < 0 || (int)floor(MaxMixVolume * vol + 0.5f) <= 0) {
 		_update_position((int)(dst_n * pitch));
 		return 0;
 	}

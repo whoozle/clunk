@@ -24,7 +24,6 @@
 #include <deque>
 #include <vector>
 #include <stdio.h>
-#include <SDL_audio.h>
 
 #include "export_clunk.h"
 #include "object.h"

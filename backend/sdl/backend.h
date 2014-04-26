@@ -3,6 +3,8 @@
 
 #include "sample.h"
 #include "context.h"
+#include <SDL.h>
+#include <SDL_audio.h>
 
 namespace clunk { namespace sdl {
 

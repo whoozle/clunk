@@ -29,6 +29,7 @@
 #include "stream.h"
 #include "object.h"
 #include "clunk_ex.h"
+#include "resample.h"
 #include <stdexcept>
 
 using namespace clunk;
@@ -136,7 +137,7 @@ void Context::process(void *stream_, int size) {
 		if (buf_size >= size)
 			buf_size = size;
 
-		int sdl_v = (int)floor(SDL_MIX_MAXVOLUME * stream_info.gain + 0.5f);
+		int sdl_v = (int)floor(MaxMixVolume * stream_info.gain + 0.5f);
 		SDL_MixAudio((u8 *)stream, (u8 *)stream_info.buffer.get_ptr(), buf_size, sdl_v);
 		
 		if ((int)stream_info.buffer.get_size() > size) {
@@ -164,17 +165,17 @@ void Context::process(void *stream_, int size) {
 		}
 
 		float volume = fx_volume * distance_model.gain(source_info.s_pos.length());
-		int sdl_v = (int)floor(SDL_MIX_MAXVOLUME * volume + 0.5f);
+		int sdl_v = (int)floor(MaxMixVolume * volume + 0.5f);
 		if (sdl_v <= 0)
 			continue;
 		//check for 0
 		volume = source->_process(buf, _spec.channels, source_info.s_pos, source_info.s_dir, volume, dpitch);
-		sdl_v = (int)floor(SDL_MIX_MAXVOLUME * volume + 0.5f);
+		sdl_v = (int)floor(MaxMixVolume * volume + 0.5f);
 		//LOG_DEBUG(("%u: mixing source with volume %g (%d)", i, volume, sdl_v));
 		if (sdl_v <= 0)
 			continue;
-		if (sdl_v > SDL_MIX_MAXVOLUME)
-			sdl_v = SDL_MIX_MAXVOLUME;
+		if (sdl_v > MaxMixVolume)
+			sdl_v = MaxMixVolume;
 		
 		SDL_MixAudio((u8 *)stream, (u8 *)buf.get_ptr(), size, sdl_v);
 	}
