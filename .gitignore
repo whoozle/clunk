@@ -4,3 +4,4 @@ cmake_*.cmake
 *.so
 *ninja*
 clunk-test
+nbproject
