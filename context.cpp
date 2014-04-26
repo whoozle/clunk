@@ -29,7 +29,7 @@
 #include "stream.h"
 #include "object.h"
 #include "clunk_ex.h"
-#include "resample.h"
+#include "mixer.h"
 #include <stdexcept>
 
 using namespace clunk;
@@ -138,7 +138,7 @@ void Context::process(void *stream_, int size) {
 			buf_size = size;
 
 		int sdl_v = (int)floor(MaxMixVolume * stream_info.gain + 0.5f);
-		SDL_MixAudio((u8 *)stream, (u8 *)stream_info.buffer.get_ptr(), buf_size, sdl_v);
+		Mixer::mix(_spec.format, stream, stream_info.buffer.get_ptr(), buf_size, sdl_v);
 		
 		if ((int)stream_info.buffer.get_size() > size) {
 			memmove(stream_info.buffer.get_ptr(), ((u8 *)stream_info.buffer.get_ptr()) + size, stream_info.buffer.get_size() - size);
@@ -177,7 +177,7 @@ void Context::process(void *stream_, int size) {
 		if (sdl_v > MaxMixVolume)
 			sdl_v = MaxMixVolume;
 		
-		SDL_MixAudio((u8 *)stream, (u8 *)buf.get_ptr(), size, sdl_v);
+		Mixer::mix(_spec.format, stream, buf.get_ptr(), size, sdl_v);
 	}
 	
 	if (_fdump != NULL) {

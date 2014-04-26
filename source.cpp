@@ -23,7 +23,7 @@
 #include "sample.h"
 #include <assert.h>
 #include "clunk_assert.h"
-#include "resample.h"
+#include "mixer.h"
 
 #if defined _MSC_VER || __APPLE__ || __FreeBSD__
 #	define pow10f(x) powf(10.0f, (x))
