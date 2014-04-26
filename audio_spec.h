@@ -20,6 +20,33 @@ struct CLUNKAPI AudioSpec {
 	AudioSpec(Format format, int freq, u8 channels): format(format), freq(freq), channels(channels) {}
 };
 
+template<int Format>
+struct AudioFormat {};
+
+template<>
+struct AudioFormat<AudioSpec::S8> {
+	typedef s8	Type;
+	typedef s16	DoubleType;
+};
+
+template<>
+struct AudioFormat<AudioSpec::S16> {
+	typedef s16	Type;
+	typedef s32	DoubleType;
+};
+
+template<>
+struct AudioFormat<AudioSpec::U8> {
+	typedef u8	Type;
+	typedef u16	DoubleType;
+};
+
+template<>
+struct AudioFormat<AudioSpec::U16> {
+	typedef u16	Type;
+	typedef u32	DoubleType;
+};
+
 }
 
 #endif
