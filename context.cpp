@@ -110,7 +110,7 @@ void Context::process(void *stream_, int size) {
 		while ((int)stream_info.buffer.get_size() < size) {
 			clunk::Buffer data;
 			bool eos = !stream_info.stream->read(data, size);
-			if (!data.empty() && stream_info.stream->_spec.freq != _spec.freq) {
+			if (!data.empty() && stream_info.stream->_spec.sample_rate != _spec.sample_rate) {
 				Resample::resample(_spec, data, stream_info.stream->_spec, data);
 			}
 			stream_info.buffer.append(data);

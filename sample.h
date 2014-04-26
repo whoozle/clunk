@@ -52,7 +52,7 @@ public:
 	void generateSine(int freq, float len);
 	
 	float length() const {
-		return 1.0f * _data.get_size() / _spec.freq / _spec.channels / 2;
+		return 1.0f * _data.get_size() / _spec.sample_rate / _spec.channels / 2;
 	}
 	
 private: 	

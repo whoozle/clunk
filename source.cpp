@@ -303,7 +303,7 @@ float Source::_process(clunk::Buffer &buffer, unsigned dst_ch, const v3<float> &
 	const int kemar_idx_left = (((360 - (int)angle_gr - 180 / (int)angles) / (360 / (int)angles)) % (int)angles);
 	//LOG_DEBUG(("%g -> left: %d, right: %d", angle_gr, kemar_idx_left, kemar_idx_right));
 	
-	int idt_offset = (int)(t_idt * sample->_spec.freq);
+	int idt_offset = (int)(t_idt * sample->_spec.sample_rate);
 
 	int window = 0;
 	while(sample3d[0].get_size() < dst_n * 2 || sample3d[1].get_size() < dst_n * 2) {
@@ -395,5 +395,5 @@ void Source::get_kemar_data(kemar_ptr & kemar_data, int & elev_n, const v3<float
 Source::~Source() {}
 
 void Source::fade_out(const float sec) {
-	fadeout = fadeout_total = (int)(sample->_spec.freq * sec);
+	fadeout = fadeout_total = (int)(sample->_spec.sample_rate * sec);
 }

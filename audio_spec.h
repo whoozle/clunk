@@ -13,11 +13,11 @@ struct CLUNKAPI AudioSpec {
 		U16
 	};
 	Format	format;
-	int		freq;
+	int		sample_rate;
 	u8		channels;
 
-	AudioSpec(): format(S16), freq(), channels() {}
-	AudioSpec(Format format, int freq, u8 channels): format(format), freq(freq), channels(channels) {}
+	AudioSpec(): format(S16), sample_rate(), channels() {}
+	AudioSpec(Format format, int freq, u8 channels): format(format), sample_rate(freq), channels(channels) {}
 };
 
 template<int Format>

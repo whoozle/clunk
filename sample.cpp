@@ -31,15 +31,15 @@ Sample::Sample(Context *context) : gain(1.0f), pitch(1.0f), _context(context) {}
 void Sample::generateSine(const int freq, const float len) {
 	AudioLocker l;
 	
-	_spec.freq = _context->get_spec().freq;
+	_spec.sample_rate = _context->get_spec().sample_rate;
 	_spec.channels = 1;
 	_spec.format = _context->get_spec().format;
 
-	unsigned size = ((int)(len * _spec.freq)) * 2;
+	unsigned size = ((int)(len * _spec.sample_rate)) * 2;
 	_data.set_size(size);
 
 	static double a = 0;
-	double da = freq * 2 * M_PI / _spec.freq;
+	double da = freq * 2 * M_PI / _spec.sample_rate;
 	//LOG_DEBUG(("da = %g", da));
 	
 	int n = size / 2;
@@ -56,7 +56,7 @@ void Sample::generateSine(const int freq, const float len) {
 void Sample::init(const clunk::Buffer &src_data, const AudioSpec &spec) {
 	AudioLocker l;
 
-	_spec.freq = _context->get_spec().freq;
+	_spec.sample_rate = _context->get_spec().sample_rate;
 	_spec.channels = 1;
 	_spec.format = _context->get_spec().format;
 	Resample::resample(_spec, _data, spec, src_data);

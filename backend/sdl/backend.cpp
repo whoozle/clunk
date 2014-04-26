@@ -86,7 +86,7 @@ Sample* Backend::load(const std::string &file) {
 SDL_AudioSpec Backend::convert(const AudioSpec &spec) {
 	SDL_AudioSpec r = {};
 	r.channels = spec.channels;
-	r.freq = spec.freq;
+	r.freq = spec.sample_rate;
 	switch(spec.format) {
 		case AudioSpec::S8:		r.format = AUDIO_S8; break;
 		case AudioSpec::U8:		r.format = AUDIO_U8; break;
