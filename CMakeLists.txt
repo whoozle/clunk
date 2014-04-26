@@ -74,7 +74,7 @@ if (SDL_FOUND)
 endif (SDL_FOUND)
 
 if (WITH_SSE)
-	set(SOURCES ${SOURCES} sse_fft_context.cpp)
+	set(SOURCES ${SOURCES} clunk/sse_fft_context.cpp)
 	add_definitions(-DCLUNK_USES_SSE)
 endif(WITH_SSE)
 
