@@ -99,7 +99,7 @@ for elev, az_dict in sorted(kemar.iteritems()):
 """ %array_name
 
 	for az, mic_n_data in sorted(az_dict.iteritems()):
-		source += """	//azimuth = %d
+		source += """	/* azimuth = %d */
 	{
 		{%s},
 		{%s}
