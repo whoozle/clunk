@@ -155,7 +155,7 @@ void Source::hrtf(int window, const unsigned channel_idx, clunk::Buffer &result,
 		const int kemar_angle_idx = i * 512 / mdct_type::M;
 		const float decay = 1 + i * (freq_decay - 1) / mdct_type::M;
 		assert(kemar_angle_idx < 512);
-		float m = pow10f(-kemar_data[kemar_idx][0][kemar_angle_idx] * v / 20) / decay;
+		float m = pow10f(-kemar_data[kemar_idx][0][kemar_angle_idx] * v / 20 / 32768) / decay;
 
 		mdct.data[i] = v * m;
 		//fprintf(stderr, "%g d: %g", m, decay);
@@ -347,48 +347,15 @@ void Source::get_kemar_data(kemar_ptr & kemar_data, int & elev_n, const v3<float
 
 	int elev_gr = (int)(180 * atan2f(pos.z, len) / (float)M_PI);
 
-	if (elev_gr < -35) {
-		kemar_data = elev_m40;
-		elev_n = ELEV_M40_N;
-	} else if (elev_gr < -25) {
-		kemar_data = elev_m30;
-		elev_n = ELEV_M30_N;
-	} else if (elev_gr < -15) {
-		kemar_data = elev_m20;
-		elev_n = ELEV_M20_N;
-	} else if (elev_gr < -5) {
-		kemar_data = elev_m10;
-		elev_n = ELEV_M10_N;
-	} else if (elev_gr < 5) {
-		kemar_data = elev_0;
-		elev_n = ELEV_0_N;
-	} else if (elev_gr < 15) {
-		kemar_data = elev_10;
-		elev_n = ELEV_10_N;
-	} else if (elev_gr < 25) {
-		kemar_data = elev_20;
-		elev_n = ELEV_20_N;
-	} else if (elev_gr < 35) {
-		kemar_data = elev_30;
-		elev_n = ELEV_30_N;
-	} else if (elev_gr < 45) {
-		kemar_data = elev_40;
-		elev_n = ELEV_40_N;
-	} else if (elev_gr < 55) {
-		kemar_data = elev_50;
-		elev_n = ELEV_50_N;
-	} else if (elev_gr < 65) {
-		kemar_data = elev_60;
-		elev_n = ELEV_60_N;
-	} else if (elev_gr < 75) {
-		kemar_data = elev_70;
-		elev_n = ELEV_70_N;
-	} else if (elev_gr < 85) {
-		kemar_data = elev_80;
-		elev_n = ELEV_80_N;
-	} else {
-		kemar_data = elev_90;
-		elev_n = ELEV_90_N;
+	for(size_t i = 0; i < KemarElevationCount; ++i)
+	{
+		const kemar_elevation_data &elev = ::kemar_data[i];
+		if (elev_gr < elev.elevation + KemarElevationStep / 2)
+		{
+			kemar_data = elev.data;
+			elev_n = elev.samples;
+			break;
+		}
 	}
 }
 
