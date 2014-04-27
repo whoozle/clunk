@@ -6,7 +6,7 @@ find_package(SDL REQUIRED)
 option(WITH_SSE "Use highly optimized SSE FFT/MDCT routines" false)
 
 set(clunk_VERSION_MAJOR 1)
-set(clunk_VERSION_MINOR 1)
+set(clunk_VERSION_MINOR 3)
 
 if (CMAKE_BUILD_TYPE MATCHES Debug)
 	add_definitions(-DDEBUG)
