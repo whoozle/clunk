@@ -172,7 +172,7 @@ void Context::process(void *stream_, int size) {
 		//check for 0
 		volume = source->_process(buf, _spec.channels, source_info.s_pos, source_info.s_dir, volume, dpitch);
 		sdl_v = (int)floor(MaxMixVolume * volume + 0.5f);
-		//LOG_DEBUG(("%u: mixing source with volume %g (%d)", i, volume, sdl_v));
+		//LOG_DEBUG(("%u: %s: mixing source with volume %g (%d)", i, source->sample->name.c_str(), volume, sdl_v));
 		if (sdl_v <= 0)
 			continue;
 		if (sdl_v > MaxMixVolume)
