@@ -3593,7 +3593,7 @@ static const int16_t elev_90[][2][512] =
 	},
 };
 
-struct kemar_elevation_data kemar_data[14] =
+struct kemar_elevation_data kemar_data[KemarElevationCount] =
 {
 	{ -40,   56,   elev_m40 },
 	{ -30,   60,   elev_m30 },
