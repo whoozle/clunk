@@ -146,20 +146,17 @@ void Source::hrtf(int window, const unsigned channel_idx, clunk::Buffer &result,
 	}
 	
 	mdct.apply_window();
-	mdct.mdct();
+	typedef fft_context<WINDOW_BITS, float> filter_type;
+	filter_type fir;
+	for(size_t i = 0; i < filter_type::N; ++i) {
+		const int kemar_sample = i * 512 / filter_type::N;
+		fir.data[i] = std::complex<float>(kemar_data[kemar_idx][0][kemar_sample] / 32768.0f, 0);
+	}
+	fir.fft();
+	mdct.mdct(fir.data);
 
 	//LOG_DEBUG(("kemar angle index: %d\n", kemar_idx));
 	assert(freq_decay >= 1);
-	for(int i = 0; i < mdct_type::M; ++i) {
-		float v = mdct.data[i];
-		const int kemar_angle_idx = i * 512 / mdct_type::M;
-		const float decay = 1 + i * (freq_decay - 1) / mdct_type::M;
-		assert(kemar_angle_idx < 512);
-		float m = pow10f(-kemar_data[kemar_idx][0][kemar_angle_idx] * v / 20 / 32768) / decay;
-
-		mdct.data[i] = v * m;
-		//fprintf(stderr, "%g d: %g", m, decay);
-	}
 	
 	mdct.imdct();
 	mdct.apply_window();

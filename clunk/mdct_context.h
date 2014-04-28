@@ -42,7 +42,7 @@ public:
 		}
 	}
 	
-	void mdct() {
+	void mdct(const std::complex<float> *multiply = 0) {
 		T rotate[N];
 		unsigned int t;
 		for(t = 0; t < N4; ++t) {
@@ -64,6 +64,11 @@ public:
 			std::complex<T> a = angle_cache[t];
 			std::complex<T>& f = fft.data[t];
 			f = std::complex<T>(2 / sqrt_N * (f.real() * a.real() + f.imag() * a.imag()), 2 / sqrt_N * (-f.real() * a.imag() + f.imag() * a.real()));
+		}
+
+		if (multiply) {
+			for(t = 0; t < M; ++t)
+				fft.data[t] *= multiply[t];
 		}
 
 		for(t = 0; t < N4; ++t) {
