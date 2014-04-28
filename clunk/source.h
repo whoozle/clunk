@@ -41,6 +41,13 @@ struct vorbis_window_func : public clunk::window_func_base<N, T> {
 	}
 };
 
+template<int N, typename T>
+struct sin_window_func : public clunk::window_func_base<N, T> {
+	inline T operator()(int x) const {
+		return sin(T(M_PI) * x / N);
+	}
+};
+
 //!class holding information about source. 
 class CLUNKAPI Source {
 public: 
