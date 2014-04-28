@@ -69,7 +69,7 @@ header += "static const int KemarMaxElevation = %d;\n" % max(eangles)
 header += "static const int KemarElevationCount = %d;\n" % len(eangles)
 header += "static const int KemarElevationStep = %d;\n" % ((max(eangles) - min(eangles)) / (len(eangles) - 1))
 header += "\n"
-header += "extern struct kemar_elevation_data kemar_data[KemarElevationCount];\n"
+header += "extern struct kemar_elevation_data kemar_data[%d];\n" %len(eangles)
 
 header += """
 #ifdef __cplusplus
@@ -87,9 +87,9 @@ source = """#include "kemar.h"
 """
 
 epilogue = """
-struct kemar_elevation_data kemar_data[KemarElevationCount] =
+struct kemar_elevation_data kemar_data[%d] =
 {
-"""
+""" %len(eangles)
 
 for elev, az_dict in sorted(kemar.iteritems()):
 	print "elevation %d, items: %d" %(elev, len(az_dict))

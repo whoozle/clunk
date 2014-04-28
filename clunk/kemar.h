@@ -28,7 +28,7 @@ static const int KemarMaxElevation = 90;
 static const int KemarElevationCount = 14;
 static const int KemarElevationStep = 10;
 
-extern struct kemar_elevation_data kemar_data[KemarElevationCount];
+extern struct kemar_elevation_data kemar_data[14];
 
 #ifdef __cplusplus
 }
