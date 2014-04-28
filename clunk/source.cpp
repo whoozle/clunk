@@ -147,7 +147,7 @@ void Source::hrtf(int window, const unsigned channel_idx, clunk::Buffer &result,
 	
 	mdct.apply_window();
 	mdct.mdct();
-		
+
 	//LOG_DEBUG(("kemar angle index: %d\n", kemar_idx));
 	assert(freq_decay >= 1);
 	for(int i = 0; i < mdct_type::M; ++i) {

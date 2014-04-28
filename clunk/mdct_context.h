@@ -61,7 +61,7 @@ public:
 		fft.fft();
 
 		for(t = 0; t < N4; ++t) {
-		std::complex<T> a = angle_cache[t];
+			std::complex<T> a = angle_cache[t];
 			std::complex<T>& f = fft.data[t];
 			f = std::complex<T>(2 / sqrt_N * (f.real() * a.real() + f.imag() * a.imag()), 2 / sqrt_N * (-f.real() * a.imag() + f.imag() * a.real()));
 		}
