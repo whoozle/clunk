@@ -298,9 +298,10 @@ float Source::_process(clunk::Buffer &buffer, unsigned dst_ch, const v3<float> &
 	float t_idt, angle_gr, left_to_right_amp;
 	idt_iit(delta_position, direction, t_idt, angle_gr, left_to_right_amp);
 
-	const int kemar_idx_right = ((((int)angle_gr  + 180 / (int)angles)/ (360 / (int)angles)) % (int)angles);
-	const int kemar_idx_left = (((360 - (int)angle_gr - 180 / (int)angles) / (360 / (int)angles)) % (int)angles);
-	//LOG_DEBUG(("%g -> left: %d, right: %d", angle_gr, kemar_idx_left, kemar_idx_right));
+	const int kemar_sector_size = 360 / angles;
+	const int kemar_idx_right = ((int)angle_gr + kemar_sector_size / 2) / kemar_sector_size;
+	const int kemar_idx_left = ((360 - (int)angle_gr + kemar_sector_size / 2) / kemar_sector_size) % angles;
+	//LOG_DEBUG(("%g (of %d)-> left: %d, right: %d", angle_gr, angles, kemar_idx_left, kemar_idx_right));
 	
 	int idt_offset = (int)(t_idt * sample->_spec.sample_rate);
 
