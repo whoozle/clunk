@@ -47,8 +47,12 @@ int main(int argc, char *argv[]) {
 	
 	clunk::Object * o = context.create_object();
 	clunk::Sample * s = clunk::WavFile::load(context, "scissors.wav");
+	clunk::Sample * h = clunk::WavFile::load(context, "helicopter.wav");
 
-	static const int d = 2, n = 6;
+	static const int d = 3, n = 72;
+	clunk::DistanceModel dm(clunk::DistanceModel::Exponent, false);
+	dm.rolloff_factor = 0.7f;
+	context.set_distance_model(dm);
 	
 	context.save("test_out.raw");
 	backend.start();
@@ -65,11 +69,15 @@ int main(int argc, char *argv[]) {
 	o->play("b", new clunk::Source(s, false, clunk::v3<float>(0, 0, d)));
 	sleep(1);
 */
+	o->play("h", new clunk::Source(h, true));
 
 	for(int i = 0; i <= n; ++i) {
-		float a = M_PI * i / n;
-		o->play("s", new clunk::Source(s, false, clunk::v3<float>(-cos(a), -sin(a), 0) * d));
-		usleep(500000);
+		float a = 2 * M_PI * i / n;
+		clunk::v3<float> pos(0, cos(a) * d, sin(a) * d);
+		o->set_position(pos);
+		printf("%g %g %g\n", pos.x, pos.y, pos.z);
+		usleep(100000);
+		o->cancel("s", 0);
 	}
 
 /*	for(int i = 0; i <= n; ++i) {
@@ -77,6 +85,6 @@ int main(int argc, char *argv[]) {
 		o->play("s", new clunk::Source(s, false, clunk::v3<float>(cos(a), -0.25f, sin(a)) * d));
 		usleep(500000);
 	}
-*/	usleep(500000);
+*/	backend.stop();
 	return 0;
 }
