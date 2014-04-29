@@ -350,6 +350,7 @@ void Source::get_kemar_data(kemar_ptr & kemar_data, int & elev_n, const v3<float
 		const kemar_elevation_data &elev = ::kemar_data[i];
 		if (elev_gr < elev.elevation + KemarElevationStep / 2)
 		{
+			//LOG_DEBUG(("used elevation %d", elev.elevation)); 
 			kemar_data = elev.data;
 			elev_n = elev.samples;
 			break;
