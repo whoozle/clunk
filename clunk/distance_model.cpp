@@ -33,13 +33,13 @@ float clunk::DistanceModel::gain(float distance) const {
 		break;
 		
 	case Linear: 
-		if (clamped && distance < reference_distance) {
-			distance = reference_distance;
+		if (clamped) {
+			if (distance < reference_distance)
+				distance = reference_distance;
+			if (distance > max_distance)
+				distance = max_distance;			
 		} 
 		
-		if (distance > max_distance)
-			distance = max_distance;
-			
 		gain = 1 - rolloff_factor * (distance - reference_distance) / (max_distance - reference_distance);
 		break;
 	
