@@ -84,11 +84,11 @@ public:
 	
 	///returns length of this vector
 	inline T length() const {
-#ifdef _WINDOWS
-		return (float)_hypot(x, y);
-#else
-		return (float)hypot(x, y);
-#endif
+		const T ql = x * x + y * y + z * z;
+		if (ql == (T)0 || ql == (T)1)
+				return ql;
+
+		return (T)sqrt(ql);
 	}
 	///returns square of length. To avoid sqrt if needed.
 	inline T quick_length() const {
