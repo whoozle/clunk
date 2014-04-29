@@ -153,7 +153,9 @@ void Source::hrtf(int window, const unsigned channel_idx, clunk::Buffer &result,
 		fir.data[i] = std::complex<float>(kemar_data[kemar_idx][0][kemar_sample] / 32768.0f, 0);
 	}
 	fir.fft();
-	mdct.mdct(fir.data);
+	mdct.mdct();
+	for(size_t i = 0; i < mdct_type::M; ++i)
+		mdct.data[i] *= std::abs(fir.data[i * mdct_type::M / filter_type::N]);
 
 	//LOG_DEBUG(("kemar angle index: %d\n", kemar_idx));
 	assert(freq_decay >= 1);
