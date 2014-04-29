@@ -42,7 +42,7 @@ public:
 	///nullify vector
 	inline void clear() { x = y = z = 0; }
 	///returns true if x == y == z == 0 ? 
-	inline const bool is0() const {
+	inline bool is0() const {
 		return x== 0 && y == 0 && z == 0;
 	}
 
@@ -50,7 +50,7 @@ public:
 		\brief normalizes vector. 
 		\return old length of this vector
 	*/ 
-	inline const T normalize() {
+	inline T normalize() {
 		const T len = length();
 		if (len == (T)0 || len ==(T)1) 
 			return len;
@@ -67,7 +67,7 @@ public:
 		\return old length of this vector
 	*/ 
 
-	inline const T normalize(const T nlen) {
+	inline T normalize(const T nlen) {
 		const T len = length();
 		if (len == (T)0 || len == nlen) 
 			return len;
@@ -78,20 +78,20 @@ public:
 		return len;
 	}
 	
-	inline const T dot_product(const v3<T> &v) const {
+	inline T dot_product(const v3<T> &v) const {
 		return x * v.x + y * v.y + z * v.z;
 	}
 	
 	///returns length of this vector
-	inline const T length() const {
-		const T ql = x * x + y * y + z * z;
-		if (ql == (T)0 || ql == (T)1) 
-			return ql;
-		
-		return (T)sqrt(ql);
+	inline T length() const {
+#ifdef _WINDOWS
+		return (float)_hypot(x, y);
+#else
+		return (float)hypot(x, y);
+#endif
 	}
 	///returns square of length. To avoid sqrt if needed.
-	inline const T quick_length() const {
+	inline T quick_length() const {
 		return (T)(x * x + y * y + z * z);
 	}
 
@@ -100,14 +100,14 @@ public:
 		inline v3<T2> convert() const { return v3<T2>((T2)x, (T2)y, (T2)z); }
 
 	///returns distance between two points	
-	inline const T distance(const v3<T>& other) const {
+	inline T distance(const v3<T>& other) const {
 		v3<T>d(*this);
 		d -= other;
 		return d.length();
 	}
 	
 	///return square distance between two points
-	inline const T quick_distance(const v3<T>& other) const {
+	inline T quick_distance(const v3<T>& other) const {
 		const T dx = x - other.x;
 		const T dy = y - other.y;
 		const T dz = z - other.z;
@@ -115,7 +115,7 @@ public:
 	}
 
 	///allows v3 be placed in sorted STL container such std::map
-	inline const bool operator<(const v3<T> &other) const {
+	inline bool operator<(const v3<T> &other) const {
 		if (x != other.x) {
 			return x < other.x;
 		}
@@ -126,76 +126,76 @@ public:
 	}
 
 	///negate all components
-	inline const v3<T> operator-() const {
+	inline v3<T> operator-() const {
 		return v3<T>(-x, -y, -z);
 	}
 	///test equality 
-	inline const bool operator==(const v3<T> &other) const {
+	inline bool operator==(const v3<T> &other) const {
 		return x == other.x && y == other.y && z == other.z;
 	}
 
 	///test inequality 
-	inline const bool operator!=(const v3<T> &other) const {
+	inline bool operator!=(const v3<T> &other) const {
 		return x != other.x || y != other.y || z != other.z;
 	}
 	
 	///adds another vector
-	inline const v3<T>& operator+=(const v3<T>& other) {
+	inline v3<T>& operator+=(const v3<T>& other) {
 		x += other.x; y += other.y; z += other.z;
 		return *this;
 	}
 
 	///substracts another vector
-	inline const v3<T>& operator-=(const v3<T>& other) {
+	inline v3<T>& operator-=(const v3<T>& other) {
 		x -= other.x; y -= other.y; z -= other.z;
 		return *this;
 	}
 
 	///multiplies another vector
-	inline const v3<T>& operator*=(const v3<T>& other) {
+	inline v3<T>& operator*=(const v3<T>& other) {
 		x *= other.x; y *= other.y; z *= other.z;
 		return *this;
 	}
 
 	///divide with another vector
-	inline const v3<T>& operator/=(const v3<T>& other) {
+	inline v3<T>& operator/=(const v3<T>& other) {
 		x /= other.x; y /= other.y; z /= other.z;
 		return *this;
 	}
 	///multiplication
-	inline const v3<T> operator*(const v3<T>& other) const {
+	inline v3<T> operator*(const v3<T>& other) const {
 		return v3<T>(x * other.x, y * other.y, z * other.z);
 	}
 	///summing
-	inline const v3<T> operator+(const v3<T>& other) const {
+	inline v3<T> operator+(const v3<T>& other) const {
 		return v3<T>(x + other.x, y + other.y, z + other.z);
 	}
 	///substraction
-	inline const v3<T> operator-(const v3<T>& other) const {
+	inline v3<T> operator-(const v3<T>& other) const {
 		return v3<T>(x - other.x, y - other.y, z - other.z);
 	}
 	///division
-	inline const v3<T> operator/(const v3<T>& other) const {
+	inline v3<T> operator/(const v3<T>& other) const {
 		return v3<T>(x / other.x, y / other.y, z / other.z);
 	}
 	///multiplies all components with constant
-	inline const v3<T> operator*(const T& other) const {
+	inline v3<T> operator*(const T& other) const {
 		return v3<T>(x * other, y * other, z * other);
 	}
 	///sums all components with constant
-	inline const v3<T> operator+(const T& other) const {
+	inline v3<T> operator+(const T& other) const {
 		return v3<T>(x + other, y + other, z + other);
 	}
 	///substracts all components with constant
-	inline const v3<T> operator-(const T& other) const {
+	inline v3<T> operator-(const T& other) const {
 		return v3<T>(x - other, y - other, z - other);
 	}
 	///divides all components by constant
-	inline const v3<T> operator/(const T& other) const {
+	inline v3<T> operator/(const T& other) const {
 		return v3<T>(x / other, y / other, z / other);
 	}
 	///divides this vector by constant
-	inline const v3<T>& operator/=(const T& other) {
+	inline v3<T>& operator/=(const T& other) {
 		x /= other;
 		y /= other;
 		z /= other;
@@ -203,7 +203,7 @@ public:
 	}
 
 	///multiplies this vector with constant
-	inline const v3<T>& operator*=(const T& other) {
+	inline v3<T>& operator*=(const T& other) {
 		x *= other;
 		y *= other;
 		z *= other;
@@ -211,7 +211,7 @@ public:
 	}
 
 	///sums this vector with constant
-	inline const v3<T>& operator+=(const T& other) {
+	inline v3<T>& operator+=(const T& other) {
 		x += other;
 		y += other;
 		z += other;
@@ -219,7 +219,7 @@ public:
 	}
 
 	///substracts this vector with constant
-	inline const v3<T>& operator-=(const T& other) {
+	inline v3<T>& operator-=(const T& other) {
 		x -= other;
 		y -= other;
 		z -= other;
@@ -227,46 +227,46 @@ public:
 	}
 
 	///adds constant to the vector
-	inline const v3<T> operator+(const T a)  {
+	inline v3<T> operator+(const T a)  {
 		return v3<T>(x + a, y + a, z + a);
 	}
 
 	///subs constant from the vector
-	inline const v3<T> operator-(const T a)  {
+	inline v3<T> operator-(const T a)  {
 		return v3<T>(x - a, y - a, z - a);
 	}
 
 	///muls constant to the vector
-	inline const v3<T> operator*(const T a)  {
+	inline v3<T> operator*(const T a)  {
 		return v3<T>(x * a, y * a, z * a);
 	}
 
 	///divs constant to the vector
-	inline const v3<T> operator/(const T a)  {
+	inline v3<T> operator/(const T a)  {
 		return v3<T>(x / a, y  / a, z / a);
 	}
 };
 ///external operator+
 template <typename T>
-	inline const v3<T> operator+(const T a, const v3<T> &v)  {
+	inline v3<T> operator+(const T a, const v3<T> &v)  {
 		return v3<T>(v.x + a, v.y + a, v.z + a);
 	}
 
 ///external operator-
 template <typename T>
-	inline const v3<T> operator-(const T a, const v3<T> &v)  {
+	inline v3<T> operator-(const T a, const v3<T> &v)  {
 		return v3<T>(a - v.x, a - v.y, a - v.z);
 	}
 
 ///external operator*
 template <typename T>
-	inline const v3<T> operator*(const T a, const v3<T> &v)  {
+	inline v3<T> operator*(const T a, const v3<T> &v)  {
 		return v3<T>(v.x * a, v.y * a, v.z * a);
 	}
 
 ///external operator/
 template <typename T>
-	inline const v3<T> operator/(const T a, const v3<T> &v)  {
+	inline v3<T> operator/(const T a, const v3<T> &v)  {
 		return v3<T>(a / v.x, a / v.y, a / v.z);
 	}
 

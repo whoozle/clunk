@@ -336,11 +336,7 @@ void Source::get_kemar_data(kemar_ptr & kemar_data, int & elev_n, const v3<float
 	if (pos.is0())
 		return;
 
-#ifdef _WINDOWS
-	float len = (float)_hypot(pos.x, pos.y);
-#else
-	float len = (float)hypot(pos.x, pos.y);
-#endif
+	float len = pos.length();
 
 	int elev_gr = (int)(180 * atan2f(pos.z, len) / (float)M_PI);
 
