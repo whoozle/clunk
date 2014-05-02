@@ -186,21 +186,27 @@ class CLUNKAPI ListenerObject : public Object {
 	
 	ListenerObject(Context *context);
 private:
-	v3<float> _direction, _up;
+	v3<float> _direction, _initialUp, _up;
 
 public:
 	/*!
 		\brief updates object's direction
-		\param[in] dir velocity
+		\param[in] dir direction
 	*/
 	void set_direction(const v3<float> &dir);
 
 	/*!
 		\brief updates object's up vector
-		\param[in] dir velocity
+		\param[in] up vector pointing "up"
 	*/
 	void set_up(const v3<float> &up);
 	
+	/*!
+		\brief updates object's direction and up vector
+		\param[in] dir direction
+		\param[in] up vector pointing "up"
+	*/
+	void update_view(v3<float> dir, v3<float> up);
 };
 
 }

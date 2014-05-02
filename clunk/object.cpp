@@ -21,6 +21,7 @@
 #include <clunk/context.h>
 #include <clunk/locker.h>
 #include <clunk/source.h>
+#include <stdexcept>
 
 using namespace clunk;
 
@@ -193,14 +194,32 @@ void Object::autodelete() {
 	dead = true;
 }
 
-ListenerObject::ListenerObject(Context *context) : Object(context) {}
+ListenerObject::ListenerObject(Context *context):
+	Object(context) {
+	update_view(v3<float>(0, 1, 0), v3<float>(0, 0, 1));
+}
+
+void ListenerObject::update_view(v3<float> dir, v3<float> up)
+{
+	dir.normalize();
+	up.normalize();
+
+	AudioLocker l;
+	v3<float> left = up.cross_product(dir);
+	if (left.is0())
+		throw std::runtime_error("colinear direction and \"up\" vector");
+
+	_initialUp = up;
+	_direction = dir;
+	_up = dir.cross_product(left);
+}
 
 void ListenerObject::set_direction(const v3<float> &dir) {
 	AudioLocker l;
-	_direction = dir;
+	update_view(dir, _initialUp);
 }
 
 void ListenerObject::set_up(const v3<float> &up) {
 	AudioLocker l;
-	_up = up;
+	update_view(_direction, up);
 }
