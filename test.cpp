@@ -73,11 +73,10 @@ int main(int argc, char *argv[]) {
 
 	for(int i = 0; i <= n; ++i) {
 		float a = 2 * M_PI * i / n;
-		clunk::v3<float> pos(0, cos(a) * d, sin(a) * d);
+		clunk::v3<float> pos(cos(a) * d, sin(a) * d * 2, 1);
 		o->set_position(pos);
 		printf("%g %g %g\n", pos.x, pos.y, pos.z);
 		usleep(100000);
-		o->cancel("s", 0);
 	}
 
 /*	for(int i = 0; i <= n; ++i) {
