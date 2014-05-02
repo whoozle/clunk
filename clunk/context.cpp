@@ -36,7 +36,7 @@
 
 using namespace clunk;
 
-Context::Context() : _listener(NULL), max_sources(8), fx_volume(1), distance_model(DistanceModel::Inverse, true, 128), _fdump(NULL) {
+Context::Context() : _listener(NULL), max_sources(8), fx_volume(1), distance_model(DistanceModel::Exponent, false), _fdump(NULL) {
 }
 
 template<class Sources>
