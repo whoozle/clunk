@@ -81,6 +81,14 @@ public:
 	inline T dot_product(const v3<T> &v) const {
 		return x * v.x + y * v.y + z * v.z;
 	}
+
+	inline v3<T> cross_product(const v3<T> &v) const {
+		return v3<T>(
+			y * v.z - z * v.y,
+			z * v.x - x * v.z,
+			x * v.y - y * v.x
+		);
+	}
 	
 	///returns length of this vector
 	inline T length() const {
