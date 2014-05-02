@@ -116,13 +116,13 @@ public:
 	void stop_all();
 
 	///returns object associated to the current listener position
-	Object *get_listener() { return _listener; }
+	ListenerObject *get_listener() { return _listener; }
 	
 	///Sets distance model
 	inline void set_distance_model(const DistanceModel &model) { distance_model = model; }
 	DistanceModel &get_distance_model() { return distance_model; }
 
-private: 
+private:
 	AudioSpec _spec;
 
 	void delete_object(Object *o);
@@ -145,7 +145,7 @@ private:
 	typedef std::map<const int, stream_info> streams_type;
 	streams_type streams;
 
-	Object *_listener;
+	ListenerObject *_listener;
 	unsigned max_sources;
 	float fx_volume;
 	

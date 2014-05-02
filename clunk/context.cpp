@@ -57,7 +57,7 @@ bool Context::process_object(Object *o, Sources &sset, std::vector<source_t> &ls
 		typename stats_type::iterator s_i = sources_stats.find(name);
 		unsigned same_sounds_n = (s_i != sources_stats.end())? s_i->second: 0;
 		if (lsources.size() < max_sources && same_sounds_n < distance_model.same_sounds_limit) {
-			lsources.push_back(source_t(s, o->position + s->delta_position - _listener->position, o->velocity, o->direction, _listener->velocity));
+			lsources.push_back(source_t(s, o->position + s->delta_position - _listener->position, o->velocity, _listener->_direction, _listener->velocity));
 			if (same_sounds_n == 0) {
 				sources_stats.insert(typename stats_type::value_type(name, 1));
 			} else {
@@ -217,7 +217,8 @@ void Context::save(const std::string &file) {
 void Context::init(const AudioSpec &spec) {
 	AudioLocker l;
 	_spec = spec;
-	_listener = create_object();
+	_listener = new ListenerObject(this);
+	objects.push_back(_listener);
 }
 
 void Context::delete_object(Object *o) {

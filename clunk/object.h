@@ -51,7 +51,7 @@ public:
 		\brief updates object's position, velocity and direction at once.
 		\param[in] pos position
 	*/
-	void update(const v3<float> &pos, const v3<float> &vel, const v3<float> &dir);
+	void update(const v3<float> &pos, const v3<float> &vel);
 	
 	/*! 
 		\brief updates object's position
@@ -64,12 +64,6 @@ public:
 		\param[in] vel velocity
 	*/
 	void set_velocity(const v3<float> &vel);
-	
-	/*! 
-		\brief updates object's direction
-		\param[in] dir velocity
-	*/
-	void set_direction(const v3<float> &dir);
 	
 	/*! 
 		\brief plays given source
@@ -170,12 +164,14 @@ public:
 	*/
 	bool get_loop(int index);
 
-private: 
+protected:
 	friend class Context;
 	
 	Object(Context *context);
+
+private: 
 	Context *context;
-	v3<float> position, velocity, direction;
+	v3<float> position, velocity;
 
 	typedef std::multimap<const std::string, Source *> NamedSources;
 	NamedSources named_sources;
@@ -184,6 +180,29 @@ private:
 	
 	bool dead;
 };
+
+class CLUNKAPI ListenerObject : public Object {
+	friend class Context;
+	
+	ListenerObject(Context *context);
+private:
+	v3<float> _direction, _up;
+
+public:
+	/*!
+		\brief updates object's direction
+		\param[in] dir velocity
+	*/
+	void set_direction(const v3<float> &dir);
+
+	/*!
+		\brief updates object's up vector
+		\param[in] dir velocity
+	*/
+	void set_up(const v3<float> &up);
+	
+};
+
 }
 
 #endif

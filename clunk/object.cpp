@@ -26,11 +26,10 @@ using namespace clunk;
 
 Object::Object(Context *context) : context(context), dead(false) {}
 
-void Object::update(const v3<float> &pos, const v3<float> &vel, const v3<float> &dir) {
+void Object::update(const v3<float> &pos, const v3<float> &vel) {
 	AudioLocker l;
 	position = pos;
 	velocity = vel;
-	direction = dir;
 }
 
 void Object::set_position(const v3<float> &pos) {
@@ -41,11 +40,6 @@ void Object::set_position(const v3<float> &pos) {
 void Object::set_velocity(const v3<float> &vel) {
 	AudioLocker l;
 	velocity = vel;
-}
-
-void Object::set_direction(const v3<float> &dir) {
-	AudioLocker l;
-	direction = dir;
 }
 
 void Object::play(const std::string &name, Source *source) {
@@ -197,4 +191,16 @@ void Object::autodelete() {
 	AudioLocker l;
 	cancel_all();
 	dead = true;
+}
+
+ListenerObject::ListenerObject(Context *context) : Object(context) {}
+
+void ListenerObject::set_direction(const v3<float> &dir) {
+	AudioLocker l;
+	_direction = dir;
+}
+
+void ListenerObject::set_up(const v3<float> &up) {
+	AudioLocker l;
+	_up = up;
 }
