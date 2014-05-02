@@ -208,10 +208,12 @@ void ListenerObject::update_view(v3<float> dir, v3<float> up)
 	v3<float> left = up.cross_product(dir);
 	if (left.is0())
 		throw std::runtime_error("colinear direction and \"up\" vector");
+	left.normalize();
 
 	_initialUp = up;
 	_direction = dir;
 	_up = dir.cross_product(left);
+	_up.normalize();
 }
 
 void ListenerObject::set_direction(const v3<float> &dir) {
