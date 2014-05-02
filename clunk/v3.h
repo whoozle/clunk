@@ -20,14 +20,19 @@
 */
 
 #include <clunk/types.h>
+#include <limits>
 
 namespace clunk {
 /*! 
 	\brief 3d vector 
 	\tparam T type of the axis. usually int or float. 
 */
-template <typename T> class v3  {
-public:
+template <typename T> struct v3  {
+	typedef std::numeric_limits<T> limits_type;
+
+	template<typename V>
+	static inline V abs(V v) { return v < 0? -v: v; }
+
 	///x component
 	T x;
 	///y component
@@ -43,7 +48,8 @@ public:
 	inline void clear() { x = y = z = 0; }
 	///returns true if x == y == z == 0 ? 
 	inline bool is0() const {
-		return x== 0 && y == 0 && z == 0;
+		T zero = limits_type::epsilon();
+		return abs(x) <= zero && abs(y) <= zero && abs(z) <= zero;
 	}
 
 	/*! 
