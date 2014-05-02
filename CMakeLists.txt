@@ -8,8 +8,8 @@ option(WITH_SSE "Use highly optimized SSE FFT/MDCT routines" false)
 set(clunk_VERSION_MAJOR 1)
 set(clunk_VERSION_MINOR 3)
 
+message(STATUS "build type: ${CMAKE_BUILD_TYPE}")
 if (${CMAKE_BUILD_TYPE} MATCHES Debug)
-	message(STATUS "DEBUG BUILD")
 	add_definitions(-DDEBUG)
 endif (${CMAKE_BUILD_TYPE} MATCHES Debug)
 
