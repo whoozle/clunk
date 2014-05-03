@@ -166,13 +166,13 @@ public:
 
 protected:
 	friend class Context;
-	
-	Object(Context *context);
 
-private: 
 	Context *context;
 	v3f position, velocity;
 
+	Object(Context *context);
+
+private:
 	typedef std::multimap<const std::string, Source *> NamedSources;
 	NamedSources named_sources;
 	typedef std::multimap<const int, Source *> IndexedSources;

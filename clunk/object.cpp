@@ -227,5 +227,5 @@ void ListenerObject::set_up(const v3f &up) {
 }
 
 v3f ListenerObject::transform(v3f v) {
-	return v;
+	return v - position;
 }
