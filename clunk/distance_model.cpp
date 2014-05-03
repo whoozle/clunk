@@ -64,7 +64,7 @@ float clunk::DistanceModel::gain(float distance) const {
 }
 
 
-float clunk::DistanceModel::doppler_pitch(const v3<float> &sl, const v3<float> &s_vel, const v3<float> &l_vel) const {
+float clunk::DistanceModel::doppler_pitch(const v3f &sl, const v3f &s_vel, const v3f &l_vel) const {
 	if (doppler_factor <= 0)
 		return 1.0f;
 	

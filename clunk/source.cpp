@@ -44,7 +44,7 @@ template <typename T> inline T clunk_max(T a, T b) {
 	return a > b? a: b;
 }
 
-Source::Source(const Sample * sample, const bool loop, const v3<float> &delta, float gain, float pitch, float panning) : 
+Source::Source(const Sample * sample, const bool loop, const v3f &delta, float gain, float pitch, float panning):
 	sample(sample), loop(loop), delta_position(delta), gain(gain), pitch(pitch), panning(panning), 
 	position(0), fadeout(0), fadeout_total(0)
 	{
@@ -71,7 +71,7 @@ bool Source::playing() const {
 	return position < (int)(sample->_data.get_size() / sample->_spec.channels / 2);
 }
 	
-void Source::idt_iit(const v3<float> &delta, const v3<float> &dir_vec, float &idt_offset, float &angle_gr, float &left_to_right_amp) {
+void Source::idt_iit(const v3f &delta, const v3f &dir_vec, float &idt_offset, float &angle_gr, float &left_to_right_amp) {
 	float head_r = 0.093f;
 
 	float direction = dir_vec.is0()? float(M_PI_2): (float)atan2f(dir_vec.y, dir_vec.x);
@@ -235,7 +235,7 @@ void Source::_update_position(const int dp) {
 	}
 }
 
-float Source::_process(clunk::Buffer &buffer, unsigned dst_ch, const v3<float> &delta_position, const v3<float> &direction, float fx_volume, float pitch) {
+float Source::_process(clunk::Buffer &buffer, unsigned dst_ch, const v3f &delta_position, const v3f &direction, float fx_volume, float pitch) {
 	s16 * dst = static_cast<s16*>(buffer.get_ptr());
 	unsigned dst_n = (unsigned)buffer.get_size() / dst_ch / 2;
 	const s16 * src = static_cast<const s16 *>(sample->_data.get_ptr());
@@ -345,7 +345,7 @@ float Source::_process(clunk::Buffer &buffer, unsigned dst_ch, const v3<float> &
 
 #include "kemar.h"
 
-void Source::get_kemar_data(kemar_ptr & kemar_data, int & elev_n, const v3<float> &pos) {
+void Source::get_kemar_data(kemar_ptr & kemar_data, int & elev_n, const v3f &pos) {
 	
 	kemar_data = NULL;
 	elev_n = 0;

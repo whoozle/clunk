@@ -156,12 +156,12 @@ private:
 	struct source_t {
 		Source *source;
 	
-		v3<float> s_pos;
-		v3<float> s_vel;
-		v3<float> s_dir;
-		v3<float> l_vel;
+		v3f s_pos;
+		v3f s_vel;
+		v3f s_dir;
+		v3f l_vel;
 
-		inline source_t(Source *source, const v3<float> &s_pos, const v3<float> &s_vel, const v3<float>& s_dir, const v3<float>& l_vel) : 
+		inline source_t(Source *source, const v3f &s_pos, const v3f &s_vel, const v3f& s_dir, const v3f& l_vel):
 		source(source), s_pos(s_pos), s_vel(s_vel), s_dir(s_dir), l_vel(l_vel) {}
 	};
 	template<class Sources>

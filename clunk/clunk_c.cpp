@@ -115,25 +115,25 @@ CLUNKCAPI void clunk_context_stop_all(clunk_context *ctx)
 
 CLUNKCAPI void clunk_object_update(clunk_object *obj, clunk_v3 *pos, clunk_v3 *vel, clunk_v3 *dir)
 {
-	v3<float> p(pos->x, pos->y, pos->z), v(vel->x, vel->y, vel->z), d(dir->x, dir->y, dir->z);
+	v3f p(pos->x, pos->y, pos->z), v(vel->x, vel->y, vel->z), d(dir->x, dir->y, dir->z);
 	obj->update(p, v, d);
 }
 
 CLUNKCAPI void clunk_object_set_position(clunk_object *obj, clunk_v3 *pos)
 {
-	v3<float> p(pos->x, pos->y, pos->z);
+	v3f p(pos->x, pos->y, pos->z);
 	obj->set_position(p);
 }
 
 CLUNKCAPI void clunk_object_set_velocity(clunk_object *obj, clunk_v3 *vel)
 {
-	v3<float> v(vel->x, vel->y, vel->z);
+	v3f v(vel->x, vel->y, vel->z);
 	obj->set_velocity(v);
 }
 
 CLUNKCAPI void clunk_object_set_direction(clunk_object *obj, clunk_v3 *dir)
 {
-	v3<float> d(dir->x, dir->y, dir->z);
+	v3f d(dir->x, dir->y, dir->z);
 	obj->set_direction(d);
 }
 
@@ -264,7 +264,7 @@ CLUNKCAPI float clunk_sample_length(clunk_sample *smp)
 
 CLUNKCAPI clunk_source *clunk_source_create(const clunk_sample *sample, const int loop, const clunk_v3 *delta, float gain, float pitch, float panning)
 {
-	return new Source(sample, loop ? true : false, v3<float>(delta->x, delta->y, delta->z), gain, pitch, panning);
+	return new Source(sample, loop ? true : false, v3f(delta->x, delta->y, delta->z), gain, pitch, panning);
 }
 
 CLUNKCAPI void clunk_source_destroy(clunk_source *src)
@@ -298,7 +298,7 @@ CLUNKCAPI clunk_v3 clunk_source_get_delta(clunk_source *src)
 
 CLUNKCAPI void clunk_source_set_delta(clunk_source *src, clunk_v3 *delta)
 {
-	src->delta_position = v3<float>(delta->x, delta->y, delta->z);
+	src->delta_position = v3f(delta->x, delta->y, delta->z);
 }
 
 CLUNKCAPI float clunk_source_get_gain(clunk_source *src)

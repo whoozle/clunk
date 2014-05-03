@@ -66,7 +66,7 @@ public:
 	///loop flag
 	bool loop;
 	///delta position from the object's center
-	v3<float> delta_position; //0 - from the center of the object. 
+	v3f delta_position; //0 - from the center of the object. 
 	///gain
 	float gain;
 	///pitch, 2.0f - pitching up one octave
@@ -84,7 +84,7 @@ public:
 		\param[in] gain gain
 		\param[in] pitch pitch
 	*/
-	Source(const Sample * sample, const bool loop = false, const v3<float> &delta = v3<float>(), float gain = 1, float pitch = 1, float panning = 0);
+	Source(const Sample * sample, const bool loop = false, const v3f &delta = v3f(), float gain = 1, float pitch = 1, float panning = 0);
 	///returns current source's status.
 	bool playing() const;
 
@@ -103,13 +103,13 @@ public:
 		\brief for the internal use only. DO NOT USE IT. 
 		\internal for the internal use only. 
 	*/
-	float _process(clunk::Buffer &buffer, unsigned ch, const v3<float> &position, const v3<float> &direction, float fx_volume, float pitch);
+	float _process(clunk::Buffer &buffer, unsigned ch, const v3f &position, const v3f &direction, float fx_volume, float pitch);
 
 private: 
 	typedef const s16 (*kemar_ptr)[2][512];
-	void get_kemar_data(kemar_ptr & kemar_data, int & samples, const v3<float> &delta_position);
+	void get_kemar_data(kemar_ptr & kemar_data, int & samples, const v3f &delta_position);
 
-	static void idt_iit(const v3<float> &delta, const v3<float> &direction, float &idt_offset, float &angle_gr, float &left_to_right_amp);
+	static void idt_iit(const v3f &delta, const v3f &direction, float &idt_offset, float &angle_gr, float &left_to_right_amp);
 	//generate hrtf response for channel idx (0 left), in result.
 	void hrtf(int window, const unsigned channel_idx, clunk::Buffer &result, const s16 *src, int src_ch, int src_n, int idt_offset, const kemar_ptr& kemar_data, int kemar_idx, float freq_decay);
 

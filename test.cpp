@@ -56,24 +56,24 @@ int main(int argc, char *argv[]) {
 	
 	context.save("test_out.raw");
 	backend.start();
-/*	o->play("l", new clunk::Source(s, false, clunk::v3<float>(-d, 0, 0)));
+/*	o->play("l", new clunk::Source(s, false, clunk::v3f(-d, 0, 0)));
 	sleep(1);
-	//o->play("c", new clunk::Source(s, false, clunk::v3<float>(0, 0, 0)));
+	//o->play("c", new clunk::Source(s, false, clunk::v3f(0, 0, 0)));
 	//sleep(1);
-	o->play("r", new clunk::Source(s, false, clunk::v3<float>(d, 0, 0)));
+	o->play("r", new clunk::Source(s, false, clunk::v3f(d, 0, 0)));
 	sleep(1);
 
-	o->play("u", new clunk::Source(s, false, clunk::v3<float>(0, d, 0)));
+	o->play("u", new clunk::Source(s, false, clunk::v3f(0, d, 0)));
 	sleep(1);
 
-	o->play("b", new clunk::Source(s, false, clunk::v3<float>(0, 0, d)));
+	o->play("b", new clunk::Source(s, false, clunk::v3f(0, 0, d)));
 	sleep(1);
 */
 	o->play("h", new clunk::Source(h, true));
 
 	for(int i = 0; i <= n; ++i) {
 		float a = 2 * M_PI * i / n;
-		clunk::v3<float> pos(cos(a) * d, sin(a) * d * 2, 1);
+		clunk::v3f pos(cos(a) * d, sin(a) * d * 2, 1);
 		o->set_position(pos);
 		printf("%g %g %g\n", pos.x, pos.y, pos.z);
 		usleep(100000);
@@ -81,7 +81,7 @@ int main(int argc, char *argv[]) {
 
 /*	for(int i = 0; i <= n; ++i) {
 		float a = M_PI * i / n;
-		o->play("s", new clunk::Source(s, false, clunk::v3<float>(cos(a), -0.25f, sin(a)) * d));
+		o->play("s", new clunk::Source(s, false, clunk::v3f(cos(a), -0.25f, sin(a)) * d));
 		usleep(500000);
 	}
 */	backend.stop();

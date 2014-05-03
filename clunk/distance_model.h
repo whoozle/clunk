@@ -69,7 +69,7 @@ struct CLUNKAPI DistanceModel {
 	//! Computes gain by distance. Return values is in [0-1] range.
 	float gain(float distance) const;
 	//! Computes doppler pitch.
-	float doppler_pitch(const v3<float> &sl, const v3<float> &s_vel, const v3<float> &l_vel) const;
+	float doppler_pitch(const v3f &sl, const v3f &s_vel, const v3f &l_vel) const;
 };
 
 }

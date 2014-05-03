@@ -37,8 +37,8 @@ class CLUNKAPI Object {
 public: 
 	friend struct DistanceOrder;
 	struct DistanceOrder {
-		v3<float> listener;
-		DistanceOrder(const v3<float> &listener) : listener(listener) {}
+		v3f listener;
+		DistanceOrder(const v3f &listener) : listener(listener) {}
 
 		inline bool operator()(const Object *a, const Object * b) const {
 			return listener.quick_distance(a->position) < listener.quick_distance(b->position); 
@@ -51,19 +51,19 @@ public:
 		\brief updates object's position, velocity and direction at once.
 		\param[in] pos position
 	*/
-	void update(const v3<float> &pos, const v3<float> &vel);
+	void update(const v3f &pos, const v3f &vel);
 	
 	/*! 
 		\brief updates object's position
 		\param[in] pos position
 	*/
-	void set_position(const v3<float> &pos);
+	void set_position(const v3f &pos);
 
 	/*! 
 		\brief updates object's velocity
 		\param[in] vel velocity
 	*/
-	void set_velocity(const v3<float> &vel);
+	void set_velocity(const v3f &vel);
 	
 	/*! 
 		\brief plays given source
@@ -171,7 +171,7 @@ protected:
 
 private: 
 	Context *context;
-	v3<float> position, velocity;
+	v3f position, velocity;
 
 	typedef std::multimap<const std::string, Source *> NamedSources;
 	NamedSources named_sources;
@@ -186,27 +186,34 @@ class CLUNKAPI ListenerObject : public Object {
 	
 	ListenerObject(Context *context);
 private:
-	v3<float> _direction, _initialUp, _up;
+	v3f _direction, _initialUp, _up;
 
 public:
 	/*!
 		\brief updates object's direction
 		\param[in] dir direction
 	*/
-	void set_direction(const v3<float> &dir);
+	void set_direction(const v3f &dir);
 
 	/*!
 		\brief updates object's up vector
 		\param[in] up vector pointing "up"
 	*/
-	void set_up(const v3<float> &up);
+	void set_up(const v3f &up);
 	
 	/*!
 		\brief updates object's direction and up vector
 		\param[in] dir direction
 		\param[in] up vector pointing "up"
 	*/
-	void update_view(v3<float> dir, v3<float> up);
+	void update_view(v3f dir, v3f up);
+
+	/*!
+		\brief transform vector in listener's coordinate system
+		\param[in] v vector
+		\return transformed vector
+	*/
+	v3f transform(v3f v);
 };
 
 }

@@ -284,6 +284,8 @@ template <typename T>
 		return v3<T>(a / v.x, a / v.y, a / v.z);
 	}
 
+typedef v3<float> v3f;
+
 #if 0 //defined CLUNK_USES_SSE
 #	include <xmmintrin.h>
 

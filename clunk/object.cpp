@@ -27,18 +27,18 @@ using namespace clunk;
 
 Object::Object(Context *context) : context(context), dead(false) {}
 
-void Object::update(const v3<float> &pos, const v3<float> &vel) {
+void Object::update(const v3f &pos, const v3f &vel) {
 	AudioLocker l;
 	position = pos;
 	velocity = vel;
 }
 
-void Object::set_position(const v3<float> &pos) {
+void Object::set_position(const v3f &pos) {
 	AudioLocker l;
 	position = pos;
 }
 
-void Object::set_velocity(const v3<float> &vel) {
+void Object::set_velocity(const v3f &vel) {
 	AudioLocker l;
 	velocity = vel;
 }
@@ -196,16 +196,16 @@ void Object::autodelete() {
 
 ListenerObject::ListenerObject(Context *context):
 	Object(context) {
-	update_view(v3<float>(0, 1, 0), v3<float>(0, 0, 1));
+	update_view(v3f(0, 1, 0), v3f(0, 0, 1));
 }
 
-void ListenerObject::update_view(v3<float> dir, v3<float> up)
+void ListenerObject::update_view(v3f dir, v3f up)
 {
 	dir.normalize();
 	up.normalize();
 
 	AudioLocker l;
-	v3<float> left = up.cross_product(dir);
+	v3f left = up.cross_product(dir);
 	if (left.is0())
 		throw std::runtime_error("colinear direction and \"up\" vector");
 	left.normalize();
@@ -216,12 +216,16 @@ void ListenerObject::update_view(v3<float> dir, v3<float> up)
 	_up.normalize();
 }
 
-void ListenerObject::set_direction(const v3<float> &dir) {
+void ListenerObject::set_direction(const v3f &dir) {
 	AudioLocker l;
 	update_view(dir, _initialUp);
 }
 
-void ListenerObject::set_up(const v3<float> &up) {
+void ListenerObject::set_up(const v3f &up) {
 	AudioLocker l;
 	update_view(_direction, up);
+}
+
+v3f ListenerObject::transform(v3f v) {
+	return v;
 }
