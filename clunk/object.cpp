@@ -29,18 +29,18 @@ Object::Object(Context *context) : context(context), dead(false) {}
 
 void Object::update(const v3f &pos, const v3f &vel) {
 	AudioLocker l;
-	position = pos;
-	velocity = vel;
+	_position = pos;
+	_velocity = vel;
 }
 
 void Object::set_position(const v3f &pos) {
 	AudioLocker l;
-	position = pos;
+	_position = pos;
 }
 
 void Object::set_velocity(const v3f &vel) {
 	AudioLocker l;
-	velocity = vel;
+	_velocity = vel;
 }
 
 void Object::play(const std::string &name, Source *source) {
@@ -227,5 +227,5 @@ void ListenerObject::set_up(const v3f &up) {
 }
 
 v3f ListenerObject::transform(v3f v) {
-	return v - position;
+	return v - _position;
 }

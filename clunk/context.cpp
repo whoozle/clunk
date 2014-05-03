@@ -57,7 +57,7 @@ bool Context::process_object(Object *o, Sources &sset, std::vector<source_t> &ls
 		typename stats_type::iterator s_i = sources_stats.find(name);
 		unsigned same_sounds_n = (s_i != sources_stats.end())? s_i->second: 0;
 		if (lsources.size() < max_sources && same_sounds_n < distance_model.same_sounds_limit) {
-			lsources.push_back(source_t(s, _listener->transform(o->position + s->delta_position), o->velocity, _listener->velocity));
+			lsources.push_back(source_t(s, _listener->transform(o->_position + s->delta_position), o->_velocity, _listener->_velocity));
 			if (same_sounds_n == 0) {
 				sources_stats.insert(typename stats_type::value_type(name, 1));
 			} else {
@@ -82,7 +82,7 @@ void Context::process(void *stream_, int size) {
 
 	{
 		//TIMESPY(("sorting objects"));
-		std::sort(objects.begin(), objects.end(), Object::DistanceOrder(_listener->position));
+		std::sort(objects.begin(), objects.end(), Object::DistanceOrder(_listener->_position));
 	}
 	//LOG_DEBUG(("sorted %u objects", (unsigned)objects.size()));
 	

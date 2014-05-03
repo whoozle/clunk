@@ -41,7 +41,7 @@ public:
 		DistanceOrder(const v3f &listener) : listener(listener) {}
 
 		inline bool operator()(const Object *a, const Object * b) const {
-			return listener.quick_distance(a->position) < listener.quick_distance(b->position); 
+			return listener.quick_distance(a->_position) < listener.quick_distance(b->_position); 
 		}
 	};
 	///dtor, do not forget to delete object if you do not need it anymore
@@ -168,7 +168,7 @@ protected:
 	friend class Context;
 
 	Context *context;
-	v3f position, velocity;
+	v3f _position, _velocity;
 
 	Object(Context *context);
 
