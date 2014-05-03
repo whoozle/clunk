@@ -71,17 +71,16 @@ bool Source::playing() const {
 	return position < (int)(sample->_data.get_size() / sample->_spec.channels / 2);
 }
 	
-void Source::idt_iit(const v3f &delta, const v3f &dir_vec, float &idt_offset, float &angle_gr, float &left_to_right_amp) {
+void Source::idt_iit(const v3f &position, float &idt_offset, float &angle_gr, float &left_to_right_amp) {
 	float head_r = 0.093f;
 
-	float direction = dir_vec.is0()? float(M_PI_2): (float)atan2f(dir_vec.y, dir_vec.x);
-	float angle = direction - atan2f(delta.y, delta.x);
+	float angle = M_PI_2 - atan2f(position.y, position.x);
 	
 	angle_gr = angle * 180 / float(M_PI);
 	while (angle_gr < 0)
 		angle_gr += 360;
 	
-	//LOG_DEBUG(("relative position = (%g,%g,%g), angle = %g (%g)", delta.x, delta.y, delta.z, angle, angle_gr));
+	//LOG_DEBUG(("relative position = (%g,%g,%g), angle = %g (%g)", position.x, position.y, position.z, angle, angle_gr));
 	
 	float idt_angle = fmodf(angle, 2 * (float)M_PI);
 
@@ -235,7 +234,7 @@ void Source::_update_position(const int dp) {
 	}
 }
 
-float Source::_process(clunk::Buffer &buffer, unsigned dst_ch, const v3f &delta_position, const v3f &direction, float fx_volume, float pitch) {
+float Source::_process(clunk::Buffer &buffer, unsigned dst_ch, const v3f &delta_position, float fx_volume, float pitch) {
 	s16 * dst = static_cast<s16*>(buffer.get_ptr());
 	unsigned dst_n = (unsigned)buffer.get_size() / dst_ch / 2;
 	const s16 * src = static_cast<const s16 *>(sample->_data.get_ptr());
@@ -309,7 +308,7 @@ float Source::_process(clunk::Buffer &buffer, unsigned dst_ch, const v3f &delta_
 	}
 
 	float t_idt, angle_gr, left_to_right_amp;
-	idt_iit(delta_position, direction, t_idt, angle_gr, left_to_right_amp);
+	idt_iit(delta_position, t_idt, angle_gr, left_to_right_amp);
 
 	const int kemar_sector_size = 360 / angles;
 	const int kemar_idx_right = ((int)angle_gr + kemar_sector_size / 2) / kemar_sector_size;

@@ -57,7 +57,7 @@ bool Context::process_object(Object *o, Sources &sset, std::vector<source_t> &ls
 		typename stats_type::iterator s_i = sources_stats.find(name);
 		unsigned same_sounds_n = (s_i != sources_stats.end())? s_i->second: 0;
 		if (lsources.size() < max_sources && same_sounds_n < distance_model.same_sounds_limit) {
-			lsources.push_back(source_t(s, o->position + s->delta_position - _listener->position, o->velocity, _listener->_direction, _listener->velocity));
+			lsources.push_back(source_t(s, o->position + s->delta_position - _listener->position, o->velocity, _listener->velocity));
 			if (same_sounds_n == 0) {
 				sources_stats.insert(typename stats_type::value_type(name, 1));
 			} else {
@@ -170,7 +170,7 @@ void Context::process(void *stream_, int size) {
 		if (sdl_v <= 0)
 			continue;
 		//check for 0
-		volume = source->_process(buf, _spec.channels, source_info.s_pos, source_info.s_dir, volume, dpitch);
+		volume = source->_process(buf, _spec.channels, source_info.s_pos, volume, dpitch);
 		sdl_v = (int)floor(MaxMixVolume * volume + 0.5f);
 		//LOG_DEBUG(("%u: %s: mixing source with volume %g (%d)", i, source->sample->name.c_str(), volume, sdl_v));
 		if (sdl_v <= 0)

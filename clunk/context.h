@@ -158,11 +158,10 @@ private:
 	
 		v3f s_pos;
 		v3f s_vel;
-		v3f s_dir;
 		v3f l_vel;
 
-		inline source_t(Source *source, const v3f &s_pos, const v3f &s_vel, const v3f& s_dir, const v3f& l_vel):
-		source(source), s_pos(s_pos), s_vel(s_vel), s_dir(s_dir), l_vel(l_vel) {}
+		inline source_t(Source *source, const v3f &s_pos, const v3f &s_vel, const v3f& l_vel):
+		source(source), s_pos(s_pos), s_vel(s_vel), l_vel(l_vel) {}
 	};
 	template<class Sources>
 	bool process_object(Object *o, Sources &sset, std::vector<source_t> &lsources, unsigned n);
