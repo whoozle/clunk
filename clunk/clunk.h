@@ -19,6 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 */
 
+#include <clunk/types.h>
 #include <clunk/v3.h>
 #include <clunk/context.h>
 #include <clunk/object.h>
