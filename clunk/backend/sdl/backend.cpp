@@ -99,10 +99,10 @@ SDL_AudioSpec Backend::convert(const AudioSpec &spec) {
 AudioSpec Backend::convert(const SDL_AudioSpec &spec) {
 	AudioSpec::Format format;
 	switch(spec.format) {
-		case AUDIO_S8:	format = AudioSpec::S8; break;
-		case AUDIO_U8:	format = AudioSpec::U8; break;
-		case AUDIO_S16:	format = AudioSpec::S16; break;
-		case AUDIO_U16:	format = AudioSpec::U16; break;
+		case AUDIO_S8:		format = AudioSpec::S8; break;
+		case AUDIO_U8:		format = AudioSpec::U8; break;
+		case AUDIO_S16SYS:	format = AudioSpec::S16; break;
+		case AUDIO_U16SYS:	format = AudioSpec::U16; break;
 		default: throw std::runtime_error("invalid sdl audio format");
 	}
 	return AudioSpec(format, spec.freq, spec.channels);
