@@ -3,6 +3,7 @@
 
 #include <clunk/types.h>
 #include <clunk/export_clunk.h>
+#include <stdexcept>
 
 namespace clunk {
 
@@ -17,12 +18,13 @@ struct CLUNKAPI AudioSpec {
 	int		sample_rate;
 	u8		channels;
 
-	int bytes_per_sample() {
+	unsigned bytes_per_sample() const {
 		switch(format)
 		{
-			case S8: case U8: return 1;
-			case S16: case U16: return 2;
-			default: return -1;
+			case S8:	case U8:	return 1;
+			case S16:	case U16:	return 2;
+			default:
+				throw std::runtime_error("invalid format");
 		}
 	}
 
