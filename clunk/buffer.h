@@ -50,7 +50,7 @@ public:
 	//! Gets pointer to the memory buffer
 	inline void *get_ptr() const { return ptr; }
 	//! Gets pointer to the memory buffer (const)
-	inline const size_t get_size() const { return size; } 
+	inline size_t get_size() const { return size; }
 	/*!
 		\brief Tests if buffer was empty
 		\return returns true if the buffer is empty or deallocated.
