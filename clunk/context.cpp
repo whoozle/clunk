@@ -76,8 +76,7 @@ bool Context::process_object(Object *o, Sources &sset, std::vector<source_t> &ls
 	return true;
 }
 
-void Context::process(void *stream_, int size) {
-	u16 *stream = static_cast<u16 *>(stream_);
+void Context::process(void *stream, int size) {
 	//TIMESPY(("total"));
 
 	{
