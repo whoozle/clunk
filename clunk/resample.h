@@ -14,21 +14,21 @@ namespace clunk {
 		template<> struct SampleResampler<u8, u8>	{ static void Write(u8 &dst, const u8 &src)		{ dst = src; } };
 		template<> struct SampleResampler<u8, s8>	{ static void Write(u8 &dst, const s8 &src)		{ dst = src + 128; } };
 		template<> struct SampleResampler<u8, u16>	{ static void Write(u8 &dst, const u16 &src)	{ dst = src >> 8; } };
-		template<> struct SampleResampler<u8, s16>	{ static void Write(u8 &dst, const s16 &src)	{ dst = (src + 32768u) >> 8; } };
+		template<> struct SampleResampler<u8, s16>	{ static void Write(u8 &dst, const s16 &src)	{ dst = (src + (u16)32768) >> 8; } };
 
 		template<> struct SampleResampler<s8, u8>	{ static void Write(s8 &dst, const u8 &src)		{ dst = src - 128; } };
 		template<> struct SampleResampler<s8, s8>	{ static void Write(s8 &dst, const s8 &src)		{ dst = src; } };
-		template<> struct SampleResampler<s8, u16>	{ static void Write(s8 &dst, const u16 &src)	{ dst = (src - 32768) >> 8; } };
+		template<> struct SampleResampler<s8, u16>	{ static void Write(s8 &dst, const u16 &src)	{ dst = (src - (u16)32768) >> 8; } };
 		template<> struct SampleResampler<s8, s16>	{ static void Write(s8 &dst, const s16 &src)	{ dst = src >> 8; } };
 
 		template<> struct SampleResampler<u16, u8>	{ static void Write(u16 &dst, const u8 &src)	{ dst = src << 8; } };
-		template<> struct SampleResampler<u16, s8>	{ static void Write(u16 &dst, const s8 &src)	{ dst = (src + 128u) << 8; } };
+		template<> struct SampleResampler<u16, s8>	{ static void Write(u16 &dst, const s8 &src)	{ dst = (src + (u16)128) << 8; } };
 		template<> struct SampleResampler<u16, u16>	{ static void Write(u16 &dst, const u16 &src)	{ dst = src; } };
-		template<> struct SampleResampler<u16, s16>	{ static void Write(u16 &dst, const s16 &src)	{ dst = src + 32768; } };
+		template<> struct SampleResampler<u16, s16>	{ static void Write(u16 &dst, const s16 &src)	{ dst = src + (u16)32768; } };
 
-		template<> struct SampleResampler<s16, u8>	{ static void Write(s16 &dst, const u8 &src)	{ dst = (s16)(src - 128) << 8; } };
+		template<> struct SampleResampler<s16, u8>	{ static void Write(s16 &dst, const u8 &src)	{ dst = ((s16)src - (s16)128) << 8; } };
 		template<> struct SampleResampler<s16, s8>	{ static void Write(s16 &dst, const s8 &src)	{ dst = src << 8; } };
-		template<> struct SampleResampler<s16, u16>	{ static void Write(s16 &dst, const u16 &src)	{ dst = src - 32768; } };
+		template<> struct SampleResampler<s16, u16>	{ static void Write(s16 &dst, const u16 &src)	{ dst = src - (u16)32768; } };
 		template<> struct SampleResampler<s16, s16>	{ static void Write(s16 &dst, const s16 &src)	{ dst = src; } };
 
 		template<int DstChannels, int SrcChannels>
