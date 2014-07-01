@@ -64,7 +64,7 @@ namespace clunk {
 			} else if (id == 0x61746164) {
 				read(_data, size);
 
-#if __BYTE_ORDER == __BIG_ENDIAN
+#if !defined(_WINDOWS) && __BYTE_ORDER == __BIG_ENDIAN
 				if (_spec.bytes_per_sample() == 2)
 				{
 					u8 *ptr = static_cast<u8 *>(_data.get_ptr());
