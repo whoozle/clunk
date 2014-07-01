@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 2.6)
 set(CMAKE_USE_RELATIVE_PATHS TRUE)
 
 find_package(SDL REQUIRED)
+option(BUILD_TEST "Build simple test application" false)
 option(WITH_SSE "Use highly optimized SSE FFT/MDCT routines" false)
 
 set(clunk_VERSION_MAJOR 1)
