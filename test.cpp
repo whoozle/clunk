@@ -3,7 +3,12 @@
 #include <clunk/source.h>
 #include <clunk/wav_file.h>
 #include <stdlib.h>
-#include <unistd.h>
+#ifdef _WINDOWS
+#	include <Windows.h>
+#	define usleep(us) ::Sleep(((us) + 999) / 1000)
+#else
+#	include <unistd.h>
+#endif
 
 #define WINDOW_BITS 9
 
