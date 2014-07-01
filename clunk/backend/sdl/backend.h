@@ -1,6 +1,10 @@
 #ifndef CLUNK_BACKEND_SDL_H
 #define CLUNK_BACKEND_SDL_H
 
+#ifndef BACKEND_SDL
+#	error invalid configuration
+#endif
+
 #include <clunk/sample.h>
 #include <clunk/context.h>
 #include <SDL.h>
