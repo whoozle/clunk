@@ -74,7 +74,7 @@ bool Source::playing() const {
 void Source::idt_iit(const v3f &position, float &idt_offset, float &angle_gr, float &left_to_right_amp) {
 	float head_r = 0.093f;
 
-	float angle = M_PI_2 - atan2f(position.y, position.x);
+	float angle = (float)(M_PI_2 - atan2f(position.y, position.x));
 	
 	angle_gr = angle * 180 / float(M_PI);
 	while (angle_gr < 0)

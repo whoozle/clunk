@@ -54,9 +54,9 @@ struct danielson_lanczos<8, T> {
 		next_type::template apply<SIGN>(data + 4);
 		
 		rotate(data, 0, std::complex<T>(1, 0));
-		rotate(data, 1, std::complex<T>(M_SQRT1_2, -M_SQRT1_2 * SIGN));
+		rotate(data, 1, std::complex<T>(float(M_SQRT1_2), -float(M_SQRT1_2) * SIGN));
 		rotate(data, 2, std::complex<T>(0, -1));
-		rotate(data, 3, std::complex<T>(-M_SQRT1_2, -M_SQRT1_2 * SIGN));
+		rotate(data, 3, std::complex<T>(-float(M_SQRT1_2), -float(M_SQRT1_2) * SIGN));
 	}
 };
 

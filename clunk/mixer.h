@@ -26,7 +26,7 @@ namespace clunk {
 						value = std::numeric_limits<Type>::max();
 					if (value < std::numeric_limits<Type>::min())
 						value = std::numeric_limits<Type>::min();
-					*dst++ = value;
+					*dst++ = Type(value);
 				}
 			}
 		};

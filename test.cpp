@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
 	if (argc > 1 && argv[1][0] == 't') {
 		fft_type fft;
 		for(int i = 0; i < fft_type::N; ++i) {
-			fft.data[i] = std::complex<float>((i / 4) & 1, 0);
+			fft.data[i] = std::complex<float>((float)((i / 4) & 1), 0);
 		}
 		fft.fft();
 		for(int i = 0; i < fft_type::N; ++i) {
@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
 		fft.ifft();
 
 		for(int i = 0; i < fft_type::N; ++i) {
-			fft.data[i] -= std::complex<float>((i / 4) & 1, 0);
+			fft.data[i] -= std::complex<float>((float)((i / 4) & 1), 0);
 			printf("%f, %f\n", fft.data[i].real(), fft.data[i].imag());
 		}
 		
@@ -77,7 +77,7 @@ int main(int argc, char *argv[]) {
 	o->play("h", new clunk::Source(h, true));
 
 	for(int i = 0; i <= n; ++i) {
-		float a = 2 * M_PI * i / n;
+		float a = float(2 * M_PI * i / n);
 		clunk::v3f pos(cos(a) * d, sin(a) * d * 2, 1);
 		o->set_position(pos);
 		printf("%g %g %g\n", pos.x, pos.y, pos.z);
