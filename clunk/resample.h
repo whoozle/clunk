@@ -77,7 +77,7 @@ namespace clunk {
 			static void resample(AudioSpec dst_format, Buffer &dst_data, AudioSpec src_format, const Buffer &src_data) {
 				const typename SrcAudioFormat::Type *src = static_cast<typename SrcAudioFormat::Type *>(src_data.get_ptr());
 				size_t src_size = src_data.get_size() / sizeof(typename SrcAudioFormat::Type) / src_format.channels;
-				size_t dst_size = src_size * dst_format.sample_rate / src_format.sample_rate;
+				size_t dst_size = (size_t)(src_size * (1.0f * dst_format.sample_rate / src_format.sample_rate));
 
 				dst_data.set_size(dst_size * dst_format.channels * sizeof(typename DstAudioFormat::Type));
 				typename DstAudioFormat::Type *dst = static_cast<typename DstAudioFormat::Type *>(dst_data.get_ptr());
