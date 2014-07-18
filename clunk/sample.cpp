@@ -30,7 +30,7 @@ Sample::Sample(Context *context) : gain(1.0f), pitch(1.0f), _context(context) {}
 
 void Sample::generateSine(const int freq, const float len) {
 	AudioLocker l;
-	
+
 	_spec.sample_rate = _context->get_spec().sample_rate;
 	_spec.channels = 1;
 	_spec.format = _context->get_spec().format;

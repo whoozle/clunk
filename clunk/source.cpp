@@ -68,7 +68,7 @@ bool Source::playing() const {
 	//if (!sample3d[0].empty() || !sample3d[1].empty())
 	//	return true;
 	
-	return position < (int)(sample->_data.get_size() / sample->_spec.channels / 2);
+	return position < (int)(sample->get_data().get_size() / sample->get_spec().channels / 2);
 }
 	
 void Source::idt_iit(const v3f &position, float &idt_offset, float &angle_gr, float &left_to_right_amp) {
@@ -218,7 +218,7 @@ void Source::_update_position(const int dp) {
 		buf.pop(dp * 2);
 	}
 	
-	int src_n = (int)sample->_data.get_size() / sample->_spec.channels / 2;
+	int src_n = (int)sample->get_data().get_size() / sample->get_spec().channels / 2;
 	if (loop) {
 		position %= src_n;
 		//LOG_DEBUG(("position %d", position));
@@ -237,7 +237,7 @@ void Source::_update_position(const int dp) {
 float Source::_process(clunk::Buffer &buffer, unsigned dst_ch, const v3f &delta_position, float fx_volume, float pitch) {
 	s16 * dst = static_cast<s16*>(buffer.get_ptr());
 	unsigned dst_n = (unsigned)buffer.get_size() / dst_ch / 2;
-	const s16 * src = static_cast<const s16 *>(sample->_data.get_ptr());
+	const s16 * src = static_cast<const s16 *>(sample->get_data().get_ptr());
 	if (src == NULL)
 		throw_ex(("uninitialized sample used (%p)", (void *)sample));
 
@@ -245,8 +245,8 @@ float Source::_process(clunk::Buffer &buffer, unsigned dst_ch, const v3f &delta_
 	if (pitch <= 0)
 		throw_ex(("pitch %g could not be negative or zero", pitch));
 		
-	unsigned src_ch = sample->_spec.channels; 
-	unsigned src_n = (unsigned)sample->_data.get_size() / src_ch / 2;
+	unsigned src_ch = sample->get_spec().channels;
+	unsigned src_n = (unsigned)sample->get_data().get_size() / src_ch / 2;
 
 	float vol = fx_volume * gain * sample->gain;
 	
@@ -315,7 +315,7 @@ float Source::_process(clunk::Buffer &buffer, unsigned dst_ch, const v3f &delta_
 	const int kemar_idx_left = ((360 - (int)angle_gr + kemar_sector_size / 2) / kemar_sector_size) % angles;
 	//LOG_DEBUG(("%g (of %d)-> left: %d, right: %d", angle_gr, angles, kemar_idx_left, kemar_idx_right));
 	
-	int idt_offset = (int)(t_idt * sample->_spec.sample_rate);
+	int idt_offset = (int)(t_idt * sample->get_spec().sample_rate);
 
 	int window = 0;
 	while(sample3d[0].get_size() < dst_n * 2 || sample3d[1].get_size() < dst_n * 2) {
@@ -376,5 +376,5 @@ void Source::get_kemar_data(kemar_ptr & kemar_data, int & elev_n, const v3f &pos
 Source::~Source() {}
 
 void Source::fade_out(const float sec) {
-	fadeout = fadeout_total = (int)(sample->_spec.sample_rate * sec);
+	fadeout = fadeout_total = (int)(sample->get_spec().sample_rate * sec);
 }

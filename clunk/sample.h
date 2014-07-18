@@ -38,27 +38,31 @@ public:
 	float pitch;
 
 	~Sample();
+
 	/*!
 		\brief initializes sample
 		\param[in] data raw audio data
 		\param[in] spec audio format specification
 	*/	
 	void init(const clunk::Buffer &data, const AudioSpec &spec);
+
 	/*! 
 		\brief generate sine wave with given length (seconds)
 		\param[in] freq frequency
 		\param[in] len of the sample in seconds
 	*/
 	void generateSine(int freq, float len);
-	
+
 	float length() const {
 		return 1.0f * _data.get_size() / _spec.sample_rate / _spec.channels / 2;
 	}
-	
-private: 	
+
+	const clunk::Buffer & get_data() const	{ return _data; }
+	const AudioSpec get_spec() const		{ return _spec; }
+
+private:
 	friend class Context;
-	friend class Source;
-	
+
 	Sample(Context *context);
 
 	Sample(const Sample &);
