@@ -102,12 +102,12 @@ void Source::idt_iit(const v3f &position, float &idt_offset, float &angle_gr, fl
 
 void Source::hrtf(int window, const unsigned channel_idx, clunk::Buffer &result, const s16 *src, int src_ch, int src_n, int idt_offset, const kemar_ptr& kemar_data, int kemar_idx, float freq_decay) {
 	assert(channel_idx < 2);
-	
+
 	//LOG_DEBUG(("%d bytes, %d actual window size, %d windows", dst_n, CLUNK_ACTUAL_WINDOW, n));
 	//result.set_size(2 * WINDOW_SIZE / 2); //sizeof(s16) * window  / 2
 	size_t result_start = result.get_size();
 	result.reserve(WINDOW_SIZE);
-	
+
 	//LOG_DEBUG(("channel %d: window %d: adding %d, buffer size: %u, decay: %g", channel_idx, window, WINDOW_SIZE, (unsigned)result.get_size(), freq_decay));
 
 	if (channel_idx <= 1) {
