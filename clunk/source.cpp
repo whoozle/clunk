@@ -32,8 +32,6 @@
 
 using namespace clunk;
 
-Source::mdct_type Source::mdct __attribute__ ((aligned (16)));
-
 clunk_static_assert(Source::WINDOW_BITS > 2);
 
 template <typename T> inline T clunk_min(T a, T b) {
@@ -109,6 +107,8 @@ void Source::hrtf(int window, const unsigned channel_idx, clunk::Buffer &result,
 	result.reserve(WINDOW_SIZE);
 
 	//LOG_DEBUG(("channel %d: window %d: adding %d, buffer size: %u, decay: %g", channel_idx, window, WINDOW_SIZE, (unsigned)result.get_size(), freq_decay));
+
+	mdct_type mdct __attribute__ ((aligned (16)));
 
 	if (channel_idx <= 1) {
 		bool left = channel_idx == 0;
