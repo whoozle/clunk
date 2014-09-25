@@ -156,7 +156,7 @@ void Source::hrtf(int window, const unsigned channel_idx, clunk::Buffer &result,
 	{
 		for(size_t i = 0; i < mdct_type::M; ++i)
 		{
-			mdct.data[i] *= std::abs(fir.data[i * mdct_type::M / filter_type::N]);
+			mdct.data[i] *= std::abs(fir.data[i * filter_type::N / mdct_type::M]);
 		}
 	}
 
