@@ -154,18 +154,9 @@ void Source::hrtf(int window, const unsigned channel_idx, clunk::Buffer &result,
 	fir.fft();
 	mdct.mdct();
 	{
-		float e1 = 0, e2 = 0;
 		for(size_t i = 0; i < mdct_type::M; ++i)
 		{
-			e1 += mdct.data[i] * mdct.data[i];
 			mdct.data[i] *= std::abs(fir.data[i * mdct_type::M / filter_type::N]);
-			e2 += mdct.data[i] * mdct.data[i];
-		}
-
-		float norm = sqrt(e1 / e2);
-		for(size_t i = 0; i < mdct_type::M; ++i)
-		{
-			mdct.data[i] *= norm;
 		}
 	}
 
