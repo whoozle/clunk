@@ -4,6 +4,8 @@ import re
 import os
 import os.path
 import struct
+from numpy.fft import rfft
+
 file_re = re.compile(r"([LR])(\-?\d+).*e(\d+)a.dat", re.IGNORECASE)
 
 kemar = {}
@@ -25,6 +27,10 @@ for dirpath, _dn, files in os.walk("full"):
 			data = f.read()
 		#print "Read %d" %len(data)
 		data = struct.unpack(">512h", data)
+		sdata = []
+		for i in xrange(0, len(data)):
+			sdata.append(data[i] / 32768.0)
+		data = rfft(sdata)
 		if elev not in kemar:
 			kemar[elev] = {az: {mic: data}}
 			continue
@@ -57,7 +63,7 @@ extern "C" {
 struct kemar_elevation_data {
 	int elevation;
 	unsigned samples;
-	const int16_t (*data)[2][512];
+	const float (*data)[2][257][2];
 };
 
 """
@@ -94,17 +100,23 @@ struct kemar_elevation_data kemar_data[%d] =
 for elev, az_dict in sorted(kemar.iteritems()):
 	print "elevation %d, items: %d" %(elev, len(az_dict))
 	array_name = "elev_%s" %(elev if elev >= 0 else ("m%d" % -elev))
-	source += """static const int16_t %s[][2][512] =
+	source += """static const float %s[][2][257][2] =
 {
 """ %array_name
 
 	for az, mic_n_data in sorted(az_dict.iteritems()):
+		data0 = ""
+		data1 = ""
+		for a in mic_n_data[0]:
+			data0 += "{%g, %g}, " %(float(a.real), float(a.imag))
+		for a in mic_n_data[1]:
+			data1 += "{%g, %g}, " %(float(a.real), float(a.imag))
 		source += """	/* azimuth = %d */
 	{
 		{%s},
 		{%s}
 	},
-""" %(az, str(mic_n_data[0]).strip("[]()"), str(mic_n_data[1]).strip("[]()"))
+""" %(az, data0, data1)
 	source += "};\n"
 	epilogue += "\t{%4d, %4d, %10s },\n" %(elev, len(az_dict), array_name)
 

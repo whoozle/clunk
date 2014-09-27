@@ -105,7 +105,7 @@ public:
 	float _process(clunk::Buffer &buffer, unsigned ch, const v3f &position, float fx_volume, float pitch);
 
 private: 
-	typedef const s16 (*kemar_ptr)[2][512];
+	typedef const float (*kemar_ptr)[2][257][2];
 	void get_kemar_data(kemar_ptr & kemar_data, int & samples, const v3f &delta_position);
 
 	static void idt_iit(const v3f &position, float &idt_offset, float &angle_gr, float &left_to_right_amp);

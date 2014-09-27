@@ -145,18 +145,13 @@ void Source::hrtf(int window, const unsigned channel_idx, clunk::Buffer &result,
 	}
 	
 	mdct.apply_window();
-	typedef fft_context<WINDOW_BITS, float> filter_type;
-	filter_type fir;
-	for(size_t i = 0; i < filter_type::N; ++i) {
-		const int kemar_sample = i * 512 / filter_type::N;
-		fir.data[i] = std::complex<float>(kemar_data[kemar_idx][0][kemar_sample] / 32768.0f, 0);
-	}
-	fir.fft();
 	mdct.mdct();
 	{
 		for(size_t i = 0; i < mdct_type::M; ++i)
 		{
-			mdct.data[i] *= std::abs(fir.data[i * filter_type::N / mdct_type::M]);
+			const int kemar_sample = i * 257 / mdct_type::M;
+			std::complex<float> fir(kemar_data[kemar_idx][0][kemar_sample][0], kemar_data[kemar_idx][0][kemar_sample][1]);
+			mdct.data[i] *= std::abs(fir);
 		}
 	}
 
