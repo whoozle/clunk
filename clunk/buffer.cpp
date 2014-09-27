@@ -40,11 +40,7 @@ const Buffer& Buffer::operator=(const Buffer& c) {
 	}
 	assert(c.size > 0);
 
-	void *p = realloc(ptr, c.size);
-	if (p == NULL) 
-		throw_io(("realloc (%p, %u)", ptr, (unsigned)c.size));
-	ptr = p;
-	size = c.size;
+	set_size(c.get_size());
 	memcpy(ptr, c.ptr, c.size);
 	return *this;
 }
