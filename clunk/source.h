@@ -21,10 +21,8 @@
 
 #include <clunk/export_clunk.h>
 #include <clunk/v3.h>
-#include <clunk/mdct_context.h>
 #include <clunk/buffer.h>
-
-struct kiss_fftr_state;
+#include <clunk/hrtf.h>
 
 namespace clunk {
 
@@ -32,33 +30,9 @@ namespace clunk {
 class Sample;
 class Buffer;
 
-//window function used in ogg/vorbis
-template<int N, typename T>
-struct vorbis_window_func : public clunk::window_func_base<N, T> {
-	inline T operator()(int x) const {
-		T s = sin(T(M_PI) * (x + 0.5f) / N);
-		return sin(T(M_PI_2) * s * s); 
-	}
-};
-
-template<int N, typename T>
-struct sin_window_func : public clunk::window_func_base<N, T> {
-	inline T operator()(int x) const {
-		return sin(T(M_PI) * x / N);
-	}
-};
-
 //!class holding information about source. 
 class CLUNKAPI Source {
-public: 
-	enum { WINDOW_BITS = 9 };
-
-private: 
-	typedef mdct_context<WINDOW_BITS, vorbis_window_func, float> mdct_type;
-
 public:
-	enum { WINDOW_SIZE = mdct_type::N };
-
 	///pointer to the sample holding audio data
 	const Sample * const sample;
 	
@@ -105,18 +79,8 @@ public:
 	float _process(clunk::Buffer &buffer, unsigned ch, const v3f &position, float fx_volume, float pitch);
 
 private: 
-	typedef const float (*kemar_ptr)[2][257][2];
-	void get_kemar_data(kemar_ptr & kemar_data, int & samples, const v3f &delta_position);
-
-	static void idt_iit(const v3f &position, float &idt_offset, float &angle_gr, float &left_to_right_amp);
-	//generate hrtf response for channel idx (0 left), in result.
-	void hrtf(int window, const unsigned channel_idx, clunk::Buffer &result, const s16 *src, int src_ch, int src_n, int idt_offset, const kemar_ptr& kemar_data, int kemar_idx, float freq_decay);
-
 	int position, fadeout, fadeout_total;
-	
-	clunk::Buffer sample3d[2];
-
-	float overlap_data[2][WINDOW_SIZE / 2];
+	Hrtf _hrtf;
 };
 }
 

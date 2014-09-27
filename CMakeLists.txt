@@ -36,6 +36,7 @@ set(SOURCES
 	clunk/clunk_ex.cpp
 	clunk/context.cpp
 	clunk/distance_model.cpp
+	clunk/hrtf.cpp
 	clunk/kemar.c
 	clunk/logger.cpp
 	clunk/object.cpp
@@ -62,6 +63,7 @@ set(PUBLIC_HEADERS
 	clunk/distance_model.h
 	clunk/export_clunk.h
 	clunk/fft_context.h
+	clunk/hrtf.h
 	clunk/locker.h
 	clunk/logger.h
 	clunk/mdct_context.h
