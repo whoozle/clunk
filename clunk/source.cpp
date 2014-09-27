@@ -81,9 +81,10 @@ float Source::_process(clunk::Buffer &dst_buf, unsigned dst_ch, const v3f &delta
 		vol = 1;
 
 	Buffer src_buf;
-	src_buf.set_size(dst_ch * dst_n * 2);
+	unsigned dst_n_plus_overlap = dst_n + Hrtf::WINDOW_SIZE;
+	src_buf.set_size(dst_ch * dst_n_plus_overlap * 2);
 	s16 * src_buf_ptr = static_cast<s16 *>(src_buf.get_ptr());
-	for(unsigned i = 0; i < dst_n; ++i) {
+	for(unsigned i = 0; i < dst_n_plus_overlap; ++i) {
 		for(unsigned c = 0; c < dst_ch; ++c) {
 			int p = position + (int)(i * pitch);
 

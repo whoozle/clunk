@@ -92,9 +92,7 @@ void Hrtf::process(
 
 	const s16 * const src = static_cast<const s16 *>(src_buf.get_ptr());
 	const unsigned src_n = (unsigned)src_buf.get_size() / src_ch / 2;
-
-	if (dst_n != src_n)
-		throw_ex(("hrtf operates on buffer with the same sample count"));
+	assert(dst_n <= src_n);
 
 	kemar_ptr kemar_data;
 	int angles;
@@ -103,7 +101,7 @@ void Hrtf::process(
 	if (delta_position.is0() || kemar_data == NULL) {
 		//2d stereo sound!
 		if (src_ch == dst_ch) {
-			dst_buf = src_buf;
+			memcpy(dst_buf.get_ptr(), src_buf.get_ptr(), dst_buf.get_size());
 			return;
 		}
 		else
@@ -154,8 +152,6 @@ void Hrtf::skip(unsigned samples) {
 
 void Hrtf::hrtf(int window, const unsigned channel_idx, clunk::Buffer &result, const s16 *src, int src_ch, int src_n, int idt_offset, const kemar_ptr& kemar_data, int kemar_idx, float freq_decay) {
 	assert(channel_idx < 2);
-	assert(idt_offset + (window * WINDOW_SIZE / 2 + 0) >= 0);
-	assert(idt_offset + (window * WINDOW_SIZE / 2 + WINDOW_SIZE) <= src_n);
 
 	size_t result_start = result.get_size();
 	result.reserve(WINDOW_SIZE);
@@ -175,6 +171,9 @@ void Hrtf::hrtf(int window, const unsigned channel_idx, clunk::Buffer &result, c
 			idt_offset = - idt_offset;
 	} else 
 		idt_offset = 0;
+
+	assert(idt_offset + (window * WINDOW_SIZE / 2 + 0) >= 0);
+	assert(idt_offset + (window * WINDOW_SIZE / 2 + WINDOW_SIZE) <= src_n);
 
 	for(int i = 0; i < WINDOW_SIZE; ++i) {
 		//-1 0 1 2 3
