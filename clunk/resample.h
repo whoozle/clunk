@@ -3,6 +3,7 @@
 
 #include <clunk/audio_spec.h>
 #include <clunk/buffer.h>
+#include <clunk/logger.h>
 #include <stdexcept>
 
 namespace clunk {
