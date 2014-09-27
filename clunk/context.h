@@ -84,7 +84,7 @@ public:
 	/*!
 		\internal generate next 'len' bytes
 	*/
-	void process(void *stream, int len);
+	void process(void *stream, size_t len);
 	/*! 
 		\brief plays stream with given id. 
 		\param[in] id stream id - any integer you want. 

@@ -76,7 +76,7 @@ bool Context::process_object(Object *o, Sources &sset, std::vector<source_t> &ls
 	return true;
 }
 
-void Context::process(void *stream, int size) {
+void Context::process(void *stream, size_t size) {
 	//TIMESPY(("total"));
 
 	{
@@ -86,7 +86,7 @@ void Context::process(void *stream, int size) {
 	//LOG_DEBUG(("sorted %u objects", (unsigned)objects.size()));
 	
 	std::vector<source_t> lsources;
-	int n = size / 2 / _spec.channels;
+	size_t n = size / 2 / _spec.channels;
 
 	for(objects_type::iterator i = objects.begin(); i != objects.end(); ) {
 		Object *o = *i;
@@ -106,7 +106,7 @@ void Context::process(void *stream, int size) {
 	for(streams_type::iterator i = streams.begin(); i != streams.end();) {
 		//LOG_DEBUG(("processing stream %d", i->first));
 		stream_info &stream_info = i->second;
-		while ((int)stream_info.buffer.get_size() < size) {
+		while (stream_info.buffer.get_size() < size) {
 			clunk::Buffer data;
 			bool eos = !stream_info.stream->read(data, size);
 			if (!data.empty() && stream_info.stream->_spec.sample_rate != _spec.sample_rate) {
@@ -122,7 +122,7 @@ void Context::process(void *stream, int size) {
 				}
 			}
 		}
-		int buf_size = (int)stream_info.buffer.get_size();
+		size_t buf_size = stream_info.buffer.get_size();
 		//LOG_DEBUG(("buffered %d bytes", buf_size));
 		if (buf_size == 0) {
 			//all data buffered. continue;
@@ -140,7 +140,7 @@ void Context::process(void *stream, int size) {
 		int sdl_v = (int)floor(MaxMixVolume * stream_info.gain + 0.5f);
 		Mixer::mix(_spec.format, stream, stream_info.buffer.get_ptr(), buf_size, sdl_v);
 		
-		if ((int)stream_info.buffer.get_size() > size) {
+		if (stream_info.buffer.get_size() > size) {
 			memmove(stream_info.buffer.get_ptr(), static_cast<u8 *>(stream_info.buffer.get_ptr()) + size, stream_info.buffer.get_size() - size);
 			stream_info.buffer.set_size(stream_info.buffer.get_size() - size);
 		} else {
@@ -170,6 +170,7 @@ void Context::process(void *stream, int size) {
 			continue;
 		//check for 0
 		volume = source->_process(buf, _spec.channels, source_info.s_pos, volume, dpitch);
+		assert(buf.get_size() == size);
 		sdl_v = (int)floor(MaxMixVolume * volume + 0.5f);
 		//LOG_DEBUG(("%u: %s: mixing source with volume %g (%d)", i, source->sample->name.c_str(), volume, sdl_v));
 		if (sdl_v <= 0)
