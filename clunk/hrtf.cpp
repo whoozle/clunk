@@ -102,6 +102,7 @@ void Hrtf::process(
 			throw_ex(("unsupported sample conversion"));
 		return;
 	}
+	assert(dst_ch == 2);
 	
 	//LOG_DEBUG(("data: %p, angles: %d", (void *) kemar_data, angles));
 
