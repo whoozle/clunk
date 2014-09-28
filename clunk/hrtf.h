@@ -35,7 +35,7 @@ private:
 	void get_kemar_data(kemar_ptr & kemar_data, int & samples, const v3f &delta_position);
 
 	//generate hrtf response for channel idx (0 left), in result.
-	void hrtf(int window, const unsigned channel_idx, clunk::Buffer &result, const s16 *src, int src_ch, int src_n, int idt_offset, const kemar_ptr& kemar_data, int kemar_idx, float freq_decay);
+	void hrtf(const unsigned channel_idx, clunk::Buffer &result, const s16 *src, int src_ch, int src_n, int idt_offset, const kemar_ptr& kemar_data, int kemar_idx, float freq_decay);
 
 private:
 	clunk::Buffer sample3d[2];

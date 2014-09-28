@@ -118,8 +118,10 @@ void Hrtf::process(
 
 	int window = 0;
 	while(sample3d[0].get_size() < dst_n * 2 || sample3d[1].get_size() < dst_n * 2) {
-		hrtf(window, 0, sample3d[0], src, src_ch, src_n, idt_offset, kemar_data, kemar_idx_left, left_to_right_amp > 1? 1: 1 / left_to_right_amp);
-		hrtf(window, 1, sample3d[1], src, src_ch, src_n, idt_offset, kemar_data, kemar_idx_right, left_to_right_amp > 1? left_to_right_amp: 1);
+		size_t offset = src_ch * window * WINDOW_SIZE / 2;
+		assert(offset + WINDOW_SIZE / 2 <= src_n);
+		hrtf(0, sample3d[0], src + offset, src_ch, src_n - offset, idt_offset, kemar_data, kemar_idx_left, left_to_right_amp > 1? 1: 1 / left_to_right_amp);
+		hrtf(1, sample3d[1], src + offset, src_ch, src_n - offset, idt_offset, kemar_data, kemar_idx_right, left_to_right_amp > 1? left_to_right_amp: 1);
 		++window;
 	}
 	assert(sample3d[0].get_size() >= dst_n * 2 && sample3d[1].get_size() >= dst_n * 2);
@@ -145,11 +147,11 @@ void Hrtf::skip(unsigned samples) {
 	}
 }
 
-void Hrtf::hrtf(int window, const unsigned channel_idx, clunk::Buffer &result, const s16 *src, int src_ch, int src_n, int idt_offset, const kemar_ptr& kemar_data, int kemar_idx, float freq_decay) {
+void Hrtf::hrtf(const unsigned channel_idx, clunk::Buffer &result, const s16 *src, int src_ch, int src_n, int idt_offset, const kemar_ptr& kemar_data, int kemar_idx, float freq_decay) {
 	assert(channel_idx < 2);
 
 	size_t result_start = result.get_size();
-	result.reserve(WINDOW_SIZE);
+	result.reserve(WINDOW_SIZE); //WINDOW_SIZE / 2 * sizeof(s16)
 
 	//LOG_DEBUG(("channel %d: window %d: adding %d, buffer size: %u, decay: %g", channel_idx, window, WINDOW_SIZE, (unsigned)result.get_size(), freq_decay));
 
@@ -170,7 +172,7 @@ void Hrtf::hrtf(int window, const unsigned channel_idx, clunk::Buffer &result, c
 
 	for(int i = 0; i < WINDOW_SIZE; ++i) {
 		//-1 0 1 2 3
-		int p = idt_offset + (window * WINDOW_SIZE / 2 + i); //overlapping half
+		int p = idt_offset + i;
 		assert(p >= 0 && p < src_n);
 		//printf("%d of %d, ", p, src_n);
 		int v = src[p * src_ch];
