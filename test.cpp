@@ -9,13 +9,61 @@
 #else
 #	include <unistd.h>
 #endif
+#include <clunk/ref_mdct_context.h>
 
 #define WINDOW_BITS 9
 
 typedef clunk::mdct_context<WINDOW_BITS, clunk::vorbis_window_func, float> mdct_type;
 typedef clunk::fft_context<WINDOW_BITS - 2, float> fft_type;
 
+template<typename mdct_type>
+struct mdct_test {
+	mdct_type	_mdct;
+	float		_input[mdct_type::N];
+	float		_overlap[mdct_type::N2];
+
+	mdct_test(): _input(), _overlap() { }
+	void dump(int n = mdct_type::N)
+	{
+		for(int i = 0; i < n; ++i)
+			printf("%+1.1g ", _mdct.data[i]);
+	}
+
+	void feed()
+	{
+		//printf("feeding ");
+		for(int i = 0; i < mdct_type::N2; ++i)
+		{
+			float v = (rand() % 11) - 5;
+			_input[i] = _input[i + mdct_type::N2];
+			_input[i + mdct_type::N2] = v;
+			//printf("%+g ", v);
+		}
+		printf("\ninput: ");
+		for(int i = 0; i < mdct_type::N; ++i)
+		{
+			_mdct.data[i] = _input[i];
+		}
+		dump();
+		//_mdct.apply_window();
+		_mdct.mdct();
+		//printf("\n\tfreq: "); dump();
+		_mdct.imdct();
+		//_mdct.apply_window();
+
+		for(int i = 0; i < mdct_type::N2; ++i)
+			_mdct.data[i] += _overlap[i];
+
+		for(int i = 0; i < mdct_type::N2; ++i)
+			_overlap[i] = _mdct.data[mdct_type::N2 + i];
+
+		printf("\nresult: "); dump(mdct_type::N2);
+		printf("\n");
+	}
+};
+
 int main(int argc, char *argv[]) {
+
 	if (argc > 1 && argv[1][0] == 'b' && argv[1][1] == 'm') {
 		mdct_type mdct;
 		for(int i = 0; i < 1000000; ++i) 
@@ -44,6 +92,22 @@ int main(int argc, char *argv[]) {
 			printf("%f, %f\n", fft.data[i].real(), fft.data[i].imag());
 		}
 		
+		return 0;
+	}
+	if (argc > 1 && argv[1][0] == 'f')
+	{
+		printf("reference: \n");
+		mdct_test<clunk::ref_mdct_context<3, clunk::sin_window_func, float> > test;
+		test.feed();
+		test.feed();
+		test.feed();
+		test.feed();
+		printf("fft based: \n");
+		mdct_test<clunk::mdct_context<3, clunk::sin_window_func, float> > test2;
+		test2.feed();
+		test2.feed();
+		test2.feed();
+		test2.feed();
 		return 0;
 	}
 
