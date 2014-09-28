@@ -68,6 +68,7 @@ set(PUBLIC_HEADERS
 	clunk/logger.h
 	clunk/mdct_context.h
 	clunk/object.h
+	clunk/ref_mdct_context.h
 	clunk/sample.h
 	clunk/source.h
 	clunk/sse_fft_context.h
