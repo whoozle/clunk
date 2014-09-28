@@ -31,6 +31,7 @@ public:
 
 private: 
 	typedef mdct_context<WINDOW_BITS, vorbis_window_func, float> mdct_type;
+	mdct_type _mdct;
 
 public:
 	enum { WINDOW_SIZE = mdct_type::N };

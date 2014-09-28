@@ -158,8 +158,6 @@ void Hrtf::hrtf(int window, const unsigned channel_idx, clunk::Buffer &result, c
 
 	//LOG_DEBUG(("channel %d: window %d: adding %d, buffer size: %u, decay: %g", channel_idx, window, WINDOW_SIZE, (unsigned)result.get_size(), freq_decay));
 
-	mdct_type mdct __attribute__ ((aligned (16)));
-
 	if (channel_idx <= 1) {
 		bool left = channel_idx == 0;
 		if (!left && idt_offset > 0) {
@@ -181,33 +179,33 @@ void Hrtf::hrtf(int window, const unsigned channel_idx, clunk::Buffer &result, c
 		assert(p >= 0 && p < src_n);
 		//printf("%d of %d, ", p, src_n);
 		int v = src[p * src_ch];
-		mdct.data[i] = v / 32768.0f;
-		//fprintf(stderr, "%g ", mdct.data[i]);
+		_mdct.data[i] = v / 32768.0f;
+		//fprintf(stderr, "%g ", _mdct.data[i]);
 	}
 	
-	mdct.apply_window();
-	mdct.mdct();
+	_mdct.apply_window();
+	_mdct.mdct();
 	{
 		for(size_t i = 0; i < mdct_type::M; ++i)
 		{
 			const int kemar_sample = i * 257 / mdct_type::M;
 			std::complex<float> fir(kemar_data[kemar_idx][0][kemar_sample][0], kemar_data[kemar_idx][0][kemar_sample][1]);
-			mdct.data[i] *= std::abs(fir);
+			_mdct.data[i] *= std::abs(fir);
 		}
 	}
 
 	//LOG_DEBUG(("kemar angle index: %d\n", kemar_idx));
 	assert(freq_decay >= 1);
 	
-	mdct.imdct();
-	mdct.apply_window();
+	_mdct.imdct();
+	_mdct.apply_window();
 
 	s16 *dst = static_cast<s16 *>(static_cast<void *>((static_cast<u8 *>(result.get_ptr()) + result_start)));
 
 	float max_v = 1.0f, min_v = -1.0f;
 	
 	for(int i = 0; i < WINDOW_SIZE / 2; ++i) {
-		float v = (mdct.data[i] + overlap_data[channel_idx][i]);
+		float v = (_mdct.data[i] + overlap_data[channel_idx][i]);
 
 		if (v < min_v)
 			min_v = v;
@@ -219,7 +217,7 @@ void Hrtf::hrtf(int window, const unsigned channel_idx, clunk::Buffer &result, c
 		//stupid msvc
 		int i;
 		for(i = 0; i < WINDOW_SIZE / 2; ++i) {
-			float v = ((mdct.data[i] + overlap_data[channel_idx][i]) - min_v) / (max_v - min_v) * 2 - 1;
+			float v = ((_mdct.data[i] + overlap_data[channel_idx][i]) - min_v) / (max_v - min_v) * 2 - 1;
 			
 			if (v < -1) {
 				LOG_DEBUG(("clipping %f [%f-%f]", v, min_v, max_v));
@@ -231,7 +229,7 @@ void Hrtf::hrtf(int window, const unsigned channel_idx, clunk::Buffer &result, c
 			*dst++ = (int)(v * 32767);
 		}
 		for(; i < WINDOW_SIZE; ++i) {
-			overlap_data[channel_idx][i - WINDOW_SIZE / 2] = mdct.data[i];
+			overlap_data[channel_idx][i - WINDOW_SIZE / 2] = _mdct.data[i];
 		}
 	}
 }
