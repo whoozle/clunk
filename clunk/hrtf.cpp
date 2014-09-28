@@ -15,14 +15,8 @@ namespace clunk
 
 clunk_static_assert(Hrtf::WINDOW_BITS > 2);
 
-Hrtf::Hrtf()
-{
-	for(int i = 0; i < 2; ++i) {
-		for(int j = 0; j < WINDOW_SIZE / 2; ++j) {
-			overlap_data[i][j] = 0;
-		}
-	}
-}
+Hrtf::Hrtf(): overlap_data()
+{ }
 
 void Hrtf::idt_iit(const v3f &position, float &idt_offset, float &angle_gr, float &left_to_right_amp) {
 	float head_r = 0.093f;
