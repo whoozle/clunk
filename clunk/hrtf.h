@@ -13,7 +13,7 @@ namespace clunk {
 template<int N, typename T>
 struct vorbis_window_func : public clunk::window_func_base<N, T> {
 	inline T operator()(int x) const {
-		T s = sin(T(M_PI) * (x + 0.5f) / N);
+		T s = sin(T(M_PI) * (x + (T)0.5) / N);
 		return sin(T(M_PI_2) * s * s); 
 	}
 };
@@ -21,7 +21,7 @@ struct vorbis_window_func : public clunk::window_func_base<N, T> {
 template<int N, typename T>
 struct sin_window_func : public clunk::window_func_base<N, T> {
 	inline T operator()(int x) const {
-		return sin(T(M_PI) * x / N);
+		return sin(T(M_PI) * (x + (T)0.5) / N);
 	}
 };
 
