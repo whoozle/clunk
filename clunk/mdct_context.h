@@ -50,7 +50,7 @@ public:
 		}
 	}
 	
-	void mdct(const std::complex<float> *multiply = 0) {
+	void mdct() {
 		T rotate[N];
 		for(unsigned t = 0; t < N4; ++t) {
 			rotate[t] = -data[t + 3 * N4];
