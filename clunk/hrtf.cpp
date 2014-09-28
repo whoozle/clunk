@@ -202,28 +202,17 @@ void Hrtf::hrtf(int window, const unsigned channel_idx, clunk::Buffer &result, c
 
 	s16 *dst = static_cast<s16 *>(static_cast<void *>((static_cast<u8 *>(result.get_ptr()) + result_start)));
 
-	float max_v = 1.0f, min_v = -1.0f;
-	
-	for(int i = 0; i < WINDOW_SIZE / 2; ++i) {
-		float v = (_mdct.data[i] + overlap_data[channel_idx][i]);
-
-		if (v < min_v)
-			min_v = v;
-		else if (v > max_v)
-			max_v = v;
-	}
-
 	{
 		//stupid msvc
 		int i;
 		for(i = 0; i < WINDOW_SIZE / 2; ++i) {
-			float v = ((_mdct.data[i] + overlap_data[channel_idx][i]) - min_v) / (max_v - min_v) * 2 - 1;
+			float v = _mdct.data[i] + overlap_data[channel_idx][i];
 			
 			if (v < -1) {
-				LOG_DEBUG(("clipping %f [%f-%f]", v, min_v, max_v));
+				LOG_DEBUG(("clipping %f", v));
 				v = -1;
 			} else if (v > 1) {
-				LOG_DEBUG(("clipping %f [%f-%f]", v, min_v, max_v));
+				LOG_DEBUG(("clipping %f", v));
 				v = 1;
 			}
 			*dst++ = (int)(v * 32767);
