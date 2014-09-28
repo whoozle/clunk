@@ -93,8 +93,8 @@ public:
 			std::complex<T> a = angle_cache[t];
 			std::complex<T>& f = fft.data[t];
 			fft.data[t] = std::complex<T>(
-				4 / sqrt_N * (f.real() * a.real() + f.imag() * a.imag()),
-				4 / sqrt_N * (-f.real() * a.imag() + f.imag() * a.real())
+				8 / sqrt_N * (f.real() * a.real() + f.imag() * a.imag()),
+				8 / sqrt_N * (-f.real() * a.imag() + f.imag() * a.real())
 			);
 		}
 
