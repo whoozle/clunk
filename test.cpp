@@ -45,11 +45,11 @@ struct mdct_test {
 			_mdct.data[i] = _input[i];
 		}
 		dump();
-		//_mdct.apply_window();
+		_mdct.apply_window();
 		_mdct.mdct();
 		//printf("\n\tfreq: "); dump();
 		_mdct.imdct();
-		//_mdct.apply_window();
+		_mdct.apply_window();
 
 		for(int i = 0; i < mdct_type::N2; ++i)
 			_mdct.data[i] += _overlap[i];

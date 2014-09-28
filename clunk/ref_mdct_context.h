@@ -53,7 +53,7 @@ public:
 			result[n] = v;
 		}
 		for(unsigned n = 0; n < N; ++n) {
-			data[n] = result[n] / N2;
+			data[n] = result[n] / N4;
 		}
 	}
 	
