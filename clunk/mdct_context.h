@@ -7,15 +7,14 @@
 
 namespace clunk {
 
-template<int N, typename T>
+template<int N, typename T, typename impl>
 struct window_func_base {
-	virtual ~window_func_base() {}
-	virtual T operator() (int x) const = 0;
-	void precalculate() {
+	window_func_base() {
 		for(int i = 0; i < N; ++i) {
-			cache[i] = (*this)(i);
+			cache[i] = static_cast<impl &>(*this)(i);
 		}
 	}
+
 	T cache[N];
 };
 
@@ -30,7 +29,7 @@ public:
 	enum { N = 1 << BITS , M = N / 2, N2 = M, N4 =  fft_type::N };
 
 private:
-	window_func_type<N, T> window_func;
+	const window_func_type<N, T> window_func;
 
 	std::complex<T> angle_cache[N4];
 	T sqrt_N;
@@ -44,7 +43,6 @@ public:
 	T data[N];
 
 	mdct_context() : sqrt_N((T)sqrt((T)N)), data() {
-		window_func.precalculate();
 		for(unsigned t = 0; t < N4; ++t) {
 			angle_cache[t] = std::polar<T>(1, 2 * T(M_PI) * (t + T(0.125)) / N);
 		}
@@ -120,7 +118,7 @@ public:
 	}
 	
 	void apply_window() {
-		for(unsigned i = 0; i < N; ++i) {
+		for(int i = 0; i < N; ++i) {
 			data[i] *= window_func.cache[i];
 		}
 	}

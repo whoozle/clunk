@@ -11,7 +11,7 @@ public:
 	enum { N = 1 << BITS , M = N / 2, N2 = M, N4 = N / 4 };
 
 private:
-	window_func_type<N, T> _window_func;
+	const window_func_type<N, T> _window_func;
 	T _cos[N][N2];
 	T _sqrtN;
 
@@ -22,7 +22,6 @@ public:
 	T data[N];
 
 	ref_mdct_context() : _sqrtN((T)sqrt((T)N)), data() {
-		_window_func.precalculate();
 		for(unsigned n = 0; n < N; ++n)
 			for(unsigned k = 0; k < N2; ++k) {
 				T a = M_PI * (n + 0.5 + N4) * (k + 0.5) / N2;
