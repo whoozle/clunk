@@ -118,10 +118,10 @@ void Hrtf::process(
 
 	int window = 0;
 	while(sample3d[0].get_size() < dst_n * 2 || sample3d[1].get_size() < dst_n * 2) {
-		size_t offset = src_ch * window * WINDOW_SIZE / 2;
+		size_t offset = window * WINDOW_SIZE / 2;
 		assert(offset + WINDOW_SIZE / 2 <= src_n);
-		hrtf(0, sample3d[0], src + offset, src_ch, src_n - offset, idt_offset, kemar_data, kemar_idx_left, left_to_right_amp > 1? 1: 1 / left_to_right_amp);
-		hrtf(1, sample3d[1], src + offset, src_ch, src_n - offset, idt_offset, kemar_data, kemar_idx_right, left_to_right_amp > 1? left_to_right_amp: 1);
+		hrtf(0, sample3d[0], src + offset * src_ch, src_ch, src_n - offset, idt_offset, kemar_data, kemar_idx_left, left_to_right_amp > 1? 1: 1 / left_to_right_amp);
+		hrtf(1, sample3d[1], src + offset * src_ch, src_ch, src_n - offset, idt_offset, kemar_data, kemar_idx_right, left_to_right_amp > 1? left_to_right_amp: 1);
 		++window;
 	}
 	assert(sample3d[0].get_size() >= dst_n * 2 && sample3d[1].get_size() >= dst_n * 2);
@@ -167,8 +167,8 @@ void Hrtf::hrtf(const unsigned channel_idx, clunk::Buffer &result, const s16 *sr
 	} else 
 		idt_offset = 0;
 
-	assert(std::min(0, idt_offset) + (window * WINDOW_SIZE / 2 + 0) >= 0);
-	assert(std::max(0, idt_offset) + (window * WINDOW_SIZE / 2 + WINDOW_SIZE) <= src_n);
+	assert(std::min(0, idt_offset) + WINDOW_SIZE / 2 >= 0);
+	assert(std::max(0, idt_offset) + WINDOW_SIZE / 2 <= src_n);
 
 	for(int i = 0; i < WINDOW_SIZE; ++i) {
 		//-1 0 1 2 3
