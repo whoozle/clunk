@@ -75,6 +75,7 @@ set(PUBLIC_HEADERS
 	clunk/stream.h
 	clunk/v3.h
 	clunk/clunk_c.h
+	clunk/window_function.h
 )
 
 if (SDL_FOUND)
