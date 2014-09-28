@@ -167,8 +167,8 @@ void Hrtf::hrtf(const unsigned channel_idx, clunk::Buffer &result, const s16 *sr
 	} else 
 		idt_offset = 0;
 
-	assert(std::min(0, idt_offset) + WINDOW_SIZE / 2 >= 0);
-	assert(std::max(0, idt_offset) + WINDOW_SIZE / 2 <= src_n);
+	assert(std::min(0, idt_offset) >= 0);
+	assert(std::max(0, idt_offset) + WINDOW_SIZE <= src_n);
 
 	for(int i = 0; i < WINDOW_SIZE; ++i) {
 		//-1 0 1 2 3
