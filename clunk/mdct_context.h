@@ -43,7 +43,7 @@ public:
 
 	T data[N];
 
-	mdct_context() : sqrt_N((T)sqrt((T)N)) {
+	mdct_context() : sqrt_N((T)sqrt((T)N)), data() {
 		window_func.precalculate();
 		for(unsigned t = 0; t < N4; ++t) {
 			angle_cache[t] = std::polar<T>(1, 2 * T(M_PI) * (t + T(0.125)) / N);

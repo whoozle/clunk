@@ -21,7 +21,7 @@ public:
 
 	T data[N];
 
-	ref_mdct_context() : _sqrtN((T)sqrt((T)N)) {
+	ref_mdct_context() : _sqrtN((T)sqrt((T)N)), data() {
 		_window_func.precalculate();
 		for(unsigned n = 0; n < N; ++n)
 			for(unsigned k = 0; k < N2; ++k) {

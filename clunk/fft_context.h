@@ -119,6 +119,8 @@ private:
 public:
 	typedef std::complex<T> value_type;
 	value_type data[N];
+
+	fft_context(): data() { }
 	
 	inline void fft() {
 		scramble(data);
