@@ -2,6 +2,7 @@
 #define CLUNK_CONFIG_H
 
 #cmakedefine CLUNK_BACKEND_SDL
+#cmakedefine CLUNK_USES_SSE
 
 #endif
 

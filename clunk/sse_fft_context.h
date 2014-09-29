@@ -20,13 +20,13 @@
 */
 
 
-#ifndef CLUNK_USES_SSE
-#	error turn on SSE support with CLUNK_USES_SSE macro
-#endif
-
 #include <clunk/types.h>
 #include <clunk/clunk_assert.h>
 #include <clunk/export_clunk.h>
+
+#ifndef CLUNK_USES_SSE
+#	error turn on SSE support with CLUNK_USES_SSE macro
+#endif
 
 #ifndef _USE_MATH_DEFINES
 #	define _USE_MATH_DEFINES

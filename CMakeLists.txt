@@ -55,8 +55,6 @@ if (SDL_FOUND)
 	)
 endif (SDL_FOUND)
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clunk/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/clunk/config.h)
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 set(PUBLIC_HEADERS
 	clunk/buffer.h
@@ -90,8 +88,11 @@ endif (SDL_FOUND)
 
 if (WITH_SSE)
 	set(SOURCES ${SOURCES} clunk/sse_fft_context.cpp)
-	add_definitions(-DCLUNK_USES_SSE)
+	set(CLUNK_USES_SSE 1)
 endif(WITH_SSE)
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clunk/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/clunk/config.h)
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 add_library(clunk SHARED
 	${SOURCES}
