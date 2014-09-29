@@ -48,7 +48,7 @@ set(SOURCES
 )
 
 if (SDL_FOUND)
-	add_definitions(-DBACKEND_SDL=1)
+	add_definitions(-DCLUNK_BACKEND_SDL=1)
 	list(APPEND SOURCES
 		clunk/backend/sdl/sdl_ex.cpp
 		clunk/backend/sdl/backend.cpp

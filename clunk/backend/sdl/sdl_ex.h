@@ -19,7 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 */
 
-#ifndef BACKEND_SDL
+#ifndef CLUNK_BACKEND_SDL
 #	error invalid configuration
 #endif
 

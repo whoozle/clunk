@@ -1,7 +1,7 @@
 #ifndef CLUNK_BACKEND_SDL_H
 #define CLUNK_BACKEND_SDL_H
 
-#ifndef BACKEND_SDL
+#ifndef CLUNK_BACKEND_SDL
 #	error invalid configuration
 #endif
 
