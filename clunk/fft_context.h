@@ -41,6 +41,25 @@ public:
 	}
 };
 
+template<typename T>
+struct danielson_lanczos<4, T> {
+	typedef danielson_lanczos<2, T> next_type;
+
+	template<int SIGN>
+	static inline void apply(std::complex<T>* data) {
+		next_type::template apply<SIGN>(data);
+		next_type::template apply<SIGN>(data + 2);
+		
+		std::complex<T> temp = data[2];
+		data[2] = data[0] - temp;
+		data[0] += temp;
+
+		temp = data[3] * std::complex<T>(0, -SIGN);
+		data[3] = data[1] - temp;
+		data[1] += temp;
+	}
+};
+
 
 template<typename T>
 struct danielson_lanczos<8, T> {
@@ -65,26 +84,6 @@ struct danielson_lanczos<8, T> {
 		rotate(data, 1, std::complex<T>(float(M_SQRT1_2), -float(M_SQRT1_2) * SIGN));
 		rotate(data, 2, std::complex<T>(0, -1));
 		rotate(data, 3, std::complex<T>(-float(M_SQRT1_2), -float(M_SQRT1_2) * SIGN));
-	}
-};
-
-
-template<typename T>
-struct danielson_lanczos<4, T> {
-	typedef danielson_lanczos<2, T> next_type;
-
-	template<int SIGN>
-	static inline void apply(std::complex<T>* data) {
-		next_type::template apply<SIGN>(data);
-		next_type::template apply<SIGN>(data + 2);
-		
-		std::complex<T> temp = data[2];
-		data[2] = data[0] - temp;
-		data[0] += temp;
-
-		temp = data[3] * std::complex<T>(0, -SIGN);
-		data[3] = data[1] - temp;
-		data[1] += temp;
 	}
 };
 
