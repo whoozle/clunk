@@ -1,14 +1,16 @@
 #ifndef CLUNK_BACKEND_SDL_H
 #define CLUNK_BACKEND_SDL_H
 
-#ifndef CLUNK_BACKEND_SDL
-#	error invalid configuration
-#endif
-
+#include <clunk/config.h>
 #include <clunk/sample.h>
 #include <clunk/context.h>
 #include <SDL.h>
 #include <SDL_audio.h>
+
+#ifndef CLUNK_BACKEND_SDL
+#	error invalid configuration
+#endif
+
 
 namespace clunk { namespace sdl {
 

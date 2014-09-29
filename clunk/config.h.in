@@ -1,0 +1,7 @@
+#ifndef CLUNK_CONFIG_H
+#define CLUNK_CONFIG_H
+
+#cmakedefine CLUNK_BACKEND_SDL
+
+#endif
+

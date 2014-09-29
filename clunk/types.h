@@ -8,6 +8,7 @@
 #endif
 
 #include <math.h>
+#include <clunk/config.h>
 
 namespace clunk
 {

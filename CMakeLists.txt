@@ -48,12 +48,15 @@ set(SOURCES
 )
 
 if (SDL_FOUND)
-	add_definitions(-DCLUNK_BACKEND_SDL=1)
+	set(CLUNK_BACKEND_SDL 1)
 	list(APPEND SOURCES
 		clunk/backend/sdl/sdl_ex.cpp
 		clunk/backend/sdl/backend.cpp
 	)
 endif (SDL_FOUND)
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clunk/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/clunk/config.h)
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 set(PUBLIC_HEADERS
 	clunk/buffer.h
@@ -76,6 +79,7 @@ set(PUBLIC_HEADERS
 	clunk/v3.h
 	clunk/clunk_c.h
 	clunk/window_function.h
+	${CMAKE_CURRENT_BINARY_DIR}/config.h
 )
 
 if (SDL_FOUND)

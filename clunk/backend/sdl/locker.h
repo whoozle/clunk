@@ -19,12 +19,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 */
 
+#include <SDL_audio.h>
+#include <clunk/export_clunk.h>
+
 #ifndef CLUNK_BACKEND_SDL
 #	error invalid configuration
 #endif
 
-#include <SDL_audio.h>
-#include <clunk/export_clunk.h>
+
 namespace clunk { namespace sdl {
 
 /*! 

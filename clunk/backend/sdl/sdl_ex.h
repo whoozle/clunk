@@ -19,13 +19,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 */
 
+#include <clunk/export_clunk.h>
+#include <clunk/clunk_ex.h>
+
 #ifndef CLUNK_BACKEND_SDL
 #	error invalid configuration
 #endif
 
-
-#include <clunk/export_clunk.h>
-#include <clunk/clunk_ex.h>
 
 namespace clunk {
 	class CLUNKAPI SDLException : public Exception {
