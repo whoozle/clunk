@@ -32,14 +32,6 @@
 
 using namespace clunk;
 
-template <typename T> inline T clunk_min(T a, T b) {
-	return a < b? a: b;
-}
-
-template <typename T> inline T clunk_max(T a, T b) {
-	return a > b? a: b;
-}
-
 Source::Source(const Sample * sample, const bool loop, const v3f &delta, float gain, float pitch, float panning):
 	sample(sample), loop(loop), delta_position(delta), gain(gain), pitch(pitch), panning(panning), 
 	position(0), fadeout(0), fadeout_total(0)

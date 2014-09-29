@@ -2,6 +2,7 @@
 #include <clunk/buffer.h>
 #include <clunk/clunk_ex.h>
 #include <stddef.h>
+#include <algorithm>
 
 #include "kemar.h"
 
