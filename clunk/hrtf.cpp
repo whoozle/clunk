@@ -77,7 +77,7 @@ void Hrtf::get_kemar_data(kemar_ptr & kemar_data, int & elev_n, const v3f &pos) 
 	}
 }
 
-void Hrtf::process(
+unsigned Hrtf::process(
 	unsigned sample_rate, clunk::Buffer &dst_buf, unsigned dst_ch,
 	const clunk::Buffer &src_buf, unsigned src_ch,
 	const v3f &delta_position, float fx_volume)
@@ -97,11 +97,10 @@ void Hrtf::process(
 		//2d stereo sound!
 		if (src_ch == dst_ch) {
 			memcpy(dst_buf.get_ptr(), src_buf.get_ptr(), dst_buf.get_size());
-			return;
+			return src_n;
 		}
 		else
 			throw_ex(("unsupported sample conversion"));
-		return;
 	}
 	assert(dst_ch == 2);
 	
@@ -149,6 +148,7 @@ void Hrtf::process(
 		}
 	}
 	skip(dst_n);
+	return window * WINDOW_SIZE / 2;
 }
 
 void Hrtf::skip(unsigned samples) {

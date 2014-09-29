@@ -120,8 +120,8 @@ float Source::_process(clunk::Buffer &dst_buf, unsigned dst_ch, const v3f &delta
 		return 0;
 	}
 	
-	_hrtf.process(sample->get_spec().sample_rate, dst_buf, dst_ch, src_buf, dst_ch, delta_position, vol);
-	_update_position((int)(dst_n * pitch));
+	unsigned used_samples = _hrtf.process(sample->get_spec().sample_rate, dst_buf, dst_ch, src_buf, dst_ch, delta_position, vol);
+	_update_position((int)(used_samples * pitch));
 
 	//LOG_DEBUG(("size2: %u, %u, needed: %u", (unsigned)sample3d[0].get_size(), (unsigned)sample3d[1].get_size(), dst_n));
 	return vol;

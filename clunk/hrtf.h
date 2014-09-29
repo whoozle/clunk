@@ -23,7 +23,8 @@ public:
 
 	Hrtf();
 
-	void process(unsigned sample_rate, clunk::Buffer &dst_buf, unsigned dst_ch,
+	///fills dst_buf with dst_ch (must be 2 for now) of binaural data, returns number of samples used
+	unsigned process(unsigned sample_rate, clunk::Buffer &dst_buf, unsigned dst_ch,
 			const clunk::Buffer &src_buf, unsigned src_ch,
 			const v3f &position, float fx_volume);
 
