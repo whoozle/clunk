@@ -65,6 +65,7 @@ set(PUBLIC_HEADERS
 	clunk/export_clunk.h
 	clunk/fft_context.h
 	clunk/hrtf.h
+	clunk/kemar.h
 	clunk/locker.h
 	clunk/logger.h
 	clunk/mdct_context.h
