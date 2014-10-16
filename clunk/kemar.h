@@ -20,7 +20,7 @@ extern "C" {
 struct kemar_elevation_data {
 	int elevation;
 	unsigned samples;
-	const float (*data)[2][257][2];
+	const float (*data)[2][513][2];
 };
 
 static const int KemarMinElevation = -40;

@@ -29,6 +29,8 @@ for dirpath, _dn, files in os.walk("full"):
 		data = struct.unpack(">512h", data)
 		sdata = []
 		for i in xrange(0, len(data)):
+			sdata.append(0)
+		for i in xrange(0, len(data)):
 			sdata.append(data[i] / 32768.0)
 		data = rfft(sdata)
 		if elev not in kemar:
@@ -63,7 +65,7 @@ extern "C" {
 struct kemar_elevation_data {
 	int elevation;
 	unsigned samples;
-	const float (*data)[2][257][2];
+	const float (*data)[2][513][2];
 };
 
 """
@@ -100,7 +102,7 @@ struct kemar_elevation_data kemar_data[%d] =
 for elev, az_dict in sorted(kemar.iteritems()):
 	print "elevation %d, items: %d" %(elev, len(az_dict))
 	array_name = "elev_%s" %(elev if elev >= 0 else ("m%d" % -elev))
-	source += """static const float %s[][2][257][2] =
+	source += """static const float %s[][2][513][2] =
 {
 """ %array_name
 

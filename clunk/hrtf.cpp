@@ -211,7 +211,7 @@ void Hrtf::hrtf(const unsigned channel_idx, s16 *dst, const s16 *src, int src_ch
 	{
 		for(size_t i = 0; i < mdct_type::M; ++i)
 		{
-			const int kemar_sample = i * 257 / mdct_type::M;
+			const int kemar_sample = i * kemar_points / mdct_type::M;
 			std::complex<float> fir(kemar_data[kemar_idx][0][kemar_sample][0], kemar_data[kemar_idx][0][kemar_sample][1]);
 			_mdct.data[i] *= std::abs(fir);
 		}

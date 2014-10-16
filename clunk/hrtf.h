@@ -51,7 +51,8 @@ public:
 
 private:
 	static void idt_iit(const v3f &position, float &idt_offset, float &angle_gr, float &left_to_right_amp);
-	typedef const float (*kemar_ptr)[2][257][2];
+	static const unsigned kemar_points = 513; //fixme: move me into kemar.h
+	typedef const float (*kemar_ptr)[2][kemar_points][2];
 	void get_kemar_data(kemar_ptr & kemar_data, int & samples, const v3f &delta_position);
 
 	//generate hrtf response for channel idx (0 left), in result.
