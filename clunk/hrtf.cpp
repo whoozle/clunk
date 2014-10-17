@@ -209,7 +209,7 @@ void Hrtf::hrtf(const unsigned channel_idx, s16 *dst, const s16 *src, int src_ch
 	_mdct.apply_window();
 	_mdct.mdct();
 	{
-		for(size_t i = 0; i < mdct_type::M; ++i)
+		for(size_t i = 1; i < mdct_type::M; ++i)
 		{
 			const int kemar_sample = i * KemarPoints / mdct_type::M;
 			std::complex<float> fir(kemar_data[kemar_idx][0][kemar_sample][0], kemar_data[kemar_idx][0][kemar_sample][1]);
