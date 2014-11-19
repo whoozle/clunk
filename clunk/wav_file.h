@@ -45,12 +45,15 @@ namespace clunk {
 		{ return _spec.channels != 0 && !_data.empty(); }
 
 	public:
+		WavFile(const AudioSpec & spec, const Buffer & data): _f(), _spec(spec), _data(data) {}
 		~WavFile();
 		const Buffer & data() const		{ return _data; }
 		const AudioSpec & spec() const  { return _spec; }
 
 		static WavFile * load(const std::string &fname);
 		static Sample * load(Context &context, const std::string &fname);
+
+		void save(const std::string &fname);
 	};
 }
 

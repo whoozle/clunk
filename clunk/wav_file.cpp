@@ -113,4 +113,49 @@ namespace clunk {
 		sample->name = fname;
 		return sample.release();
 	}
+
+	namespace {
+		void write_little_endian(unsigned int word, int num_bytes, FILE *wav_file)
+		{
+			unsigned buf;
+			while(num_bytes>0)
+			{   buf = word & 0xff;
+				fwrite(&buf, 1,1, wav_file);
+				num_bytes--;
+			word >>= 8;
+			}
+		}
+	}
+
+	void WavFile::save(const std::string &fname)
+	{
+		FILE *wav_file = fopen(fname.c_str(), "wb");
+		if (!wav_file)
+			throw std::runtime_error("cannot open " + fname + " for writing");
+
+		unsigned byte_rate = _spec.sample_rate * _spec.channels * _spec.bytes_per_sample();
+		unsigned num_samples = _data.get_size() / _spec.channels / _spec.bytes_per_sample();
+
+		/* write RIFF header */
+		fwrite("RIFF", 1, 4, wav_file);
+		write_little_endian(36 + _spec.bytes_per_sample() * num_samples* _spec.channels, 4, wav_file);
+		fwrite("WAVE", 1, 4, wav_file);
+
+		/* write fmt  subchunk */
+		fwrite("fmt ", 1, 4, wav_file);
+		write_little_endian(16, 4, wav_file);   /* SubChunk1Size is 16 */
+		write_little_endian(1, 2, wav_file);    /* PCM is format 1 */
+		write_little_endian(_spec.channels, 2, wav_file);
+		write_little_endian(_spec.sample_rate, 4, wav_file);
+		write_little_endian(byte_rate, 4, wav_file);
+		write_little_endian(_spec.channels * _spec.bytes_per_sample(), 2, wav_file);  /* block align */
+		write_little_endian(8 * _spec.bytes_per_sample(), 2, wav_file);  /* bits/sample */
+
+		/* write data subchunk */
+		fwrite("data", 1, 4, wav_file);
+		write_little_endian(_spec.bytes_per_sample() * num_samples * _spec.channels, 4, wav_file);
+		fwrite(_data.get_ptr(), _data.get_size(), 1, wav_file);
+
+		fclose(wav_file);
+	}
 }
