@@ -26,7 +26,7 @@
 
 namespace clunk {
 	WavFile::WavFile(FILE *f) : _f(f) {}
-	WavFile::~WavFile() { fclose(_f); }
+	WavFile::~WavFile() { if (_f) fclose(_f); }
 
 	u32 WavFile::read_32le()
 	{
