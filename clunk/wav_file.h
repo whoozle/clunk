@@ -36,7 +36,6 @@ namespace clunk {
 
 	private:
 		WavFile(FILE *f);
-		~WavFile();
 
 		void read();
 		u32 read_32le();
@@ -46,8 +45,12 @@ namespace clunk {
 		{ return _spec.channels != 0 && !_data.empty(); }
 
 	public:
+		~WavFile();
+		const Buffer & data() const		{ return _data; }
+		const AudioSpec & spec() const  { return _spec; }
+
+		static WavFile * load(const std::string &fname);
 		static Sample * load(Context &context, const std::string &fname);
-		static void save(Sample &sample, const std::string &fname);
 	};
 }
 

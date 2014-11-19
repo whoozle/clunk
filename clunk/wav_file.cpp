@@ -95,14 +95,21 @@ namespace clunk {
 		}
 	}
 
-	Sample * WavFile::load(Context &context, const std::string &fname) {
+	WavFile * WavFile::load(const std::string &fname)
+	{
 		FILE *f = fopen(fname.c_str(), "rb");
 		if (!f)
 			throw std::runtime_error("cannot open file: " + fname);
-		WavFile wav(f);
-		wav.read();
+
+		std::auto_ptr<WavFile> wav(new WavFile(f));
+		wav->read();
+		return wav.release();
+	}
+
+	Sample * WavFile::load(Context &context, const std::string &fname) {
+		std::auto_ptr<WavFile> wav(load(fname));
 		std::auto_ptr<Sample> sample(context.create_sample());
-		sample->init(wav._data, wav._spec);
+		sample->init(wav->_data, wav->_spec);
 		sample->name = fname;
 		return sample.release();
 	}
