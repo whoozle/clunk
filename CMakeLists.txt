@@ -102,7 +102,10 @@ add_library(clunk SHARED
 install(TARGETS clunk DESTINATION lib)
 install(FILES ${PUBLIC_HEADERS} DESTINATION include/clunk)
 
-target_link_libraries(clunk ${SDL_LIBRARY})
+if (SDL_FOUND)
+    target_link_libraries(clunk ${SDL_LIBRARY})
+endif (SDL_FOUND)
+
 if(BUILD_TEST)
 	if (NOT SDL_FOUND)
 		message(FATAL_ERROR "you need SDL library to build test")
