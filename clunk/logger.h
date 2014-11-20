@@ -33,11 +33,13 @@ namespace clunk {
 }
 
 #ifdef DEBUG
-#	define LOG_DEBUG(fmt) clunk::log_debug fmt
-#	define LOG_ERROR(fmt) clunk::log_debug fmt
+#	define LOG_DEBUG(fmt)	clunk::log_debug fmt
+#	define LOG_INFO(fmt)	clunk::log_debug fmt
+#	define LOG_ERROR(fmt)	clunk::log_debug fmt
 #else
-#	define LOG_DEBUG(fmt) do {} while(0)
-#	define LOG_ERROR(fmt) clunk::log_debug fmt
+#	define LOG_DEBUG(fmt)	do {} while(0)
+#	define LOG_INFO(fmt)	clunk::log_debug fmt
+#	define LOG_ERROR(fmt)	clunk::log_debug fmt
 #endif
 
 #endif
