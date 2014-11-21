@@ -65,7 +65,7 @@ namespace clunk {
 
 				DoubleType max = 0;
 				for(size_t i = 0; i < size; ++i) {
-					DoubleType value = mix_sample(dst, src++, volume);
+					DoubleType value = mix_sample(dst++, src++, volume);
 					if (value > max)
 						max = value;
 					if (value < -max)
@@ -81,8 +81,8 @@ namespace clunk {
 					}
 				} else {
 					while(size--) {
-						DoubleType value = mix_sample(dst, src++, volume) >> 1;
-						value = value * (std::numeric_limits<Type>::max() >> 1) / max;
+						DoubleType value = mix_sample(dst, src++, volume);
+						value = value * std::numeric_limits<Type>::max() / max;
 						*dst++ = Type(value);
 					}
 				}
