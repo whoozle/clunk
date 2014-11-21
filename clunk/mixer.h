@@ -51,7 +51,7 @@ namespace clunk {
 		};
 	}
 	struct Mixer {
-		static void mix(AudioSpec::Format format, void *dst, const void *src, size_t size, int volume)
+		static void mix(AudioSpec::Format format, void *dst, const void *src, size_t size, int volume = MaxMixVolume)
 		{
 			switch(format)
 			{
