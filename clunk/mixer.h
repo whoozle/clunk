@@ -34,13 +34,20 @@ namespace clunk {
 			typedef typename Format::Type			Type;
 			typedef typename Format::DoubleType		DoubleType;
 
-			static void mix(void *dst_, const void *src_, size_t size, int volume) {
+			static inline DoubleType mix_sample(const Type *dst, const Type *src, DoubleType volume) {
+				return (
+					((DoubleType)*dst << MaxMixVolumeShift) +
+					(volume * (DoubleType)*src )
+				) >> MaxMixVolumeShift;
+			}
+
+			static void mix(void *dst_, const void *src_, size_t size, DoubleType volume) {
 				size /= sizeof(Type);
 				Type *dst = static_cast<Type *>(dst_);
 				const Type *src = static_cast<const Type *>(src_);
 				while(size--)
 				{
-					DoubleType value = (((DoubleType)*dst << MaxMixVolumeShift) + (volume * (DoubleType)*src++ )) >> MaxMixVolumeShift;
+					DoubleType value = mix_sample(dst, src++, volume);
 					if (value > std::numeric_limits<Type>::max())
 						value = std::numeric_limits<Type>::max();
 					if (value < std::numeric_limits<Type>::min())
@@ -48,9 +55,52 @@ namespace clunk {
 					*dst++ = Type(value);
 				}
 			}
+			static void adaptive_mix(void *dst_, const void *src_, size_t size, DoubleType volume) {
+				size /= sizeof(Type);
+				if (size == 0)
+					return;
+
+				Type *dst = static_cast<Type *>(dst_);
+				const Type *src = static_cast<const Type *>(src_);
+
+				DoubleType max = 0;
+				for(size_t i = 0; i < size; ++i) {
+					DoubleType value = mix_sample(dst, src++, volume);
+					if (value > max)
+						max = value;
+					if (value < -max)
+						max = -value;
+				}
+
+				dst = static_cast<Type *>(dst_);
+				src = static_cast<const Type *>(src_);
+				if (max <= std::numeric_limits<Type>::max()) {
+					while(size--) {
+						DoubleType value = mix_sample(dst, src++, volume);
+						*dst++ = Type(value);
+					}
+				} else {
+					while(size--) {
+						DoubleType value = mix_sample(dst, src++, volume) >> 1;
+						value = value * (std::numeric_limits<Type>::max() >> 1) / max;
+						*dst++ = Type(value);
+					}
+				}
+			}
 		};
 	}
+
 	struct Mixer {
+		static void adaptive_mix(AudioSpec::Format format, void *dst, const void *src, size_t size, int volume = MaxMixVolume)
+		{
+			switch(format)
+			{
+				case AudioSpec::S8:		impl::Mixer<AudioFormat<AudioSpec::S8> >::adaptive_mix(dst, src, size, volume); break;
+				case AudioSpec::S16:	impl::Mixer<AudioFormat<AudioSpec::S16> >::adaptive_mix(dst, src, size, volume); break;
+				case AudioSpec::U8:		impl::Mixer<AudioFormat<AudioSpec::U8> >::adaptive_mix(dst, src, size, volume); break;
+				case AudioSpec::U16:	impl::Mixer<AudioFormat<AudioSpec::U16> >::adaptive_mix(dst, src, size, volume); break;
+			}
+		}
 		static void mix(AudioSpec::Format format, void *dst, const void *src, size_t size, int volume = MaxMixVolume)
 		{
 			switch(format)
