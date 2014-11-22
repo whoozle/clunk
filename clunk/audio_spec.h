@@ -72,6 +72,12 @@ struct CLUNKAPI AudioSpec {
 		}
 	}
 
+	bool is_signed() const
+	{ return format == S8 || format == S16; }
+
+	bool is_unsigned() const
+	{ return !is_signed(); }
+
 	AudioSpec(): format(S16), sample_rate(), channels() {}
 	AudioSpec(Format format, int freq, u8 channels): format(format), sample_rate(freq), channels(channels) {}
 };
