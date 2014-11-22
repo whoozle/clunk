@@ -13,7 +13,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
@@ -23,6 +23,7 @@
 #include <clunk/types.h>
 #include <clunk/export_clunk.h>
 #include <stdexcept>
+#include <limits>
 
 namespace clunk {
 
@@ -40,10 +41,34 @@ struct CLUNKAPI AudioSpec {
 	unsigned bytes_per_sample() const {
 		switch(format)
 		{
-			case S8:	case U8:	return 1;
-			case S16:	case U16:	return 2;
-			default:
-				throw std::runtime_error("invalid format");
+		case S8:	case U8:	return 1;
+		case S16:	case U16:	return 2;
+		default:
+			throw std::runtime_error("invalid format");
+		}
+	}
+
+	unsigned max_sample_value() const {
+		switch(format)
+		{
+		case S8:	return std::numeric_limits<s8>::max();
+		case U8:	return std::numeric_limits<u8>::max();
+		case S16:	return std::numeric_limits<s16>::max();
+		case U16:	return std::numeric_limits<u16>::max();
+		default:
+			throw std::runtime_error("invalid format");
+		}
+	}
+
+	unsigned zero_sample_value() const {
+		switch(format)
+		{
+		case S8:	return 0;
+		case U8:	return (1 + (unsigned)std::numeric_limits<u8>::max()) / 2;
+		case S16:	return 0;
+		case U16:	return (1 + (unsigned)std::numeric_limits<u16>::max()) / 2;
+		default:
+			throw std::runtime_error("invalid format");
 		}
 	}
 
