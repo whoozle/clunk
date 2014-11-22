@@ -13,7 +13,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
@@ -41,18 +41,28 @@ namespace clunk {
 				) >> MaxMixVolumeShift;
 			}
 
+			static inline DoubleType mix_sample(const Type dst, const Type src) {
+				return dst + src;
+			}
+
 			static void mix(void *dst_, const void *src_, size_t size, DoubleType volume) {
 				size /= sizeof(Type);
 				Type *dst = static_cast<Type *>(dst_);
 				const Type *src = static_cast<const Type *>(src_);
-				while(size--)
-				{
-					DoubleType value = mix_sample(*dst, *src++, volume);
-					if (value > std::numeric_limits<Type>::max())
-						value = std::numeric_limits<Type>::max();
-					if (value < std::numeric_limits<Type>::min())
-						value = std::numeric_limits<Type>::min();
-					*dst++ = Type(value);
+				if (volume == MaxMixVolume) {
+					while(size--) {
+						DoubleType value = mix_sample(*dst, *src++);
+						*dst++ = Type(value);
+					}
+				} else {
+					while(size--) {
+						DoubleType value = mix_sample(*dst, *src++, volume);
+						if (value > std::numeric_limits<Type>::max())
+							value = std::numeric_limits<Type>::max();
+						if (value < std::numeric_limits<Type>::min())
+							value = std::numeric_limits<Type>::min();
+						*dst++ = Type(value);
+					}
 				}
 			}
 		};
