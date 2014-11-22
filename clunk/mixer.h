@@ -34,10 +34,10 @@ namespace clunk {
 			typedef typename Format::Type			Type;
 			typedef typename Format::DoubleType		DoubleType;
 
-			static inline DoubleType mix_sample(const Type *dst, const Type *src, DoubleType volume) {
+			static inline DoubleType mix_sample(const Type dst, const Type src, DoubleType volume) {
 				return (
-					((DoubleType)*dst << MaxMixVolumeShift) +
-					(volume * (DoubleType)*src )
+					((DoubleType)dst << MaxMixVolumeShift) +
+					(volume * (DoubleType)src )
 				) >> MaxMixVolumeShift;
 			}
 
@@ -47,7 +47,7 @@ namespace clunk {
 				const Type *src = static_cast<const Type *>(src_);
 				while(size--)
 				{
-					DoubleType value = mix_sample(dst, src++, volume);
+					DoubleType value = mix_sample(*dst, *src++, volume);
 					if (value > std::numeric_limits<Type>::max())
 						value = std::numeric_limits<Type>::max();
 					if (value < std::numeric_limits<Type>::min())
@@ -65,7 +65,7 @@ namespace clunk {
 
 				DoubleType max = 0;
 				for(size_t i = 0; i < size; ++i) {
-					DoubleType value = mix_sample(dst++, src++, volume);
+					DoubleType value = mix_sample(*dst++, *src++, volume);
 					if (value > max)
 						max = value;
 					if (value < -max)
@@ -76,12 +76,12 @@ namespace clunk {
 				src = static_cast<const Type *>(src_);
 				if (max <= std::numeric_limits<Type>::max()) {
 					while(size--) {
-						DoubleType value = mix_sample(dst, src++, volume);
+						DoubleType value = mix_sample(*dst, *src++, volume);
 						*dst++ = Type(value);
 					}
 				} else {
 					while(size--) {
-						DoubleType value = mix_sample(dst, src++, volume);
+						DoubleType value = mix_sample(*dst, *src++, volume);
 						value = value * std::numeric_limits<Type>::max() / max;
 						*dst++ = Type(value);
 					}
