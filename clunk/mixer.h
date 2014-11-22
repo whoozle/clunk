@@ -65,6 +65,15 @@ namespace clunk {
 					}
 				}
 			}
+
+			static void adjust(void *dst_, size_t size, DoubleType volume) {
+				size /= sizeof(Type);
+				Type *dst = static_cast<Type *>(dst_);
+				while(size--) {
+					DoubleType value = ((DoubleType)*dst * volume) >> MaxMixVolumeShift;
+					*dst++ = value;
+				}
+			}
 		};
 	}
 
@@ -77,6 +86,16 @@ namespace clunk {
 				case AudioSpec::S16:	impl::Mixer<AudioFormat<AudioSpec::S16> >::mix(dst, src, size, volume); break;
 				case AudioSpec::U8:		impl::Mixer<AudioFormat<AudioSpec::U8> >::mix(dst, src, size, volume); break;
 				case AudioSpec::U16:	impl::Mixer<AudioFormat<AudioSpec::U16> >::mix(dst, src, size, volume); break;
+			}
+		}
+		static void adjust_volume(AudioSpec::Format format, void *dst, size_t size, int volume)
+		{
+			switch(format)
+			{
+				case AudioSpec::S8:		impl::Mixer<AudioFormat<AudioSpec::S8> >::adjust(dst, size, volume); break;
+				case AudioSpec::S16:	impl::Mixer<AudioFormat<AudioSpec::S16> >::adjust(dst, size, volume); break;
+				case AudioSpec::U8:		impl::Mixer<AudioFormat<AudioSpec::U8> >::adjust(dst, size, volume); break;
+				case AudioSpec::U16:	impl::Mixer<AudioFormat<AudioSpec::U16> >::adjust(dst, size, volume); break;
 			}
 		}
 	};
