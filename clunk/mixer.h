@@ -116,6 +116,21 @@ namespace clunk {
 				case AudioSpec::U16:	impl::Mixer<AudioFormat<AudioSpec::U16> >::mix(dst, src, size, volume); break;
 			}
 		}
+
+		static void add(AudioSpec::Format format, void *dst, const void *src, size_t size, int volume = MaxMixVolume)
+		{ mix(format, dst, src, size, volume); }
+
+		static void sub(AudioSpec::Format format, void *dst, const void *src, size_t size, int volume = MaxMixVolume)
+		{
+			switch(format)
+			{
+				case AudioSpec::S8:		impl::Mixer<AudioFormat<AudioSpec::S8>, false>::mix(dst, src, size, volume); break;
+				case AudioSpec::S16:	impl::Mixer<AudioFormat<AudioSpec::S16>, false>::mix(dst, src, size, volume); break;
+				case AudioSpec::U8:		impl::Mixer<AudioFormat<AudioSpec::U8>, false>::mix(dst, src, size, volume); break;
+				case AudioSpec::U16:	impl::Mixer<AudioFormat<AudioSpec::U16>, false>::mix(dst, src, size, volume); break;
+			}
+		}
+
 		static void adjust_volume(AudioSpec::Format format, void *dst, size_t size, int volume)
 		{
 			switch(format)
