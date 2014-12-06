@@ -29,34 +29,62 @@ namespace clunk {
 	static const u8 MaxMixVolume = (1 << MaxMixVolumeShift);
 
 	namespace impl {
-		template<typename Format> struct Mixer {
 
+		template<typename Format, bool Additive>
+		struct SampleMixer;
+
+		template<typename Format>
+		struct SampleMixer<Format, true> {
 			typedef typename Format::Type			Type;
 			typedef typename Format::DoubleType		DoubleType;
 
-			static inline DoubleType mix_sample(const Type dst, const Type src, DoubleType volume) {
+			inline DoubleType operator()(const Type dst, const Type src, DoubleType volume) {
 				return (
 					((DoubleType)dst << MaxMixVolumeShift) +
 					(volume * (DoubleType)src )
 				) >> MaxMixVolumeShift;
 			}
 
-			static inline DoubleType mix_sample(const Type dst, const Type src) {
+			inline DoubleType operator()(const Type dst, const Type src) {
 				return dst + src;
 			}
+		};
+
+		template<typename Format>
+		struct SampleMixer<Format, false> {
+			typedef typename Format::Type			Type;
+			typedef typename Format::DoubleType		DoubleType;
+
+			inline DoubleType operator()(const Type dst, const Type src, DoubleType volume) {
+				return (
+					((DoubleType)dst << MaxMixVolumeShift) -
+					(volume * (DoubleType)src )
+				) >> MaxMixVolumeShift;
+			}
+
+			inline DoubleType operator()(const Type dst, const Type src) {
+				return dst - src;
+			}
+		};
+
+		template<typename Format, bool Additive = true> struct Mixer {
+
+			typedef typename Format::Type			Type;
+			typedef typename Format::DoubleType		DoubleType;
 
 			static void mix(void *dst_, const void *src_, size_t size, DoubleType volume) {
+				SampleMixer<Format, Additive> mixer;
 				size /= sizeof(Type);
 				Type *dst = static_cast<Type *>(dst_);
 				const Type *src = static_cast<const Type *>(src_);
 				if (volume == MaxMixVolume) {
 					while(size--) {
-						DoubleType value = mix_sample(*dst, *src++);
+						DoubleType value = mixer(*dst, *src++);
 						*dst++ = Type(value);
 					}
 				} else {
 					while(size--) {
-						DoubleType value = mix_sample(*dst, *src++, volume);
+						DoubleType value = mixer(*dst, *src++, volume);
 						if (value > std::numeric_limits<Type>::max())
 							value = std::numeric_limits<Type>::max();
 						if (value < std::numeric_limits<Type>::min())
