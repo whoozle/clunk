@@ -78,7 +78,7 @@ set(PUBLIC_HEADERS
 	clunk/v3.h
 	clunk/clunk_c.h
 	clunk/window_function.h
-	${CMAKE_CURRENT_BINARY_DIR}/config.h
+	${CMAKE_CURRENT_BINARY_DIR}/clunk/config.h
 )
 
 if (SDL_FOUND)
