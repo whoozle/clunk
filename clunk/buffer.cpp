@@ -176,3 +176,5 @@ void Buffer::pop(size_t n) {
 	memmove(ptr, static_cast<u8 *>(ptr) + n, size - n);
 	set_size(size - n);
 }
+
+void Buffer::unoptimize(void *data, size_t n) { }

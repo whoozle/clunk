@@ -107,7 +107,10 @@ public:
 	const std::string dump() const;
 	
 	//! Pops n bytes from the front
-	void pop(size_t n); 
+	void pop(size_t n);
+
+	///no-op to remove optimization of unused result
+	static void unoptimize(void *data, size_t n);
 
 protected:
 	void *ptr;
