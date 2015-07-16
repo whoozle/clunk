@@ -85,8 +85,11 @@ int main(int argc, char *argv[]) {
 	}
 	if (argc > 1 && argv[1][0] == 'b' && argv[1][1] == 'f') {
 		fft_type fft;
-		for(int i = 0; i < 2000000; ++i) 
+		for(int i = 0; i < 400000; ++i)
+		{
 			fft.fft();
+			clunk::Buffer::unoptimize(fft.data, fft.N);
+		}
 		return 0;
 	}
 	if (argc > 1 && argv[1][0] == 't') {
