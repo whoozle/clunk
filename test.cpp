@@ -14,6 +14,7 @@
 #define WINDOW_BITS 9
 
 typedef clunk::mdct_context<WINDOW_BITS, clunk::vorbis_window_func, float> mdct_type;
+typedef clunk::ref_mdct_context<WINDOW_BITS, clunk::vorbis_window_func, float> ref_mdct_type;
 typedef clunk::fft_context<WINDOW_BITS - 2, float> fft_type;
 
 template<typename mdct_type>
@@ -66,8 +67,20 @@ int main(int argc, char *argv[]) {
 
 	if (argc > 1 && argv[1][0] == 'b' && argv[1][1] == 'm') {
 		mdct_type mdct;
-		for(int i = 0; i < 1000000; ++i) 
+		for(int i = 0; i < 200000; ++i)
+		{
 			mdct.mdct();
+			clunk::Buffer::unoptimize(mdct.data, mdct.N);
+		}
+		return 0;
+	}
+	if (argc > 1 && argv[1][0] == 'b' && argv[1][1] == 'r') {
+		ref_mdct_type mdct;
+		for(int i = 0; i < 200000; ++i)
+		{
+			mdct.mdct();
+			clunk::Buffer::unoptimize(mdct.data, mdct.N);
+		}
 		return 0;
 	}
 	if (argc > 1 && argv[1][0] == 'b' && argv[1][1] == 'f') {
