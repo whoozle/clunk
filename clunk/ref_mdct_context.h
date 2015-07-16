@@ -39,7 +39,7 @@ public:
 
 	T data[N];
 
-	ref_mdct_context() : _sqrtN((T)sqrt((T)N)), data() {
+	ref_mdct_context() : _window_func(), _sqrtN((T)sqrt((T)N)), data() {
 		for(unsigned n = 0; n < N; ++n)
 			for(unsigned k = 0; k < N2; ++k)
 			{
