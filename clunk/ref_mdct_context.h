@@ -41,13 +41,15 @@ public:
 
 	ref_mdct_context() : _sqrtN((T)sqrt((T)N)), data() {
 		for(unsigned n = 0; n < N; ++n)
-			for(unsigned k = 0; k < N2; ++k) {
+			for(unsigned k = 0; k < N2; ++k)
+			{
 				T a = M_PI * (n + 0.5 + N4) * (k + 0.5) / N2;
 				_cos[n][k] = cos(a);
 			}
 	}
 	
-	void mdct() {
+	void mdct()
+	{
 		T result[N2];
 		for(unsigned k = 0; k < N2; ++k) {
 			T v = 0;
@@ -56,9 +58,7 @@ public:
 			}
 			result[k] = v;
 		}
-		for(unsigned k = 0; k < N2; ++k) {
-			data[k] = result[k];
-		}
+		std::copy(result, result + N2, data);
 	}
 	
 	void imdct() {
@@ -68,11 +68,9 @@ public:
 			for(unsigned k = 0; k < N2; ++k) {
 				v += data[k] * _cos[n][k];
 			}
-			result[n] = v;
+			result[n] = v / N4;
 		}
-		for(unsigned n = 0; n < N; ++n) {
-			data[n] = result[n] / N4;
-		}
+		std::copy(result, result + N, data);
 	}
 	
 	void apply_window() {
