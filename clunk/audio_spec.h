@@ -90,9 +90,14 @@ struct AudioFormat<AudioSpec::S8> {
 	typedef s8			Type;
 	typedef s16			DoubleType;
 
+	static const Type	Min = -128;
 	static const Type	Max = 127;
 	static const Type	Zero = 0;
 	static const Type	Range = Max - Zero;
+
+	template<typename T>
+	static s8 clip(const T & value)
+	{ return value >= Min? value <= Max? value: Max: Min; }
 };
 
 template<>
@@ -100,9 +105,14 @@ struct AudioFormat<AudioSpec::S16> {
 	typedef s16	Type;
 	typedef s32	DoubleType;
 
+	static const Type	Min = -32768;
 	static const Type	Max = 32767;
 	static const Type	Zero = 0;
 	static const Type	Range = Max - Zero;
+
+	template<typename T>
+	static s8 clip(const T & value)
+	{ return value >= Min? value <= Max? value: Max: Min; }
 };
 
 template<>
@@ -110,9 +120,14 @@ struct AudioFormat<AudioSpec::U8> {
 	typedef u8	Type;
 	typedef u16	DoubleType;
 
+	static const Type	Min = 0;
 	static const Type	Max = 255;
 	static const Type	Zero = 128;
 	static const Type	Range = Max - Zero;
+
+	template<typename T>
+	static s8 clip(const T & value)
+	{ return value >= Min? value <= Max? value: Max: Min; }
 };
 
 template<>
@@ -120,9 +135,14 @@ struct AudioFormat<AudioSpec::U16> {
 	typedef u16	Type;
 	typedef u32	DoubleType;
 
+	static const Type	Min = 0;
 	static const Type	Max = 65535;
 	static const Type	Zero = 32768;
 	static const Type	Range = Max - Zero;
+
+	template<typename T>
+	static s8 clip(const T & value)
+	{ return value >= Min? value <= Max? value: Max: Min; }
 };
 
 }

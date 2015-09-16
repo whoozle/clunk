@@ -39,10 +39,10 @@ namespace clunk {
 			typedef typename Format::DoubleType		DoubleType;
 
 			inline DoubleType operator()(const Type dst, const Type src, DoubleType volume) {
-				return (
+				return Format::clip((
 					((DoubleType)dst << MaxMixVolumeShift) +
 					(volume * (DoubleType)src )
-				) >> MaxMixVolumeShift;
+				) >> MaxMixVolumeShift);
 			}
 
 			inline DoubleType operator()(const Type dst, const Type src) {
@@ -56,10 +56,10 @@ namespace clunk {
 			typedef typename Format::DoubleType		DoubleType;
 
 			inline DoubleType operator()(const Type dst, const Type src, DoubleType volume) {
-				return (
+				return Format::clip((
 					((DoubleType)dst << MaxMixVolumeShift) -
 					(volume * (DoubleType)src )
-				) >> MaxMixVolumeShift;
+				) >> MaxMixVolumeShift);
 			}
 
 			inline DoubleType operator()(const Type dst, const Type src) {
