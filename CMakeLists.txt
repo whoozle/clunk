@@ -31,7 +31,7 @@ add_definitions(-DCLUNKAPI=DLLEXPORT)
 set(CMAKE_INCLUDE_CURRENT_DIR TRUE)
 include_directories(${SDL_INCLUDE_DIR})
 
-set(SOURCES 
+set(SOURCES
 	clunk/buffer.cpp
 	clunk/clunk_ex.cpp
 	clunk/context.cpp
@@ -96,6 +96,10 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clunk/config.h.in ${CMAKE_CURRENT_BIN
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 add_library(clunk SHARED
+	${SOURCES}
+)
+
+add_library(clunk-static STATIC
 	${SOURCES}
 )
 
