@@ -4,5 +4,6 @@ cmake_*.cmake
 *.so
 *ninja*
 clunk-test
+clunk-mdct
 nbproject
 clunk/config.h

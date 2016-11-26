@@ -116,4 +116,7 @@ if(BUILD_TEST)
 	endif (NOT SDL_FOUND)
 	add_executable(clunk-test test.cpp)
 	target_link_libraries(clunk-test clunk)
+
+	add_executable(clunk-mdct test.cpp)
+	target_link_libraries(clunk-mdct clunk)
 endif(BUILD_TEST)
