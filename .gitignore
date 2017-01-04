@@ -2,6 +2,7 @@ CMake*
 Makefile
 cmake_*.cmake
 *.so
+*.a
 *ninja*
 clunk-test
 clunk-mdct
