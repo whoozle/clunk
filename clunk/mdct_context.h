@@ -13,7 +13,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
@@ -38,7 +38,7 @@ struct window_func_base {
 };
 
 
-template<int BITS, template <int, typename> class window_func_type , typename T = float> 
+template<int BITS, template <int, typename> class window_func_type , typename T = float>
 class mdct_context {
 private:
 	typedef fft_context<BITS - 2, T> fft_type;
@@ -66,7 +66,7 @@ public:
 			angle_cache[t] = std::polar<T>(1, 2 * T(M_PI) * (t + T(0.125)) / N);
 		}
 	}
-	
+
 	void mdct() {
 		T rotate[N];
 		for(unsigned t = 0; t < N4; ++t) {
@@ -98,7 +98,7 @@ public:
 			data[M - 2 * t - 1] = -fft.data[t].imag();
 		}
 	}
-	
+
 	void imdct() {
 		for(unsigned t = 0; t < N4; ++t) {
 			T re = data[t * 2] / 2, im = data[M - 1 - t * 2] / 2;
@@ -135,13 +135,13 @@ public:
 			data[t] = -rotate[t - 3 * N4];
 		}
 	}
-	
+
 	void apply_window() {
 		for(int i = 0; i < N; ++i) {
 			data[i] *= window_func.cache[i];
 		}
 	}
-	
+
 	void clear() {
 		memset(data, 0, sizeof(data));
 	}
