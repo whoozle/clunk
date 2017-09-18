@@ -22,7 +22,7 @@ if (CMAKE_CXX_COMPILER MATCHES ".*clang")
 endif ()
 
 if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX)
-	add_definitions(-ggdb -Wall -pedantic)
+	add_definitions(-ggdb -Wall -pedantic -Wno-unused-variable)
 	set(CMAKE_CXX_FLAGS "-fvisibility=hidden -fvisibility-inlines-hidden -DGCC_HASCLASSVISIBILITY=1")
 endif (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX)
 
