@@ -25,28 +25,28 @@
 using namespace clunk;
 
 void Buffer::fill(const int b) {
-	if (ptr == NULL) 
+	if (_ptr == NULL) 
 		return;
-	memset(ptr, b, size);
+	memset(_ptr, b, _size);
 }
 
 const Buffer& Buffer::operator=(const Buffer& c) {
 	if (this == &c) 
 		return *this; // same object
 
-	if (c.ptr == NULL) {
+	if (c._ptr == NULL) {
 		free();
 		return *this;
 	}
-	assert(c.size > 0);
+	assert(c._size > 0);
 
 	set_size(c.get_size());
-	memcpy(ptr, c.ptr, c.size);
+	memcpy(_ptr, c._ptr, c._size);
 	return *this;
 }
 
 void Buffer::set_size(size_t s) {
-	if (s == size)
+	if (s == _size)
 		return;
 	
 	if (s == 0) {
@@ -54,24 +54,24 @@ void Buffer::set_size(size_t s) {
 		return;
 	}
 
-	void * x = realloc(ptr, s);
+	void * x = realloc(_ptr, s);
 	if (x == NULL) 
-		throw_io(("realloc (%p, %u)", ptr, (unsigned)s));
-	ptr = x;
-	size = s;
+		throw_io(("realloc (%p, %u)", _ptr, (unsigned)s));
+	_ptr = x;
+	_size = s;
 }
 
 void Buffer::set_data(const void *p, const size_t s) {
 	if (p == NULL || s == 0)
 		throw_ex(("calling set_data(%p, %u) is invalid", p, (unsigned)s));
 
-	void *x = realloc(ptr, s);
+	void *x = realloc(_ptr, s);
 
 	if (x == NULL) 
-		throw_io(("realloc (%p, %d)", ptr, (unsigned)s));
-	ptr = x;
-	memcpy(ptr, p, s);
-	size = s;
+		throw_io(("realloc (%p, %d)", _ptr, (unsigned)s));
+	_ptr = x;
+	memcpy(_ptr, p, s);
+	_size = s;
 }
 
 void Buffer::set_data(void *p, const size_t s, const bool own) {
@@ -80,64 +80,64 @@ void Buffer::set_data(void *p, const size_t s, const bool own) {
 	
 	if (own) {
 		free();
-		ptr = p;
-		size = s;
+		_ptr = p;
+		_size = s;
 	} else {
-		void *x = realloc(ptr, s);
+		void *x = realloc(_ptr, s);
 		if (x == NULL) 
-			throw_io(("realloc(%p, %d)", ptr, (unsigned)s));
-		ptr = x;
-		size = s;
-		memcpy(ptr, p, s);
+			throw_io(("realloc(%p, %d)", _ptr, (unsigned)s));
+		_ptr = x;
+		_size = s;
+		memcpy(_ptr, p, s);
 	}
 }
 
 void Buffer::append(const Buffer &other) {
-	size_t s1 = size, s2 = other.get_size();
+	size_t s1 = _size, s2 = other.get_size();
 	if (s2 == 0)
 		return;
 	set_size(s1 + s2);
-	memcpy(static_cast<char *>(ptr) + s1, other.ptr, s2);
+	memcpy(static_cast<char *>(_ptr) + s1, other._ptr, s2);
 }
 
 void Buffer::append(const void *data, const size_t data_size) {
 	if (data_size == 0)
 		return;
 
-	size_t s = size;
+	size_t s = _size;
 	set_size(s + data_size);
-	memcpy(static_cast<char *>(ptr) + s, data, data_size);
+	memcpy(static_cast<char *>(_ptr) + s, data, data_size);
 }
 
 
 void* Buffer::reserve(const int more) {
-	set_size(size + more);
-	return ptr;
+	set_size(_size + more);
+	return _ptr;
 }
 
 void Buffer::free() {
-	if (ptr != NULL) {
-		::free(ptr);
-		ptr = NULL;
-		size = 0;
+	if (_ptr != NULL) {
+		::free(_ptr);
+		_ptr = NULL;
+		_size = 0;
 	}
 }
 
 const std::string Buffer::dump() const {
-	if (ptr == NULL)
+	if (_ptr == NULL)
 		return "empty memory buffer";
-	assert(ptr != 0);
+	assert(_ptr != 0);
 	
-	std::string result = clunk::format_string("-[memory dump]-[size: %u]---", (unsigned)size);
-	size_t n = (size - 1)/ 16 + 1;
+	std::string result = clunk::format_string("-[memory dump]-[size: %u]---", (unsigned)_size);
+	size_t n = (_size - 1)/ 16 + 1;
 	for(size_t i = 0; i < n; ++i) {
 		result += clunk::format_string("\n%06x\t", (unsigned)(i * 16));
-		size_t j, m = (size - i * 16);
+		size_t j, m = (_size - i * 16);
 		if (m > 16) 
 			m = 16;
 		
 		for(j = 0; j < m; ++j) {
-			const u8 *p = static_cast<u8 *>(ptr) + i*16 + j;
+			const u8 *p = static_cast<u8 *>(_ptr) + i*16 + j;
 			result += clunk::format_string("%02x ", *p);
 			if (j == 7) 
 				result += " ";
@@ -150,7 +150,7 @@ const std::string Buffer::dump() const {
 		result += "\t\t";
 
 		for(j = 0; j < m; ++j) {
-			const u8 *p = static_cast<u8 *>(ptr) + i*16 + j;
+			const u8 *p = static_cast<u8 *>(_ptr) + i*16 + j;
 			result += clunk::format_string("%c", (*p>=32 && *p < 127)? *p: '.');
 			if (j == 7) 
 				result += " ";
@@ -165,16 +165,16 @@ const std::string Buffer::dump() const {
 }
 
 void Buffer::pop(size_t n) {
-	if (ptr == NULL || n == 0)
+	if (_ptr == NULL || n == 0)
 		return;
 	
-	if (n >= size) {
+	if (n >= _size) {
 		free();
 		return;
 	}
 	
-	memmove(ptr, static_cast<u8 *>(ptr) + n, size - n);
-	set_size(size - n);
+	memmove(_ptr, static_cast<u8 *>(_ptr) + n, _size - n);
+	set_size(_size - n);
 }
 
 void Buffer::unoptimize(void *data, size_t n) { }

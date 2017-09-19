@@ -27,44 +27,44 @@
 namespace clunk {
 
     /*!
-            \brief Memory buffer
-            This class contains single memory buffer, allocated by malloc.
-            It auto frees it when it goes out of scope.
+        \brief Memory buffer
+        This class contains single memory buffer, allocated by malloc.
+        It auto frees it when it goes out of scope.
     */
 
     class CLUNKAPI Buffer
     {
     public:
         //! Default ctor, empty buffer.
-        Buffer(): ptr(nullptr), size(0) {}
+        Buffer(): _ptr(nullptr), _size(0) {}
         //! Copy ctor
-        Buffer(const Buffer& c) : ptr(nullptr), size(0) { *this = c; }
-        Buffer(Buffer&& c) : ptr(c.ptr), size(c.size) { c.ptr = nullptr; c.size = 0; }
+        Buffer(const Buffer& c) : _ptr(nullptr), _size(0) { *this = c; }
+        Buffer(Buffer&& c) : _ptr(c._ptr), _size(c._size) { c._ptr = nullptr; c._size = 0; }
         /*!
                 \brief Instantly allocates 'size' memory
                 \param[in] size size of the memory buffer
         */
-        Buffer(int size): ptr(nullptr), size(0) { set_size(size); }
+        Buffer(int size): _ptr(nullptr), _size(0) { set_size(size); }
 
         //! Destructor, deallocates buffer if needed
         ~Buffer() { free(); }
 
         //! Gets pointer to the memory buffer
-        void *get_ptr() const { return ptr; }
+        void *get_ptr() const { return _ptr; }
         //! Gets pointer to the memory buffer (const)
-        size_t get_size() const { return size; }
+        size_t get_size() const { return _size; }
         /*!
                 \brief Tests if buffer was empty
                 \return returns true if the buffer is empty or deallocated.
         */
-        bool empty() const { return ptr == nullptr; }
+        bool empty() const { return _ptr == nullptr; }
 
         /*!
                 \brief Leaks buffer's content. Use it with care.
                 Leaks buffer's content.
                 Useful for exception-safe passing of malloc'ed memory to some library function which later deallocates it.
         */
-        std::pair<void *, size_t> unlink() { auto r = std::make_pair(ptr, size); ptr = nullptr; size = 0; return r; }
+        std::pair<void *, size_t> unlink() { auto r = std::make_pair(_ptr, _size); _ptr = nullptr; _size = 0; return r; }
 
         //! Default operator=
         const Buffer& operator=(const Buffer& c);
@@ -115,8 +115,8 @@ namespace clunk {
         static void unoptimize(void *data, size_t n);
 
     protected:
-        void *ptr;
-        size_t size;
+        void *_ptr;
+        size_t _size;
     };
 
 }
