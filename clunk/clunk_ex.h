@@ -27,25 +27,25 @@
 namespace clunk
 {
 
-    class CLUNKAPI Exception : public std::exception
-    {
-    public:
-        Exception() throw() {}
-        void add_message(const char *file, int line);
-        void add_message(const std::string &msg);
-        virtual void add_custom_message() {}
+	class CLUNKAPI Exception : public std::exception
+	{
+	public:
+		Exception() throw() {}
+		void add_message(const char *file, int line);
+		void add_message(const std::string &msg);
+		virtual void add_custom_message() {}
 
-        virtual ~Exception() throw() {}
-        virtual const char* what() const throw() { return message.c_str(); }
-    private:
-        std::string message;
-    };
+		virtual ~Exception() throw() {}
+		virtual const char* what() const throw() { return message.c_str(); }
+	private:
+		std::string message;
+	};
 
-    class CLUNKAPI IOException : public Exception
-    {
-    public:
-        virtual void add_custom_message();
-    };
+	class CLUNKAPI IOException : public Exception
+	{
+	public:
+		virtual void add_custom_message();
+	};
 }
 
 #define throw_generic(ex_cl, fmt) { ex_cl e; e.add_message(__FILE__, __LINE__); e.add_message(clunk::format_string fmt ); e.add_custom_message(); throw e; }

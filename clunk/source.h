@@ -27,62 +27,62 @@
 namespace clunk
 {
 
-    class Sample;
-    class Buffer;
+	class Sample;
+	class Buffer;
 
-    //!class holding information about source.
-    class CLUNKAPI Source
-    {
-    public:
-        ///pointer to the sample holding audio data
-        const Sample * const sample;
+	//!class holding information about source.
+	class CLUNKAPI Source
+	{
+	public:
+		///pointer to the sample holding audio data
+		const Sample * const sample;
 
-        ///loop flag
-        bool loop;
-        ///delta position from the object's center
-        v3f delta_position; //0 - from the center of the object.
-        ///gain
-        float gain;
-        ///pitch, 2.0f - pitching up one octave
-        float pitch;
-        /*!
-                panning. -1.0f = 2 * vol in left channel, 0 in right. +1.0f = no sound in left channel, 2 * vol in right.
-                note: panning is actually applied on mono samples in center(listener) position.
-        */
-        float panning;
-        /*!
-                \brief constructs new source
-                \param[in] sample audio data
-                \param[in] loop loops sample
-                \param[in] delta delta position. (0, 0) is the object's center.
-                \param[in] gain gain
-                \param[in] pitch pitch
-        */
-        Source(const Sample * sample, const bool loop = false, const v3f &delta = v3f(), float gain = 1, float pitch = 1, float panning = 0);
-        ///returns current source's status.
-        bool playing() const;
+		///loop flag
+		bool loop;
+		///delta position from the object's center
+		v3f delta_position; //0 - from the center of the object.
+		///gain
+		float gain;
+		///pitch, 2.0f - pitching up one octave
+		float pitch;
+		/*!
+				panning. -1.0f = 2 * vol in left channel, 0 in right. +1.0f = no sound in left channel, 2 * vol in right.
+				note: panning is actually applied on mono samples in center(listener) position.
+		*/
+		float panning;
+		/*!
+				\brief constructs new source
+				\param[in] sample audio data
+				\param[in] loop loops sample
+				\param[in] delta delta position. (0, 0) is the object's center.
+				\param[in] gain gain
+				\param[in] pitch pitch
+		*/
+		Source(const Sample * sample, const bool loop = false, const v3f &delta = v3f(), float gain = 1, float pitch = 1, float panning = 0);
+		///returns current source's status.
+		bool playing() const;
 
-        ///fades out source. usually you do not need this method
-        void fade_out(float sec);
+		///fades out source. usually you do not need this method
+		void fade_out(float sec);
 
-        ~Source();
+		~Source();
 
-        /*!
-                \brief for the internal use only. DO NOT USE IT.
-                \internal for the internal use only.
-        */
-        void _update_position(int dp);
+		/*!
+				\brief for the internal use only. DO NOT USE IT.
+				\internal for the internal use only.
+		*/
+		void _update_position(int dp);
 
-        /*!
-                \brief for the internal use only. DO NOT USE IT.
-                \internal for the internal use only.
-        */
-        float _process(clunk::Buffer &buffer, unsigned ch, const v3f &position, float fx_volume, float pitch);
+		/*!
+				\brief for the internal use only. DO NOT USE IT.
+				\internal for the internal use only.
+		*/
+		float _process(clunk::Buffer &buffer, unsigned ch, const v3f &position, float fx_volume, float pitch);
 
-    private:
-        int position, fadeout, fadeout_total;
-        Hrtf _hrtf;
-    };
+	private:
+		int position, fadeout, fadeout_total;
+		Hrtf _hrtf;
+	};
 }
 
 #endif
