@@ -76,7 +76,7 @@ int main(int argc, char **argv)
 	if (argv[1][0] == 'f')
 	{
 		int bits = atoi(argv[2]);
-		std::auto_ptr<WavFile> wav(WavFile::load(argv[3]));
+		std::unique_ptr<WavFile> wav(WavFile::load(argv[3]));
 		if (wav->spec().format != AudioSpec::S16)
 			throw std::runtime_error("only s16 samples supported");
 		if (wav->spec().channels != 1)

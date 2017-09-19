@@ -1,4 +1,5 @@
 The CLUNK C++ library provides support for real-time 3D(binaural) sound
 generation.
 
+v2.0 - refactoring and c++11 port
 v1.3.0 - now with or without SDL. C API is broken beyond repair.
