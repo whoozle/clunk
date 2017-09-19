@@ -134,7 +134,7 @@ private:
 	objects_type objects;
 	
 	struct stream_info {
-		stream_info() : stream(NULL), loop(false), gain(1.0f), paused(false), buffer() {}
+		stream_info() : stream(nullptr), loop(false), gain(1.0f), paused(false), buffer() {}
 		Stream *stream;
 		bool loop;
 		float gain;
