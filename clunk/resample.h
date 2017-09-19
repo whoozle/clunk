@@ -99,7 +99,7 @@ namespace clunk {
 				size_t src_size = src_data.get_size() / sizeof(typename SrcAudioFormat::Type) / src_format.channels;
 				size_t dst_size = (size_t)(src_size * (1.0f * dst_format.sample_rate / src_format.sample_rate));
 
-				dst_data.set_size(dst_size * dst_format.channels * sizeof(typename DstAudioFormat::Type));
+				dst_data.resize(dst_size * dst_format.channels * sizeof(typename DstAudioFormat::Type));
 				typename DstAudioFormat::Type *dst = static_cast<typename DstAudioFormat::Type *>(dst_data.get_ptr());
 				LOG_DEBUG(("converting %d:%u:%u (%u) -> %d:%u:%u (%u)",
 					src_format.sample_rate, 8 * (unsigned)sizeof(typename SrcAudioFormat::Type), src_format.channels, (unsigned)src_data.get_size(),

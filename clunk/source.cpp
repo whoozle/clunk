@@ -74,7 +74,7 @@ float Source::_process(clunk::Buffer &dst_buf, unsigned dst_ch, const v3f &delta
 
 	Buffer src_buf;
 	unsigned dst_n_plus_overlap = dst_n + Hrtf::WINDOW_SIZE;
-	src_buf.set_size(dst_ch * dst_n_plus_overlap * 2);
+	src_buf.resize(dst_ch * dst_n_plus_overlap * 2);
 	s16 * src_buf_ptr = static_cast<s16 *>(src_buf.get_ptr());
 	for(unsigned i = 0; i < dst_n_plus_overlap; ++i) {
 		for(unsigned c = 0; c < dst_ch; ++c) {

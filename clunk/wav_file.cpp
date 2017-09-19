@@ -54,7 +54,7 @@ namespace clunk {
 
 	void WavFile::read(Buffer &buffer, size_t size)
 	{
-		buffer.set_size(size);
+		buffer.resize(size);
 		if (fread(buffer.get_ptr(), 1, size, _f) != size)
 			throw std::runtime_error("read failed");
 	}

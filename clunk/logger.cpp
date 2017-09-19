@@ -52,7 +52,7 @@ const std::string clunk::format_string(const char *fmt, ...) {
 	clunk::Buffer buf;
 
     while(true) {
-		buf.set_size(size);
+		buf.resize(size);
 	    va_start(ap, fmt);    
     	int r = vsnprintf (static_cast<char *>(buf.get_ptr()), size - 1, fmt, ap);
 	    va_end(ap);

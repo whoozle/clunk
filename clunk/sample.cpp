@@ -36,7 +36,7 @@ void Sample::generateSine(const int freq, const float len) {
 	_spec.format = _context->get_spec().format;
 
 	unsigned size = ((int)(len * _spec.sample_rate)) * 2;
-	_data.set_size(size);
+	_data.resize(size);
 
 	static double a = 0;
 	double da = freq * 2 * M_PI / _spec.sample_rate;

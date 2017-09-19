@@ -142,7 +142,7 @@ void Context::process(void *stream, size_t size) {
 		
 		if (stream_info.buffer.get_size() > size) {
 			memmove(stream_info.buffer.get_ptr(), static_cast<u8 *>(stream_info.buffer.get_ptr()) + size, stream_info.buffer.get_size() - size);
-			stream_info.buffer.set_size(stream_info.buffer.get_size() - size);
+			stream_info.buffer.resize(stream_info.buffer.get_size() - size);
 		} else {
 			stream_info.buffer.free();
 		}
@@ -151,7 +151,7 @@ void Context::process(void *stream, size_t size) {
 	}
 	
 	clunk::Buffer buf;
-	buf.set_size(size);
+	buf.resize(size);
 	
 	//TIMESPY(("mixing sources"));
 	//LOG_DEBUG(("mixing %u sources", (unsigned)lsources.size()));

@@ -40,12 +40,12 @@ const Buffer& Buffer::operator=(const Buffer& c) {
 	}
 	assert(c._size > 0);
 
-	set_size(c.get_size());
+	resize(c.get_size());
 	memcpy(_ptr, c._ptr, c._size);
 	return *this;
 }
 
-void Buffer::set_size(size_t s) {
+void Buffer::resize(size_t s) {
 	if (s == _size)
 		return;
 	
@@ -96,7 +96,7 @@ void Buffer::append(const Buffer &other) {
 	size_t s1 = _size, s2 = other.get_size();
 	if (s2 == 0)
 		return;
-	set_size(s1 + s2);
+	resize(s1 + s2);
 	memcpy(static_cast<char *>(_ptr) + s1, other._ptr, s2);
 }
 
@@ -105,13 +105,13 @@ void Buffer::append(const void *data, const size_t data_size) {
 		return;
 
 	size_t s = _size;
-	set_size(s + data_size);
+	resize(s + data_size);
 	memcpy(static_cast<char *>(_ptr) + s, data, data_size);
 }
 
 
 void* Buffer::reserve(const int more) {
-	set_size(_size + more);
+	resize(_size + more);
 	return _ptr;
 }
 
@@ -174,7 +174,7 @@ void Buffer::pop(size_t n) {
 	}
 	
 	memmove(_ptr, static_cast<u8 *>(_ptr) + n, _size - n);
-	set_size(_size - n);
+	resize(_size - n);
 }
 
 void Buffer::unoptimize(void *data, size_t n) { }

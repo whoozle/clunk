@@ -44,7 +44,7 @@ namespace clunk {
 				\brief Instantly allocates 'size' memory
 				\param[in] size size of the memory buffer
 		*/
-		Buffer(int size): _ptr(nullptr), _size(0) { set_size(size); }
+		Buffer(int size): _ptr(nullptr), _size(0) { resize(size); }
 
 		//! Destructor, deallocates buffer if needed
 		~Buffer() { free(); }
@@ -76,7 +76,8 @@ namespace clunk {
 				reallocates buffer to the given size. May throw exception!
 				\param[in] s size of the new buffer.
 		*/
-		void set_size(size_t s);
+		void resize(size_t s);
+		void set_size(size_t s) { resize(s); } ///< @deprecated
 		/*! \brief Sets buffer content to a given data.
 				Copies given data to the buffer. Note, that functions allocates memory for a new buffer. Do not forget to deallocate 'p' if needed.
 				\param[in] p source pointer
