@@ -8,7 +8,7 @@ option(WITH_SDL "Use SDL backend" true)
 if (WITH_SDL)
 	find_package(SDL)
 endif()
-
+set (CMAKE_CXX_STANDARD 11)
 set(clunk_VERSION_MAJOR 1)
 set(clunk_VERSION_MINOR 3)
 
