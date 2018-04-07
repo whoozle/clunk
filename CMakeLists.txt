@@ -4,10 +4,17 @@ set(CMAKE_USE_RELATIVE_PATHS TRUE)
 
 option(BUILD_TEST "Build simple test application" false)
 option(WITH_SSE "Use highly optimized SSE FFT/MDCT routines" false)
-option(WITH_SDL "Use SDL backend" true)
-if (WITH_SDL)
-	find_package(SDL)
+option(WITH_SDL "Use SDL backend" false)
+option(WITH_SDL2 "Use SDL2 backend" true)
+
+if (WITH_SDL2)
+	message(STATUS "building with SDL2 support...")
+	find_package(SDL2 REQUIRED)
+elseif (WITH_SDL)
+	message(STATUS "building with SDL1 support...")
+	find_package(SDL REQUIRED)
 endif()
+
 set (CMAKE_CXX_STANDARD 11)
 set(clunk_VERSION_MAJOR 1)
 set(clunk_VERSION_MINOR 3)
@@ -32,7 +39,13 @@ endif(WIN32)
 
 add_definitions(-DCLUNKAPI=DLLEXPORT)
 set(CMAKE_INCLUDE_CURRENT_DIR TRUE)
-include_directories(${SDL_INCLUDE_DIR})
+if (SDL_FOUND)
+	include_directories(${SDL_INCLUDE_DIR})
+endif()
+
+if (SDL2_FOUND)
+	include_directories(${SDL2_INCLUDE_DIRS})
+endif()
 
 set(SOURCES
 	clunk/buffer.cpp
@@ -50,14 +63,13 @@ set(SOURCES
 #	clunk/clunk_c.cpp
 )
 
-if (SDL_FOUND)
+if (SDL_FOUND OR SDL2_FOUND)
 	set(CLUNK_BACKEND_SDL 1)
 	list(APPEND SOURCES
 		clunk/backend/sdl/sdl_ex.cpp
 		clunk/backend/sdl/backend.cpp
 	)
-endif (SDL_FOUND)
-
+endif ()
 
 set(PUBLIC_HEADERS
 	clunk/buffer.h
@@ -84,11 +96,11 @@ set(PUBLIC_HEADERS
 	${CMAKE_CURRENT_BINARY_DIR}/clunk/config.h
 )
 
-if (SDL_FOUND)
+if (SDL_FOUND OR SDL2_FOUND)
 	list(APPEND PUBLIC_HEADERS
 		clunk/backend/sdl/backend.h
 	)
-endif (SDL_FOUND)
+endif ()
 
 if (WITH_SSE)
 	set(SOURCES ${SOURCES} clunk/sse_fft_context.cpp)
@@ -113,10 +125,15 @@ if (SDL_FOUND)
     target_link_libraries(clunk ${SDL_LIBRARY})
 endif (SDL_FOUND)
 
+if (SDL2_FOUND)
+    target_link_libraries(clunk ${SDL2_LIBRARIES})
+endif (SDL2_FOUND)
+
 if(BUILD_TEST)
-	if (NOT SDL_FOUND)
+	if (NOT SDL_FOUND AND NOT SDL2_FOUND)
 		message(FATAL_ERROR "you need SDL library to build test")
-	endif (NOT SDL_FOUND)
+	endif ()
+
 	add_executable(clunk-test test.cpp)
 	target_link_libraries(clunk-test clunk)
 
