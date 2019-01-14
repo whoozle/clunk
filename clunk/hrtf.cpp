@@ -19,13 +19,13 @@
 #include <clunk/hrtf.h>
 #include <clunk/buffer.h>
 #include <clunk/clunk_ex.h>
-#include <stddef.h>
 #include <algorithm>
+#include <stddef.h>
+#include <math.h>
 
 #include "kemar.h"
 
 #if defined _MSC_VER || __APPLE__ || __FreeBSD__
-#	define pow10f(x) powf(10.0f, (x))
 #	define log2f(x) (logf(x) / M_LN2)
 #endif
 
@@ -62,7 +62,7 @@ void Hrtf::idt_iit(const v3f &position, float &idt_offset, float &angle_gr, floa
 
 	//LOG_DEBUG(("idt_angle = %g (%d)", idt_angle, (int)(idt_angle * 180 / M_PI)));
 	idt_offset = - head_r * (idt_angle + sin(idt_angle)) / 344;
-	left_to_right_amp = pow10f(-sin(idt_angle));
+	left_to_right_amp = powf(10, -sin(idt_angle));
 	//LOG_DEBUG(("idt_offset %g, left_to_right_amp: %g", idt_offset, left_to_right_amp));
 }
 
