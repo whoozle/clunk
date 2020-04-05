@@ -37,7 +37,7 @@ SOFTWARE.
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
@@ -137,14 +137,14 @@ namespace clunk {
 				if (dst_size == 0)
 					return;
 
-				int error = dst_size / 2;
+				int error = 2 * src_size - dst_size;
 				for(size_t i = 0; i < dst_size; ++i) {
 					ChannelResampler::resample(dst, src);
-					error -= src_size;
-					if (error < 0) {
+					if (error > 0) {
 						src += src_format.channels;
-						error += dst_size;
+						error -= 2 * dst_size;
 					}
+					error += 2 * src_size;
 				}
 			}
 		};
