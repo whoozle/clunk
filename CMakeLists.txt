@@ -108,11 +108,12 @@ if (WITH_SSE)
 endif(WITH_SSE)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clunk/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/clunk/config.h)
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 add_library(clunk SHARED
 	${SOURCES}
 )
+
+target_include_directories(clunk PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 
 add_library(clunk-static STATIC
 	${SOURCES}
