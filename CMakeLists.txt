@@ -114,10 +114,13 @@ add_library(clunk SHARED
 )
 
 target_include_directories(clunk PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(clunk PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_library(clunk-static STATIC
 	${SOURCES}
 )
+target_include_directories(clunk-static PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(clunk-static PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 install(TARGETS clunk DESTINATION lib)
 install(FILES ${PUBLIC_HEADERS} DESTINATION include/clunk)
