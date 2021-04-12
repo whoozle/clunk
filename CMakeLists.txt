@@ -1,5 +1,5 @@
 project(clunk)
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8.12)
 set(CMAKE_USE_RELATIVE_PATHS TRUE)
 
 option(BUILD_TEST "Build simple test application" false)
