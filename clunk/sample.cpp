@@ -1,4 +1,4 @@
-/*
+ /*
 MIT License
 
 Copyright (c) 2008-2019 Netive Media Group & Vladimir Menshakov
@@ -46,7 +46,7 @@ void Sample::generateSine(const int freq, const float len) {
 	static double a = 0;
 	double da = freq * 2 * M_PI / _spec.sample_rate;
 	//LOG_DEBUG(("da = %g", da));
-	
+
 	int n = size / 2;
 
 	s16 * stream = static_cast<s16 *>(_data.get_ptr());

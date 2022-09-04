@@ -39,7 +39,7 @@ Backend::Backend(int sample_rate, const u8 channels, int period_size) {
 		if (SDL_InitSubSystem(SDL_INIT_AUDIO) == -1)
 			throw_sdl(("SDL_InitSubSystem"));
 	}
-	
+
 	SDL_AudioSpec src;
 	memset(&src, 0, sizeof(src));
 	src.freq = sample_rate;
@@ -48,7 +48,7 @@ Backend::Backend(int sample_rate, const u8 channels, int period_size) {
 	src.samples = period_size;
 	src.callback = &Backend::callback;
 	src.userdata = this;
-	
+
 	if ( SDL_OpenAudio(&src, &_spec) < 0 )
 		throw_sdl(("SDL_OpenAudio(%d, %u, %d)", sample_rate, channels, period_size));
 	if (_spec.format != AUDIO_S16SYS)
