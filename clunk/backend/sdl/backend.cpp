@@ -68,7 +68,7 @@ void Backend::start()
 void Backend::stop()
 {
 	LOG_DEBUG(("stopping output"));
-	SDL_PauseAudio(0);
+	SDL_PauseAudio(1);
 }
 
 Backend::~Backend() {
